@@ -1,0 +1,25 @@
+{
+  "name": "HTiSA – Duaal Leren To The Rescue",
+  "short_name": "HTiSA Rescue",
+  "description": "SOS hulp en aanwezigheidskalender voor duaal leren leerlingen van HTiSA",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2596be",
+  "orientation": "portrait",
+  "lang": "nl",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

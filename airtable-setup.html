@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTiSA – Airtable Setup</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f9fc;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
+  .card{background:white;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.10);padding:32px;max-width:480px;width:100%;}
+  .logo{background:#2596be;color:white;font-size:22px;font-weight:900;padding:8px 14px;border-radius:8px;display:inline-block;margin-bottom:20px;}
+  h1{font-size:20px;font-weight:700;color:#0d2b38;margin-bottom:6px;}
+  p{font-size:13px;color:#5b8fa0;line-height:1.6;margin-bottom:20px;}
+  .step{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #e8f4f8;}
+  .step:last-child{border-bottom:none;}
+  .step-icon{font-size:18px;flex-shrink:0;width:28px;text-align:center;margin-top:1px;}
+  .step-text{flex:1;}
+  .step-name{font-size:13px;font-weight:600;color:#0d2b38;display:block;}
+  .step-status{font-size:12px;color:#5b8fa0;display:block;margin-top:2px;}
+  .step-status.ok{color:#2e7d32;font-weight:600;}
+  .step-status.err{color:#c62828;font-weight:600;}
+  .step-status.running{color:#2596be;}
+  .btn{width:100%;background:#2596be;color:white;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;margin-top:20px;transition:background .15s;}
+  .btn:hover{background:#1a7295;}
+  .btn:disabled{background:#a0cfe0;cursor:not-allowed;}
+  .result{margin-top:16px;padding:12px 14px;border-radius:8px;font-size:13px;font-weight:600;display:none;}
+  .result.ok{background:#e8f5e9;color:#2e7d32;border:1px solid #4caf50;}
+  .result.err{background:#ffebee;color:#c62828;border:1px solid #e57373;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">HTiSA</div>
+  <h1>Airtable automatisch instellen</h1>
+  <p>Klik op de knop hieronder. De pagina maakt automatisch alle velden aan in jouw Airtable-tabel.</p>
+
+  <div id="steps">
+    <div class="step" id="s0">
+      <span class="step-icon">🔍</span>
+      <span class="step-text">
+        <span class="step-name">Verbinding controleren</span>
+        <span class="step-status" id="st0">Wacht op start...</span>
+      </span>
+    </div>
+    <div class="step" id="s1">
+      <span class="step-icon">📝</span>
+      <span class="step-text">
+        <span class="step-name">Veld "Leerling" (tekst)</span>
+        <span class="step-status" id="st1">Wacht...</span>
+      </span>
+    </div>
+    <div class="step" id="s2">
+      <span class="step-icon">📅</span>
+      <span class="step-text">
+        <span class="step-name">Veld "Datum" (datum)</span>
+        <span class="step-status" id="st2">Wacht...</span>
+      </span>
+    </div>
+    <div class="step" id="s3">
+      <span class="step-icon">🔵</span>
+      <span class="step-text">
+        <span class="step-name">Veld "Status" (keuzelijst)</span>
+        <span class="step-status" id="st3">Wacht...</span>
+      </span>
+    </div>
+    <div class="step" id="s4">
+      <span class="step-icon">💬</span>
+      <span class="step-text">
+        <span class="step-name">Veld "Opmerking" (lange tekst)</span>
+        <span class="step-status" id="st4">Wacht...</span>
+      </span>
+    </div>
+    <div class="step" id="s5">
+      <span class="step-icon">🏭</span>
+      <span class="step-text">
+        <span class="step-name">Veld "Werkgever" (tekst)</span>
+        <span class="step-status" id="st5">Wacht...</span>
+      </span>
+    </div>
+  </div>
+
+  <button class="btn" id="start-btn" onclick="runSetup()">▶ Start automatische setup</button>
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+const TOKEN = 'patF9mAQo7N9aJeHD.cdba4d69632eb2c9d34de28825bb05303a9ccaf685e86f8336654c8d61000f60';
+const BASE  = 'appN0oikU56MoIJpJ';
+const TABLE = 'tbl3Zbf2z8Ud37mJd';
+const META_URL = `https://api.airtable.com/v0/meta/bases/${BASE}/tables/${TABLE}/fields`;
+const HEADERS = { 'Authorization': `Bearer ${TOKEN}`, 'Content-Type': 'application/json' };
+
+function setStatus(i, msg, cls) {
+  const el = document.getElementById('st' + i);
+  el.textContent = msg;
+  el.className = 'step-status ' + (cls || '');
+}
+
+async function fieldExists(name) {
+  const resp = await fetch(`https://api.airtable.com/v0/meta/bases/${BASE}/tables`, { headers: HEADERS });
+  const data = await resp.json();
+  const table = (data.tables || []).find(t => t.id === TABLE);
+  if (!table) return false;
+  return (table.fields || []).some(f => f.name === name);
+}
+
+async function createField(name, type, options) {
+  const body = { name, type, ...options };
+  const resp = await fetch(META_URL, {
+    method: 'POST',
+    headers: HEADERS,
+    body: JSON.stringify(body)
+  });
+  return resp;
+}
+
+async function renameFirstField() {
+  // The first field "Name" needs to be renamed to "Leerling" via PATCH
+  const tResp = await fetch(`https://api.airtable.com/v0/meta/bases/${BASE}/tables`, { headers: HEADERS });
+  const tData = await tResp.json();
+  const table = (tData.tables || []).find(t => t.id === TABLE);
+  if (!table) return false;
+  const firstField = table.fields && table.fields[0];
+  if (!firstField) return false;
+  if (firstField.name === 'Leerling') return true; // already renamed
+  const resp = await fetch(`https://api.airtable.com/v0/meta/bases/${BASE}/tables/${TABLE}/fields/${firstField.id}`, {
+    method: 'PATCH',
+    headers: HEADERS,
+    body: JSON.stringify({ name: 'Leerling' })
+  });
+  return resp.ok;
+}
+
+async function runSetup() {
+  document.getElementById('start-btn').disabled = true;
+  document.getElementById('result').style.display = 'none';
+
+  try {
+    // Step 0: Check connection
+    setStatus(0, 'Verbinding maken...', 'running');
+    const ping = await fetch(`https://api.airtable.com/v0/meta/bases/${BASE}/tables`, { headers: HEADERS });
+    if (!ping.ok) throw new Error('Verbinding mislukt. Controleer je token.');
+    setStatus(0, '✓ Verbonden met Airtable', 'ok');
+
+    // Step 1: Rename "Name" → "Leerling"
+    setStatus(1, 'Aanmaken of hernoemen...', 'running');
+    const exists1 = await fieldExists('Leerling');
+    if (exists1) {
+      setStatus(1, '✓ Bestaat al — overgeslagen', 'ok');
+    } else {
+      const ok = await renameFirstField();
+      if (ok) setStatus(1, '✓ Aangemaakt', 'ok');
+      else setStatus(1, '⚠ Handmatig hernoemen naar "Leerling"', 'err');
+    }
+
+    // Step 2: Datum
+    setStatus(2, 'Aanmaken...', 'running');
+    const exists2 = await fieldExists('Datum');
+    if (exists2) { setStatus(2, '✓ Bestaat al — overgeslagen', 'ok'); }
+    else {
+      const r = await createField('Datum', 'date', { options: { dateFormat: { name: 'iso' } } });
+      r.ok ? setStatus(2, '✓ Aangemaakt', 'ok') : setStatus(2, '❌ Fout: ' + (await r.text()), 'err');
+    }
+
+    // Step 3: Status (single select)
+    setStatus(3, 'Aanmaken...', 'running');
+    const exists3 = await fieldExists('Status');
+    if (exists3) { setStatus(3, '✓ Bestaat al — overgeslagen', 'ok'); }
+    else {
+      const r = await createField('Status', 'singleSelect', {
+        options: {
+          choices: [
+            { name: 'Aanwezig', color: 'greenLight2' },
+            { name: 'Afwezig',  color: 'redLight2'   },
+            { name: 'Te laat',  color: 'orangeLight2' }
+          ]
+        }
+      });
+      r.ok ? setStatus(3, '✓ Aangemaakt (Aanwezig / Afwezig / Te laat)', 'ok') : setStatus(3, '❌ Fout: ' + (await r.text()), 'err');
+    }
+
+    // Step 4: Opmerking
+    setStatus(4, 'Aanmaken...', 'running');
+    const exists4 = await fieldExists('Opmerking');
+    if (exists4) { setStatus(4, '✓ Bestaat al — overgeslagen', 'ok'); }
+    else {
+      const r = await createField('Opmerking', 'multilineText', {});
+      r.ok ? setStatus(4, '✓ Aangemaakt', 'ok') : setStatus(4, '❌ Fout: ' + (await r.text()), 'err');
+    }
+
+    // Step 5: Werkgever
+    setStatus(5, 'Aanmaken...', 'running');
+    const exists5 = await fieldExists('Werkgever');
+    if (exists5) { setStatus(5, '✓ Bestaat al — overgeslagen', 'ok'); }
+    else {
+      const r = await createField('Werkgever', 'singleLineText', {});
+      r.ok ? setStatus(5, '✓ Aangemaakt', 'ok') : setStatus(5, '❌ Fout: ' + (await r.text()), 'err');
+    }
+
+    // Done!
+    const res = document.getElementById('result');
+    res.className = 'result ok';
+    res.textContent = '🎉 Setup voltooid! Je Airtable is klaar. Je kunt deze pagina sluiten en de app gebruiken.';
+    res.style.display = 'block';
+
+  } catch (e) {
+    const res = document.getElementById('result');
+    res.className = 'result err';
+    res.textContent = '❌ Fout: ' + e.message;
+    res.style.display = 'block';
+    document.getElementById('start-btn').disabled = false;
+  }
+}
+</script>
+</body>
+</html>

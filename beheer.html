@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="HTiSA Beheer">
+<meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="manifest-beheer.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>HTiSA – Werkgever & Begeleider</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+  .logo{width:160px;height:160px;object-fit:contain;margin-bottom:16px;animation:pop .6s cubic-bezier(0.34,1.56,0.64,1) forwards;}
+  @keyframes pop{from{transform:scale(0.8);opacity:0;}to{transform:scale(1);opacity:1;}}
+  h1{font-size:22px;font-weight:800;color:#2596be;margin-bottom:6px;text-align:center;}
+  p{font-size:14px;color:#5b8fa0;text-align:center;margin-bottom:24px;line-height:1.6;}
+  .rol-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:320px;margin-bottom:20px;}
+  .rol-btn{background:#fff;border:1.5px solid #c2dfe9;border-radius:12px;padding:16px 8px;font-size:13px;font-weight:700;color:#0d2b38;cursor:pointer;text-align:center;text-decoration:none;transition:all .15s;display:block;}
+  .rol-btn:hover{border-color:#2596be;background:#eef7fb;color:#2596be;}
+  .rol-btn .ico{font-size:28px;display:block;margin-bottom:6px;}
+  .install-tip{background:#eef7fb;border:1.5px solid #c2dfe9;border-radius:10px;padding:14px;max-width:320px;}
+  .install-tip-titel{font-size:12px;font-weight:800;color:#2596be;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
+  .install-stap{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#2a6070;margin-bottom:6px;line-height:1.5;}
+  .install-stap:last-child{margin-bottom:0;}
+  .install-ico{flex-shrink:0;font-size:16px;}
+</style>
+</head>
+<body>
+<img src="icons/icon-512.png" class="logo" alt="HTiSA logo"/>
+<h1>HTiSA – Duaal Leren</h1>
+<p>Beheer aanwezigheden en volg leerlingen op.<br>Kies jouw rol:</p>
+
+<div class="rol-grid">
+  <a href="index.html" class="rol-btn" onclick="clearLeerlingRol()">
+    <span class="ico">🏭</span>Werkgever
+  </a>
+  <a href="index.html" class="rol-btn" onclick="clearLeerlingRol()">
+    <span class="ico">👨‍🏫</span>Begeleider
+  </a>
+</div>
+
+<div class="install-tip">
+  <div class="install-tip-titel">📲 Installeer op je startscherm</div>
+  <div class="install-stap"><span class="install-ico">1️⃣</span><span>Open <strong>deze pagina</strong> in Safari (iPhone) of Chrome (Android)</span></div>
+  <div class="install-stap"><span class="install-ico">2️⃣</span><span><strong>iPhone:</strong> tik op ⎋ → "Zet op beginscherm"<br><strong>Android:</strong> tik op ⋮ → "App installeren"</span></div>
+  <div class="install-stap"><span class="install-ico">3️⃣</span><span>Tik op <strong>"Voeg toe"</strong> — klaar!</span></div>
+</div>
+
+<script>
+function clearLeerlingRol(){
+  // Zorg dat deze gebruiker NIET als leerling herkend wordt
+  localStorage.removeItem('htisa_rol');
+}
+// Verwijder leerling-rol als die eventueel al ingesteld was
+localStorage.removeItem('htisa_rol');
+</script>
+</body>
+</html>
