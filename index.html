@@ -633,8 +633,20 @@
     <div id="view-werkgever" style="display:none;">
       <div style="font-size:16px;font-weight:800;color:var(--htisa-text);margin-bottom:14px;">🏭 Aanwezigheid registreren</div>
       <div class="panel open" style="margin-bottom:10px;">
+
         <label class="form-label">Naam leerling</label>
-        <input class="form-input" id="wg-leerling" type="text" placeholder="bv. Ahmed El Mansouri" style="margin-bottom:10px;"/>
+        <!-- Dropdown als er leerlingen opgeslagen zijn, anders tekstveld -->
+        <div id="wg-leerling-wrap" style="margin-bottom:10px;">
+          <div style="display:flex;gap:6px;">
+            <select class="form-input" id="wg-leerling-select" style="margin-bottom:0;flex:1;display:none;" onchange="wgSelectLeerling(this.value)">
+              <option value="">— Kies een leerling —</option>
+            </select>
+            <input class="form-input" id="wg-leerling" type="text" placeholder="bv. Ahmed El Mansouri" style="margin-bottom:0;flex:1;"/>
+            <button onclick="wgToggleLeerlingInput()" id="wg-leerling-toggle" style="background:var(--htisa);border:none;color:white;border-radius:6px;padding:0 10px;font-size:16px;cursor:pointer;flex-shrink:0;" title="Nieuwe leerling toevoegen">+</button>
+          </div>
+          <div id="wg-leerling-lijst" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;"></div>
+        </div>
+
         <label class="form-label">Datum</label>
         <input class="form-input" id="wg-datum" type="date" style="margin-bottom:10px;"/>
         <label class="form-label">Status</label>
@@ -1385,10 +1397,96 @@ function renderLeerlingCal(records){
 }
 
 // WERKGEVER
+var wgLeerlingen = JSON.parse(localStorage.getItem('htisa_wg_leerlingen') || '[]');
+var wgNieuwModus = false;
+
+function renderWgLeerlingen() {
+  var select = document.getElementById('wg-leerling-select');
+  var input  = document.getElementById('wg-leerling');
+  var toggle = document.getElementById('wg-leerling-toggle');
+  var lijst  = document.getElementById('wg-leerling-lijst');
+
+  // Bouw dropdown
+  select.innerHTML = '<option value="">— Kies een leerling —</option>';
+  wgLeerlingen.forEach(function(naam) {
+    var opt = document.createElement('option');
+    opt.value = naam; opt.textContent = naam;
+    select.appendChild(opt);
+  });
+
+  if(wgLeerlingen.length > 0 && !wgNieuwModus) {
+    // Toon dropdown, verberg tekstveld
+    select.style.display = 'block';
+    input.style.display  = 'none';
+    toggle.textContent   = '+';
+    toggle.title         = 'Nieuwe leerling toevoegen';
+    // Herselecteer vorige leerling
+    var last = localStorage.getItem('htisa_wg_last_leerling');
+    if(last) select.value = last;
+  } else {
+    // Toon tekstveld
+    select.style.display = 'none';
+    input.style.display  = 'block';
+    input.value = '';
+    toggle.textContent = wgLeerlingen.length > 0 ? '←' : '';
+    toggle.title = 'Terug naar lijst';
+    toggle.style.display = wgLeerlingen.length > 0 ? 'block' : 'none';
+  }
+
+  // Toon leerlingen als verwijderbare chips
+  lijst.innerHTML = '';
+  if(wgLeerlingen.length > 0 && !wgNieuwModus) {
+    lijst.innerHTML = '<span style="font-size:10px;color:var(--htisa-muted);width:100%;display:block;margin-bottom:3px;">Opgeslagen leerlingen:</span>';
+    wgLeerlingen.forEach(function(naam) {
+      var chip = document.createElement('span');
+      chip.style.cssText = 'background:var(--htisa-pale);border:1px solid var(--htisa-border);border-radius:12px;padding:2px 8px;font-size:11px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;';
+      chip.innerHTML = naam + ' <span style="color:var(--s-ko);font-weight:700;cursor:pointer;" onclick="wgVerwijderLeerling(\''+naam.replace(/'/g,"\\'")+'\')" title="Verwijder">×</span>';
+      lijst.appendChild(chip);
+    });
+  }
+}
+
+function wgSelectLeerling(naam) {
+  if(naam) localStorage.setItem('htisa_wg_last_leerling', naam);
+}
+
+function wgToggleLeerlingInput() {
+  wgNieuwModus = !wgNieuwModus;
+  renderWgLeerlingen();
+  if(wgNieuwModus) document.getElementById('wg-leerling').focus();
+}
+
+function wgVerwijderLeerling(naam) {
+  wgLeerlingen = wgLeerlingen.filter(function(n){ return n !== naam; });
+  localStorage.setItem('htisa_wg_leerlingen', JSON.stringify(wgLeerlingen));
+  if(localStorage.getItem('htisa_wg_last_leerling') === naam) localStorage.removeItem('htisa_wg_last_leerling');
+  renderWgLeerlingen();
+}
+
+function wgGetLeerlingNaam() {
+  if(wgLeerlingen.length > 0 && !wgNieuwModus) {
+    return document.getElementById('wg-leerling-select').value;
+  }
+  return document.getElementById('wg-leerling').value.trim();
+}
+
+function wgSlaLeerlingOp(naam) {
+  if(naam && !wgLeerlingen.includes(naam)) {
+    wgLeerlingen.push(naam);
+    localStorage.setItem('htisa_wg_leerlingen', JSON.stringify(wgLeerlingen));
+  }
+  localStorage.setItem('htisa_wg_last_leerling', naam);
+  wgNieuwModus = false;
+  renderWgLeerlingen();
+  document.getElementById('wg-leerling-select').value = naam;
+}
+
 function showWerkgeverView(){
   document.getElementById('view-werkgever').style.display='block';
   document.getElementById('wg-datum').value=new Date().toISOString().split('T')[0];
   document.getElementById('wg-naam').value=localStorage.getItem('htisa_wg_naam')||'';
+  wgNieuwModus = false;
+  renderWgLeerlingen();
 }
 function selectStatus(s){
   selectedStatusWg=s;
@@ -1397,7 +1495,7 @@ function selectStatus(s){
   document.getElementById('sb-'+map[s]).classList.add('selected');
 }
 async function saveAanwezigheid(){
-  var leerling=document.getElementById('wg-leerling').value.trim();
+  var leerling=wgGetLeerlingNaam();
   var datum=document.getElementById('wg-datum').value;
   var opmerking=document.getElementById('wg-opmerking').value.trim();
   var werkgever=document.getElementById('wg-naam').value.trim();
@@ -1419,9 +1517,10 @@ async function saveAanwezigheid(){
       resp=await fetch(AT_URL,{method:'POST',headers:{'Authorization':'Bearer '+AT_TOKEN,'Content-Type':'application/json'},body:JSON.stringify({fields:fields})});
     }
     if(resp.ok){
+      // Sla leerling op voor volgende keer
+      wgSlaLeerlingOp(leerling);
       fb.style.color='var(--s-ok)';
       fb.textContent='✅ Opgeslagen! '+selectedStatusWg+' — '+leerling+' — '+datum;
-      document.getElementById('wg-leerling').value='';
       document.getElementById('wg-opmerking').value='';
       selectedStatusWg='';
       ['aanwezig','afwezig','telaat'].forEach(function(id){document.getElementById('sb-'+id).classList.remove('selected');});
