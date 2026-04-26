@@ -1,4 +1,4 @@
-const CACHE_NAME = 'htisa-rescue-v2';
+const CACHE_NAME = 'htisa-rescue-v3';
 const BASE = '/htisa-app';
 const ASSETS = [
   BASE + '/index.html',
