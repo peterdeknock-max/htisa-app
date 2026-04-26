@@ -850,7 +850,6 @@ function openContactForm(type){
   editingContact = type;
   var lbl = cfLabels[type];
   document.getElementById('contact-form-title').textContent = lbl.title;
-  document.querySelector('#contact-form label[for-field="naam"]') // use generic labels below
   document.getElementById('cf-naam').value = contacts[type].naam || '';
   document.getElementById('cf-tel').value  = contacts[type].tel  || '';
   document.getElementById('cf-naam').placeholder = lbl.naamph;
