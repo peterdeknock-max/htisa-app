@@ -1,8 +1,8 @@
 {
-  "name": "HTiSA – Duaal Leren",
+  "name": "HTiSA \u2013 Duaal Leren",
   "short_name": "HTiSA Leerling",
   "description": "SOS hulp op de werkvloer voor leerlingen HTiSA",
-  "start_url": "/leerling.html",
+  "start_url": "/htisa-app/leerling.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2596be",
@@ -21,5 +21,6 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "scope": "/htisa-app/"
 }
