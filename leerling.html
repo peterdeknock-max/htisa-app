@@ -8,100 +8,1522 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="HTiSA Rescue">
 <meta name="theme-color" content="#ffffff">
-<link rel="manifest" href="manifest-leerling.json">
+<link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<title>HTiSA – Duaal Leren</title>
+<title>HTiSA – Duaal Leren To The Rescue</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
+  :root {
+    --htisa:#2596be; --htisa-dark:#1a7295; --htisa-darker:#115470;
+    --htisa-pale:#eef7fb; --htisa-white:#ffffff;
+    --htisa-off:#f5f9fb; --htisa-border:#c2dfe9; --htisa-border2:#a0cfe0;
+    --htisa-text:#0d2b38; --htisa-sec:#2a6070; --htisa-muted:#5b8fa0;
+    --lb:#6a3b9c; --lb-dark:#4e2a74;
+    --fris:#c07c1a; --fris-bg:#fffbeb; --fris-border:#f59e0b;
+    --veilig:#0f766e; --veilig-bg:#f0fdfa; --veilig-border:#14b8a6;
+    --lijn:#E8000D; --lijn-bg:#fff0f0;
+    --nmbs:#00529C; --nmbs-bg:#e8f0f8;
+    --s-ok:#2e7d32; --s-ok-bg:#e8f5e9;
+    --s-ko:#c62828; --s-ko-bg:#ffebee;
+    --s-late:#e65100; --s-late-bg:#fff3e0;
+    --s-info:#1565c0; --s-info-bg:#e3f0fc;
+    --font:'Barlow',Arial,sans-serif; --r:10px;
+  }
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
-  .logo{width:160px;height:160px;object-fit:contain;margin-bottom:16px;animation:pop .6s cubic-bezier(0.34,1.56,0.64,1) forwards;}
-  @keyframes pop{from{transform:scale(0.8);opacity:0;}to{transform:scale(1);opacity:1;}}
-  h1{font-size:22px;font-weight:800;color:#2596be;margin-bottom:6px;text-align:center;}
-  p{font-size:14px;color:#5b8fa0;text-align:center;margin-bottom:20px;line-height:1.6;}
-  .rol-grid{display:grid;grid-template-columns:1fr;gap:10px;width:100%;max-width:320px;margin-bottom:16px;}
-  .btn{display:block;width:100%;background:#2596be;color:white;border:none;border-radius:12px;padding:14px 16px;font-size:15px;font-weight:700;cursor:pointer;text-align:left;text-decoration:none;transition:background .15s;display:flex;align-items:center;gap:12px;}
-  .btn:hover{background:#1a7295;}
-  .btn.werkgever{background:#f59e0b;}
-  .btn.werkgever:hover{background:#d97706;}
-  .btn.begeleider{background:#7b1fa2;}
-  .btn.begeleider:hover{background:#6a1891;}
-  .btn-ico{font-size:24px;}
+  html{height:100%;}
+  body{background:var(--htisa-off);font-family:var(--font);min-height:100%;padding-bottom:env(safe-area-inset-bottom);}
+  .app{max-width:480px;margin:0 auto;padding:0 0 2.5rem;}
+  .app-header{background:var(--htisa);padding:20px 18px 18px;position:relative;overflow:hidden;}
+  .app-header::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,0.08);}
+  .app-header::after{content:'';position:absolute;bottom:-25px;left:30%;width:200px;height:70px;border-radius:50%;background:rgba(255,255,255,0.05);}
+  .header-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;position:relative;z-index:1;}
+  .logo-block{background:var(--htisa-white);border-radius:8px;padding:8px 12px;display:inline-flex;flex-direction:column;align-items:flex-start;}
+  .logo-main{font-size:22px;font-weight:900;color:var(--htisa);letter-spacing:-0.5px;line-height:1;}
+  .logo-main em{font-style:italic;font-weight:400;font-size:20px;}
+  .duaal-badge{background:#FFE900;border-radius:8px;padding:5px 8px;display:flex;align-items:center;justify-content:center;}
+  .duaal-badge img{height:44px;width:44px;object-fit:contain;display:block;}
+  .header-title{font-size:24px;font-weight:900;color:#fff;line-height:1.15;position:relative;z-index:1;}
+  .header-title span{font-size:13px;font-weight:500;color:rgba(255,255,255,0.75);display:block;margin-top:3px;}
+  .tabs-wrap{background:var(--htisa-white);border-bottom:2px solid var(--htisa-border);padding:0 16px;display:flex;}
+  .tab{padding:13px 18px;font-size:12px;font-weight:800;color:var(--htisa-muted);cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;margin-bottom:-2px;text-transform:uppercase;letter-spacing:0.08em;font-family:var(--font);transition:color .15s;}
+  .tab.active{color:var(--htisa);border-bottom-color:var(--htisa);}
+  .tab:hover:not(.active){color:var(--htisa-text);}
+  .view{display:none;padding:16px;}
+  .view.active{display:block;}
+  .contacts-bar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:16px;}
+  .contact-card{background:var(--htisa-white);border:1.5px solid var(--htisa-border);border-radius:var(--r);padding:8px 6px;min-width:0;}
+  .contact-label{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .contact-label.blue{color:var(--htisa);} .contact-label.purple{color:var(--lb);} .contact-label.dark{color:var(--htisa-darker);}
+  .contact-name{font-size:11px;font-weight:700;color:var(--htisa-text);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .call-btn{display:flex;align-items:center;justify-content:center;gap:3px;width:100%;border:none;border-radius:6px;padding:7px 4px;font-size:10px;font-weight:700;color:#fff;cursor:pointer;text-decoration:none;font-family:var(--font);transition:background .15s;white-space:nowrap;overflow:hidden;}
+  .call-btn.blue{background:var(--htisa);} .call-btn.blue:hover{background:var(--htisa-dark);}
+  .call-btn.purple{background:var(--lb);} .call-btn.purple:hover{background:var(--lb-dark);}
+  .call-btn.dark{background:var(--htisa-darker);} .call-btn.dark:hover{background:#000;}
+  .call-icon{display:none;}
+  .add-contact-card{background:var(--htisa-white);border:1.5px dashed var(--htisa-border2);border-radius:var(--r);padding:10px 11px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;transition:all .15s;}
+  .add-contact-card:hover{border-color:var(--htisa);background:var(--htisa-pale);}
+  .add-label{font-size:9px;font-weight:800;color:var(--htisa);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;}
+  .add-hint{font-size:11px;font-weight:600;color:var(--htisa-sec);}
+  .btn-edit{font-size:10px;color:var(--htisa);background:none;border:none;cursor:pointer;padding:0;font-weight:600;margin-top:4px;font-family:var(--font);text-decoration:underline;}
+  .add-form{display:none;background:var(--htisa-white);border:1.5px solid var(--htisa-border);border-radius:var(--r);padding:13px;margin-bottom:14px;}
+  .add-form.open{display:block;}
+  .form-label{font-size:10px;font-weight:800;color:var(--htisa-sec);margin-bottom:4px;display:block;text-transform:uppercase;letter-spacing:0.07em;}
+  .form-input{width:100%;padding:8px 11px;border:1.5px solid var(--htisa-border);border-radius:6px;font-size:13px;color:var(--htisa-text);background:var(--htisa-off);margin-bottom:9px;font-family:var(--font);}
+  .form-input:focus{outline:none;border-color:var(--htisa);}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .btn-save{background:var(--htisa);border:none;color:#fff;border-radius:6px;padding:9px 14px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);text-transform:uppercase;}
+  .btn-save:hover{background:var(--htisa-dark);}
+  .btn-cancel{background:var(--htisa-off);border:1.5px solid var(--htisa-border);color:var(--htisa-sec);border-radius:6px;padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);}
+  .section-label{font-size:9px;font-weight:900;color:var(--htisa);text-transform:uppercase;letter-spacing:0.14em;margin-bottom:8px;margin-top:14px;display:flex;align-items:center;gap:8px;}
+  .section-label::before{content:'';width:16px;height:2.5px;background:var(--htisa);border-radius:2px;}
+  .section-label:first-of-type{margin-top:0;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px;}
+  .grid-single{grid-template-columns:1fr;}
+  .sos-btn{background:var(--htisa-white);border:1.5px solid var(--htisa-border);border-radius:var(--r);padding:13px 14px;cursor:pointer;text-align:left;width:100%;display:flex;align-items:center;gap:11px;transition:all .15s;font-family:var(--font);}
+  .sos-btn:hover{border-color:var(--htisa);box-shadow:0 2px 8px rgba(37,150,190,0.15);}
+  .sos-btn.active        {border-color:var(--s-ko);          background:var(--s-ko-bg);}
+  .sos-btn.active-warning{border-color:var(--s-late);         background:var(--s-late-bg);}
+  .sos-btn.active-info   {border-color:var(--s-info);         background:var(--s-info-bg);}
+  .sos-btn.active-success{border-color:var(--s-ok);           background:var(--s-ok-bg);}
+  .sos-btn.active-fris   {border-color:var(--fris-border);    background:var(--fris-bg);}
+  .sos-btn.active-veilig {border-color:var(--veilig-border);  background:var(--veilig-bg);}
+  .btn-icon{font-size:22px;flex-shrink:0;}
   .btn-text{flex:1;}
-  .btn-label{display:block;font-size:15px;font-weight:700;}
-  .btn-sub{display:block;font-size:11px;opacity:0.85;margin-top:2px;}
-  .divider{width:100%;max-width:320px;display:flex;align-items:center;gap:10px;margin:4px 0 12px;color:#5b8fa0;font-size:12px;}
-  .divider::before,.divider::after{content:'';flex:1;height:1px;background:#c2dfe9;}
-  .btn-install{display:none;width:100%;max-width:320px;background:#34a853;color:white;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;margin-bottom:10px;font-family:inherit;}
-  .btn-install.show{display:block;}
-  .install-tip{background:#eef7fb;border:1.5px solid #c2dfe9;border-radius:10px;padding:14px;width:100%;max-width:320px;margin-top:4px;}
-  .install-tip-titel{font-size:12px;font-weight:800;color:#2596be;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
-  .install-stap{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#2a6070;margin-bottom:6px;line-height:1.5;}
-  .install-stap:last-child{margin-bottom:0;}
-  #status{font-size:12px;color:#2e7d32;font-weight:600;margin-bottom:8px;text-align:center;}
+  .btn-label{font-size:13px;font-weight:700;color:var(--htisa-text);line-height:1.3;display:block;}
+  .btn-sub{font-size:11px;font-weight:500;color:var(--htisa-muted);display:block;margin-top:2px;}
+  /* STICKY BACK BAR */
+  .back-bar{display:none;position:sticky;top:0;z-index:50;background:var(--htisa-white);border-bottom:1.5px solid var(--htisa-border);padding:10px 16px;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(13,43,56,0.08);}
+  .back-bar.show{display:flex;}
+  .back-btn{display:flex;align-items:center;gap:7px;background:var(--htisa);border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:800;color:#fff;cursor:pointer;font-family:var(--font);transition:background .15s;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap;}
+  .back-btn:hover{background:var(--htisa-dark);}
+  .back-bar-title{font-size:13px;font-weight:700;color:var(--htisa-text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  .panel{display:none;background:var(--htisa-white);border:1.5px solid var(--htisa-border);border-radius:var(--r);padding:14px;margin-top:6px;margin-bottom:4px;}
+  .panel.open{display:block;}
+  .panel-title{font-size:15px;font-weight:800;color:var(--htisa-text);margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .badge{display:inline-block;font-size:9px;font-weight:800;padding:3px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:0.08em;}
+  .badge-danger{background:var(--s-ko);color:#fff;} .badge-warning{background:var(--s-late);color:#fff;}
+  .badge-info{background:var(--s-info);color:#fff;} .badge-success{background:var(--s-ok);color:#fff;}
+  .top-alert{background:var(--htisa);color:#fff;border-radius:7px;padding:10px 13px;margin-bottom:12px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px;line-height:1.4;}
+  .steps{list-style:none;margin-bottom:12px;}
+  .step{display:flex;gap:11px;padding:9px 0;border-bottom:1px solid var(--htisa-border);align-items:flex-start;}
+  .step:last-child{border-bottom:none;}
+  .step-ico{font-size:26px;flex-shrink:0;width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--htisa-off);border-radius:8px;margin-top:1px;}
+  .step-num{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;margin-top:8px;}
+  .step-num.danger{background:var(--s-ko);color:#fff;} .step-num.warning{background:var(--s-late);color:#fff;}
+  .step-num.info{background:var(--s-info);color:#fff;} .step-num.success{background:var(--s-ok);color:#fff;}
+  .step-text{font-size:13px;color:var(--htisa-text);line-height:1.55;flex:1;}
+  .step-bold{font-weight:700;display:block;margin-bottom:1px;}
+  .step-hint{font-size:11px;color:var(--htisa-muted);margin-top:3px;display:block;}
+  .step-alert{font-size:11px;color:var(--s-ko);margin-top:3px;display:block;font-weight:700;}
+  .panel-contacts{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:4px;}
+  .panel-call-btn{display:flex;align-items:center;justify-content:center;gap:5px;padding:9px 6px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;text-decoration:none;font-family:var(--font);text-align:center;border:none;transition:opacity .15s;}
+  .panel-call-btn:hover{opacity:.85;}
+  .pct{background:var(--htisa);color:#fff;} .pcl{background:var(--lb);color:#fff;} .pcw{background:var(--htisa-darker);color:#fff;}
+  .pce{background:var(--htisa-off);border:1.5px dashed var(--htisa-border2)!important;color:var(--htisa-sec);cursor:pointer;}
+  .pce:hover{border-color:var(--htisa)!important;color:var(--htisa);}
+  .callout{background:var(--htisa-pale);border-radius:7px;padding:10px 12px;margin-top:12px;font-size:12px;font-weight:500;color:var(--htisa-sec);line-height:1.6;border-left:3px solid var(--htisa);}
+
+  /* ── FRIS VOOR DE DAG ── */
+  .fris-panel{display:none;background:var(--fris-bg);border:1.5px solid var(--fris-border);border-radius:var(--r);padding:14px;margin-top:6px;margin-bottom:4px;}
+  .fris-panel.open{display:block;}
+  .fris-header{font-size:15px;font-weight:800;color:var(--htisa-text);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+  .badge-fris{background:var(--fris);color:#fff;}
+  .fris-tip-card{background:var(--htisa-white);border:1.5px solid var(--fris-border);border-radius:var(--r);padding:16px 14px 14px;margin-bottom:12px;min-height:110px;}
+  .fris-counter{font-size:9px;font-weight:900;color:var(--fris);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+  .fris-counter::before{content:'';width:12px;height:2px;background:var(--fris);border-radius:2px;}
+  .fris-emoji{font-size:26px;margin-bottom:8px;display:block;}
+  .fris-tip-text{font-size:14px;font-weight:600;color:var(--htisa-text);line-height:1.55;margin-bottom:4px;}
+  .fris-tip-sub{font-size:11px;color:var(--htisa-muted);line-height:1.5;display:block;}
+  .fris-nav{display:flex;align-items:center;gap:8px;}
+  .fris-dots{display:flex;gap:5px;flex:1;justify-content:center;flex-wrap:wrap;}
+  .fris-dot{width:7px;height:7px;border-radius:50%;background:var(--fris-border);cursor:pointer;transition:background .15s;border:none;padding:0;}
+  .fris-dot.active{background:var(--fris);}
+  .fris-nav-btn{background:var(--fris);border:none;color:#fff;border-radius:7px;padding:8px 13px;font-size:11px;font-weight:800;cursor:pointer;font-family:var(--font);white-space:nowrap;transition:background .15s;}
+  .fris-nav-btn:hover{background:#a86015;}
+  .fris-nav-btn.outline{background:var(--htisa-white);color:var(--fris);border:1.5px solid var(--fris-border);}
+  .fris-nav-btn.outline:hover{background:var(--fris-bg);}
+  .fris-auto{font-size:10px;color:var(--fris);margin-top:8px;text-align:center;font-weight:600;}
+
+  /* ── VEILIGHEID ── */
+  .veilig-panel{display:none;background:var(--veilig-bg);border:1.5px solid var(--veilig-border);border-radius:var(--r);padding:14px;margin-top:6px;margin-bottom:4px;}
+  .veilig-panel.open{display:block;}
+  .veilig-header{font-size:15px;font-weight:800;color:var(--htisa-text);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+  .badge-veilig{background:var(--veilig);color:#fff;}
+  .veilig-steps{list-style:none;margin-bottom:10px;}
+  .veilig-step{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #b2f0ea;align-items:flex-start;}
+  .veilig-step:last-child{border-bottom:none;}
+  .veilig-num{width:22px;height:22px;border-radius:5px;background:var(--veilig);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px;}
+  .veilig-text{font-size:13px;color:var(--htisa-text);line-height:1.55;flex:1;}
+  .veilig-bold{font-weight:700;display:block;margin-bottom:1px;}
+  .veilig-hint{font-size:11px;color:var(--veilig);margin-top:2px;display:block;}
+  .veilig-callout{background:#ccfbf1;border-radius:7px;padding:10px 12px;font-size:12px;font-weight:600;color:var(--veilig);line-height:1.6;border-left:3px solid var(--veilig);}
+
+  /* TRANSPORT */
+  .transport-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px;}
+  .transport-col{display:flex;flex-direction:column;gap:6px;}
+  .transport-card{border-radius:var(--r);padding:12px 10px;display:flex;align-items:center;gap:8px;text-decoration:none;transition:all .15s;border:1.5px solid;}
+  .transport-card:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.10);}
+  .transport-card.lijn{background:var(--lijn-bg);border-color:var(--lijn);}
+  .transport-card.nmbs{background:var(--nmbs-bg);border-color:var(--nmbs);}
+  .transport-logo{width:52px;height:36px;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
+  .transport-logo.ll{background:transparent;} .transport-logo.nl{background:transparent;}
+  .transport-info{flex:1;}
+  .transport-name{font-size:13px;font-weight:800;display:block;margin-bottom:2px;}
+  .transport-name.lijn{color:var(--lijn);} .transport-name.nmbs{color:var(--nmbs);}
+  .transport-sub{font-size:10px;font-weight:500;color:var(--htisa-muted);display:block;}
+  .transport-arrow{font-size:16px;}
+  .transport-arrow.lijn{color:var(--lijn);} .transport-arrow.nmbs{color:var(--nmbs);}
+  .store-links{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px;}
+  .store-btn{display:flex;align-items:center;justify-content:center;gap:5px;padding:6px 8px;border-radius:6px;font-size:10px;font-weight:700;text-decoration:none;border:none;font-family:var(--font);}
+  .store-btn:hover{opacity:.82;}
+  .store-btn.ls{background:var(--lijn);color:#fff;} .store-btn.ns{background:var(--nmbs);color:#fff;}
+  .ask-btn{width:100%;margin-top:12px;background:var(--htisa-white);border:1.5px solid var(--htisa-border);border-radius:var(--r);padding:11px 14px;font-size:13px;font-weight:600;color:var(--htisa-sec);cursor:pointer;text-align:left;font-family:var(--font);transition:all .15s;}
+  .ask-btn:hover{border-color:var(--htisa);color:var(--htisa);}
+
+  /* CALENDAR */
+  .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .cal-month{font-size:16px;font-weight:900;color:var(--htisa-text);text-transform:uppercase;letter-spacing:0.05em;}
+  .cal-nav{display:flex;gap:6px;}
+  .cal-nav-btn{background:var(--htisa-white);border:1.5px solid var(--htisa-border);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--htisa-text);transition:all .15s;}
+  .cal-nav-btn:hover{background:var(--htisa);color:#fff;border-color:var(--htisa);}
+  .cal-legend{display:flex;gap:14px;margin-bottom:12px;flex-wrap:wrap;}
+  .leg-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--htisa-sec);}
+  .leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+  .leg-ok{background:var(--s-ok);} .leg-ko{background:var(--s-ko);} .leg-late{background:var(--s-late);}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:12px;}
+  .cal-dow{font-size:9px;font-weight:800;color:var(--htisa-muted);text-align:center;padding:5px 0;text-transform:uppercase;letter-spacing:0.06em;}
+  .cal-day{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--htisa-border);color:var(--htisa-text);background:var(--htisa-white);transition:all .1s;user-select:none;}
+  .cal-day:hover:not(.cal-empty):not(.cal-weekend){border-color:var(--htisa);color:var(--htisa);background:var(--htisa-pale);}
+  .cal-day.cal-empty{background:none;border-color:transparent;cursor:default;}
+  .cal-day.cal-weekend{color:#c0cdd0;background:var(--htisa-off);cursor:default;border-color:transparent;}
+  .cal-day.cal-today{border-color:var(--htisa);color:var(--htisa);font-weight:900;background:var(--htisa-pale);}
+  .cal-day.s-ok  {background:var(--s-ok);  border-color:var(--s-ok);  color:#fff;}
+  .cal-day.s-ko  {background:var(--s-ko);  border-color:var(--s-ko);  color:#fff;}
+  .cal-day.s-late{background:var(--s-late);border-color:var(--s-late);color:#fff;}
+  .status-picker{display:none;background:var(--htisa-white);border:1.5px solid var(--htisa-border);border-radius:var(--r);padding:13px;margin-bottom:12px;}
+  .status-picker.open{display:block;}
+  .picker-title{font-size:11px;font-weight:800;color:var(--htisa-sec);margin-bottom:9px;text-transform:uppercase;letter-spacing:0.07em;}
+  .picker-title strong{color:var(--htisa);}
+  .picker-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+  .pick-btn{padding:8px 4px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;border:none;text-align:center;font-family:var(--font);text-transform:uppercase;}
+  .pick-btn:hover{opacity:.85;}
+  .pick-ok  {background:var(--s-ok);  color:#fff;}
+  .pick-ko  {background:var(--s-ko);  color:#fff;}
+  .pick-late{background:var(--s-late);color:#fff;}
+  .pick-wis {background:var(--htisa-off);color:var(--htisa-sec);border:1.5px solid var(--htisa-border);}
+  .cal-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;}
+  .stat-card{border-radius:var(--r);padding:13px 8px;text-align:center;}
+  .stat-card.s-ok  {background:var(--s-ok-bg);  border:1.5px solid var(--s-ok);}
+  .stat-card.s-ko  {background:var(--s-ko-bg);  border:1.5px solid var(--s-ko);}
+  .stat-card.s-late{background:var(--s-late-bg);border:1.5px solid var(--s-late);}
+  .stat-num{font-size:26px;font-weight:900;display:block;}
+  .stat-num.s-ok  {color:var(--s-ok);}
+  .stat-num.s-ko  {color:var(--s-ko);}
+  .stat-num.s-late{color:var(--s-late);}
+  .stat-label{font-size:9px;font-weight:800;color:var(--htisa-muted);margin-top:3px;display:block;text-transform:uppercase;letter-spacing:0.08em;}
+  .export-btn{width:100%;background:var(--htisa);border:none;border-radius:var(--r);padding:12px 14px;font-size:13px;font-weight:800;color:#fff;cursor:pointer;text-align:left;font-family:var(--font);text-transform:uppercase;transition:background .15s;}
+  .export-btn:hover{background:var(--htisa-dark);}
+
+  /* TERUG KNOP */
+  .terug-btn{width:100%;margin-top:10px;background:var(--htisa-white);border:1.5px solid var(--htisa-border);border-radius:var(--r);padding:11px 14px;font-size:13px;font-weight:700;color:var(--htisa);cursor:pointer;font-family:var(--font);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .terug-btn:hover{background:var(--htisa-pale);border-color:var(--htisa);}
+
+  /* SPLASH SCREEN */
+  #splash{position:fixed;inset:0;background:#ffffff;display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.5s ease, visibility 0.5s ease;}
+  #splash.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+  #splash-logo{display:flex;flex-direction:column;align-items:center;gap:0;animation:splashPop 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards;}
+  #splash-logo img{width:260px;height:260px;border-radius:0;box-shadow:none;object-fit:contain;}
+  #splash-title{color:#2596be;font-size:16px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;margin-top:8px;opacity:0;animation:splashFade 0.4s ease 0.5s forwards;}
+  #splash-sub{color:#5b8fa0;font-size:13px;font-weight:500;margin-top:3px;opacity:0;animation:splashFade 0.4s ease 0.7s forwards;}
+  @keyframes splashPop{from{transform:scale(0.75);opacity:0;}to{transform:scale(1);opacity:1;}}
+  @keyframes splashFade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ROLE CHOOSER */
+  .role-btn{background:var(--htisa-white);border:1.5px solid var(--htisa-border);border-radius:var(--r);padding:12px 4px;cursor:pointer;font-family:var(--font);font-size:11px;font-weight:700;color:var(--htisa-text);transition:all .15s;text-align:center;height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:100%;}
+  .role-btn:hover{border-color:var(--htisa);background:var(--htisa-pale);color:var(--htisa);}
+
+  /* PIN SCREEN */
+  .pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--htisa-border);background:transparent;transition:background .15s;}
+  .pin-dot.filled{background:var(--htisa);border-color:var(--htisa);}
+  .pin-key{background:var(--htisa-white);border:1.5px solid var(--htisa-border);border-radius:8px;padding:14px;font-size:20px;font-weight:700;font-family:var(--font);color:var(--htisa-text);cursor:pointer;transition:all .15s;}
+  .pin-key:hover{background:var(--htisa-pale);border-color:var(--htisa);}
+  .pin-key:active{background:var(--htisa);color:#fff;}
+
+  /* STATUS BUTTONS */
+  .status-select-btn{padding:10px 6px;border-radius:7px;font-size:11px;font-weight:700;font-family:var(--font);cursor:pointer;text-align:center;transition:opacity .15s;}
+  .status-select-btn:hover{opacity:.8;}
+  .status-select-btn.selected{box-shadow:0 0 0 3px var(--htisa);}
+
+  /* BEGELEIDER RECORD ROWS */
+  .bg-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;margin-bottom:6px;background:var(--htisa-white);border:1.5px solid var(--htisa-border);}
+  .bg-badge{display:inline-block;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:700;flex-shrink:0;}
+  .bg-badge-ok  {background:var(--s-ok-bg);  color:var(--s-ok);  border:1px solid var(--s-ok);}
+  .bg-badge-ko  {background:var(--s-ko-bg);  color:var(--s-ko);  border:1px solid var(--s-ko);}
+  .bg-badge-late{background:var(--s-late-bg);color:var(--s-late);border:1px solid var(--s-late);}
+  .bg-info{flex:1;}
+  .bg-naam{font-size:13px;font-weight:700;color:var(--htisa-text);display:block;}
+  .bg-meta{font-size:11px;color:var(--htisa-muted);display:block;margin-top:1px;}
 </style>
 </head>
 <body>
 
-<img src="icons/icon-512.png" class="logo" alt="HTiSA logo"/>
-<h1>HTiSA – Duaal Leren</h1>
-<p>Kies jouw rol om de app te openen:</p>
-
-<div class="rol-grid">
-  <a href="index.html" class="btn" onclick="setRol('leerling')">
-    <span class="btn-ico">👨‍🎓</span>
-    <span class="btn-text">
-      <span class="btn-label">Leerling</span>
-      <span class="btn-sub">SOS-hulp en eigen aanwezigheidskalender</span>
-    </span>
-  </a>
-  <a href="index.html" class="btn werkgever" onclick="setRol('werkgever')">
-    <span class="btn-ico">🏭</span>
-    <span class="btn-text">
-      <span class="btn-label">Werkgever</span>
-      <span class="btn-sub">Aanwezigheid registreren · PIN vereist</span>
-    </span>
-  </a>
-  <a href="index.html" class="btn begeleider" onclick="setRol('begeleider')">
-    <span class="btn-ico">👨‍🏫</span>
-    <span class="btn-text">
-      <span class="btn-label">Begeleider</span>
-      <span class="btn-sub">Alle leerlingen opvolgen · PIN vereist</span>
-    </span>
-  </a>
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <div id="splash-logo">
+    <img src="icons/icon-512.png" alt="HTiSA logo"/>
+    <div id="splash-title">Duaal Leren</div>
+    <div id="splash-sub">To the rescue</div>
+  </div>
 </div>
 
-<div id="status"></div>
+<div class="app">
+  <div class="app-header">
+    <div class="header-top">
+      <div class="logo-block">
+        <div class="logo-main">HT<em>i</em>SA</div>
+      </div>
+      <div class="duaal-badge">
+        <img src="icons/duaal-leren.png" alt="Duaal Leren"/>
+      </div>
+    </div>
+    <div class="header-title">To the rescue<span>Hulp voor elke noodsituatie</span></div>
+  </div>
 
-<button class="btn-install" id="install-btn">📲 Installeer op startscherm</button>
+  <div class="tabs-wrap">
+    <button class="tab active" onclick="switchTab('sos',this)">SOS Hulp</button>
+    <button class="tab" onclick="switchTab('cal',this)">Aanwezigheden</button>
+  </div>
 
-<div class="install-tip">
-  <div class="install-tip-titel">📲 Installeer op je startscherm</div>
-  <div class="install-stap"><span>🍎</span><span><strong>iPhone:</strong> tik op ⎋ onderaan → "Zet op beginscherm"</span></div>
-  <div class="install-stap"><span>🤖</span><span><strong>Android:</strong> tik op ⋮ → "Toevoegen aan startscherm" → "Installeren"</span></div>
+  <!-- STICKY BACK BAR — verschijnt als een paneel open is -->
+  <div class="back-bar" id="back-bar">
+    <button class="back-btn" onclick="closeAllPanels()">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Terug
+    </button>
+    <span class="back-bar-title" id="back-bar-title"></span>
+  </div>
+
+  <div id="view-sos" class="view active">
+
+    <!-- CONTACTEN — alle 3 aanpasbaar -->
+    <div class="contacts-bar">
+
+      <!-- Tewerkstellingsbegeleider -->
+      <div class="contact-card" id="card-traj">
+        <div class="contact-label blue">Tewerkstelling</div>
+        <div class="contact-name" id="traj-naam">HTiSA Begeleider</div>
+        <a class="call-btn blue" id="traj-call" href="tel:0488779222">
+          <svg class="call-icon" viewBox="0 0 16 16" fill="none"><path d="M3 1h3l1.5 4L6 6.5a9 9 0 0 0 3.5 3.5L11 8.5l4 1.5v3c0 1.1-.9 2-2 2A15 15 0 0 1 1 3c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <span id="traj-tel-display">0488 77 92 22</span>
+        </a>
+        <button class="btn-edit" onclick="openContactForm('traj')">✏️ Wijzigen</button>
+      </div>
+
+      <!-- Leerlingenbegeleider -->
+      <div class="contact-card" id="card-lb">
+        <div class="contact-label purple">Leerlingenbeg.</div>
+        <div class="contact-name" id="lb-naam">HTiSA</div>
+        <a class="call-btn purple" id="lb-call" href="tel:092241620">
+          <svg class="call-icon" viewBox="0 0 16 16" fill="none"><path d="M3 1h3l1.5 4L6 6.5a9 9 0 0 0 3.5 3.5L11 8.5l4 1.5v3c0 1.1-.9 2-2 2A15 15 0 0 1 1 3c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <span id="lb-tel-display">09 224 16 20</span>
+        </a>
+        <button class="btn-edit" onclick="openContactForm('lb')">✏️ Wijzigen</button>
+      </div>
+
+      <!-- Werkgever -->
+      <div class="contact-card" id="card-werk">
+        <div class="contact-label dark">Werkgever</div>
+        <div class="contact-name" id="werk-naam">+ Toevoegen</div>
+        <a class="call-btn dark" id="werk-call" href="#" onclick="if(!contacts.werk.tel){openContactForm('werk');return false;}">
+          <svg class="call-icon" viewBox="0 0 16 16" fill="none"><path d="M3 1h3l1.5 4L6 6.5a9 9 0 0 0 3.5 3.5L11 8.5l4 1.5v3c0 1.1-.9 2-2 2A15 15 0 0 1 1 3c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <span id="werk-tel-display">Toevoegen</span>
+        </a>
+        <button class="btn-edit" onclick="openContactForm('werk')">✏️ Wijzigen</button>
+      </div>
+    </div>
+
+    <!-- UNIVERSEEL CONTACTFORMULIER -->
+    <div id="contact-form" class="add-form">
+      <div id="contact-form-title" style="font-size:12px;font-weight:800;color:var(--htisa);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;"></div>
+      <label class="form-label">Naam</label>
+      <input class="form-input" id="cf-naam" type="text" placeholder="bv. Jan Peeters"/>
+      <label class="form-label">Telefoonnummer</label>
+      <input class="form-input" id="cf-tel" type="tel" placeholder="bv. 0471 23 45 67"/>
+      <div class="form-row">
+        <button class="btn-save" onclick="saveContactForm()">Opslaan</button>
+        <button class="btn-cancel" onclick="closeContactForm()">Annuleren</button>
+      </div>
+    </div>
+
+    <!-- 1. TE LAAT -->
+    <div class="section-label">Ik ben te laat</div>
+    <div class="grid" style="margin-bottom:6px">
+      <button class="sos-btn" onclick="toggle('laat',this,'active-warning')">
+        <span class="btn-icon">⏱</span>
+        <span class="btn-text"><span class="btn-label">Te laat op het werk</span><span class="btn-sub">Bel meteen!</span></span>
+      </button>
+      <button class="sos-btn" onclick="toggle('laats',this,'active-warning')">
+        <span class="btn-icon">🏫</span>
+        <span class="btn-text"><span class="btn-label">Te laat op school</span><span class="btn-sub">Meld je aan</span></span>
+      </button>
+    </div>
+    <div id="panel-laat" class="panel"></div>
+    <div id="panel-laats" class="panel"></div>
+
+    <!-- 2. ZIEK -->
+    <div class="section-label">Ik ben ziek</div>
+    <div class="grid" style="margin-bottom:6px">
+      <button class="sos-btn" onclick="toggle('ziekwerk',this,'active')">
+        <span class="btn-icon">🏭</span>
+        <span class="btn-text"><span class="btn-label">Ziek op het werk</span><span class="btn-sub">Stageplaats</span></span>
+      </button>
+      <button class="sos-btn" onclick="toggle('ziekschool',this,'active')">
+        <span class="btn-icon">🏫</span>
+        <span class="btn-text"><span class="btn-label">Ziek op school</span><span class="btn-sub">Schooldag</span></span>
+      </button>
+    </div>
+    <div id="panel-ziekwerk" class="panel"></div>
+    <div id="panel-ziekschool" class="panel"></div>
+
+    <!-- 3. ANDERE SITUATIES -->
+    <div class="section-label">Andere situaties</div>
+    <div class="grid" style="margin-bottom:6px">
+      <button class="sos-btn" onclick="toggle('kledij',this,'active-info')">
+        <span class="btn-icon">👕</span>
+        <span class="btn-text"><span class="btn-label">Werkkledij vergeten</span><span class="btn-sub">Oplossingen</span></span>
+      </button>
+      <button class="sos-btn" onclick="toggle('vergeten',this,'active-success')">
+        <span class="btn-icon">📋</span>
+        <span class="btn-text"><span class="btn-label">Materiaal vergeten</span><span class="btn-sub">Wat doen?</span></span>
+      </button>
+    </div>
+    <div id="panel-kledij" class="panel"></div>
+    <div id="panel-vergeten" class="panel"></div>
+
+    <div class="grid" style="margin-bottom:6px">
+      <button class="sos-btn" onclick="toggle('conflict',this,'active')">
+        <span class="btn-icon">😤</span>
+        <span class="btn-text"><span class="btn-label">Conflict op het werk</span><span class="btn-sub">Ruzie of pesterij</span></span>
+      </button>
+      <button class="sos-btn" id="btn-eerstedag" onclick="toggleEersteDag(this)">
+        <span class="btn-icon">🎯</span>
+        <span class="btn-text"><span class="btn-label">Eerste dag checklist</span><span class="btn-sub">Ben ik klaar?</span></span>
+      </button>
+    </div>
+    <div id="panel-conflict" class="panel"></div>
+
+    <!-- EERSTE DAG PANEL -->
+    <div id="panel-eerstedag" class="panel">
+      <div class="panel-title"><span style="font-size:18px">🎯</span> Eerste dag checklist <span class="badge badge-info">CHECKLIST</span></div>
+      <div id="checklist-items"></div>
+      <div style="margin-top:10px;display:flex;gap:8px;">
+        <button class="btn-save" onclick="resetChecklist()" style="flex:1;font-size:12px;">↺ Opnieuw</button>
+      </div>
+      <div class="callout" style="margin-top:10px;">Vink alles af voor je vertrekt — succes op je eerste dag! 💪</div>
+    </div>
+
+    <div class="grid grid-single" style="margin-bottom:6px">
+      <button class="sos-btn" onclick="toggle('bedrijfsbezoek',this,'active-info')">
+        <span class="btn-icon">🏢</span>
+        <span class="btn-text"><span class="btn-label">Op zoek naar een stageplaats</span><span class="btn-sub">Vragen voor het bedrijfsbezoek</span></span>
+      </button>
+    </div>
+    <div id="panel-bedrijfsbezoek" class="panel"></div>
+
+    <!-- 4. TIPS -->
+    <div class="section-label">Tips voor de werkplek</div>
+    <div class="grid" style="margin-bottom:6px">
+      <button class="sos-btn" id="btn-fris" onclick="toggleFris(this)">
+        <span class="btn-icon">✨</span>
+        <span class="btn-text"><span class="btn-label">Fris voor de dag</span><span class="btn-sub">Goede indruk tips</span></span>
+      </button>
+      <button class="sos-btn" id="btn-veilig" onclick="toggleVeilig(this)">
+        <span class="btn-icon">🦺</span>
+        <span class="btn-text"><span class="btn-label">Veiligheid</span><span class="btn-sub">Op de werkplek</span></span>
+      </button>
+    </div>
+    <div class="grid grid-single" style="margin-bottom:6px">
+      <button class="sos-btn" id="btn-woorden" onclick="toggleWoorden(this)">
+        <span class="btn-icon">🌍</span>
+        <span class="btn-text"><span class="btn-label">Woordenlijst werkvloer</span><span class="btn-sub">NL · FR · EN · AR · TR</span></span>
+      </button>
+    </div>
+
+    <!-- FRIS PANEL -->
+    <div id="panel-fris" class="fris-panel">
+      <div class="fris-header">
+        <span style="font-size:18px">✨</span>
+        Fris voor de dag
+        <span class="badge badge-fris">TIPS</span>
+      </div>
+      <div class="fris-tip-card">
+        <div class="fris-counter" id="fris-num">Tip 1 / 10</div>
+        <span class="fris-emoji" id="fris-emoji">⏰</span>
+        <div class="fris-tip-text" id="fris-text"></div>
+        <span class="fris-tip-sub" id="fris-sub"></span>
+      </div>
+      <div class="fris-nav">
+        <button class="fris-nav-btn outline" onclick="frisPrev()">← Vorige</button>
+        <div class="fris-dots" id="fris-dots"></div>
+        <button class="fris-nav-btn" onclick="frisNext()">Volgende →</button>
+      </div>
+      <div class="fris-auto">Tips wisselen automatisch elke 8 seconden</div>
+    </div>
+
+    <!-- VEILIGHEID PANEL -->
+    <div id="panel-veilig" class="veilig-panel">
+      <div class="veilig-header">
+        <span style="font-size:18px">🦺</span>
+        Veiligheid op de werkplek
+        <span class="badge badge-veilig">VEILIG</span>
+      </div>
+      <ul class="veilig-steps" id="veilig-list"></ul>
+      <div class="veilig-callout">🔔 Twijfel je over een veiligheidsregel? Vraag het altijd aan je leidinggevende. Veiligheid gaat voor alles!</div>
+    </div>
+
+    <!-- WOORDENLIJST PANEL -->
+    <div id="panel-woorden" class="panel" style="background:var(--htisa-off);">
+      <div class="panel-title"><span style="font-size:18px">🌍</span> Woordenlijst werkvloer <span class="badge" style="background:#7b1fa2;color:white;">TALEN</span></div>
+      <input class="form-input" id="woorden-zoek" type="text" placeholder="🔍  Zoek een woord..." oninput="filterWoorden()" style="margin-bottom:10px;"/>
+      <div id="woorden-list"></div>
+    </div>
+
+  </div>
+
+  <!-- AANWEZIGHEDEN -->
+  <div id="view-cal" class="view">
+
+    <!-- ROLE KEUZE -->
+    <div id="role-chooser">
+      <div style="font-size:12px;font-weight:800;color:var(--htisa-muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Wie ben jij?</div>
+      <div id="role-knoppen" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:6px;">
+        <button class="role-btn" onclick="selectRole('leerling')"><span style="font-size:22px;display:block;margin-bottom:4px;">👨‍🎓</span>Leerling</button>
+        <button class="role-btn" onclick="selectRole('werkgever')"><span style="font-size:22px;display:block;margin-bottom:4px;">🏭</span>Werkgever</button>
+        <button class="role-btn" onclick="selectRole('begeleider')"><span style="font-size:22px;display:block;margin-bottom:4px;">👨‍🏫</span>Begeleider</button>
+      </div>
+    </div>
+
+    <!-- PIN SCHERM -->
+    <div id="pin-screen" style="display:none;">
+      <div class="panel open" style="text-align:center;padding:20px;">
+        <div style="font-size:28px;margin-bottom:8px;" id="pin-icon">🔒</div>
+        <div style="font-size:15px;font-weight:800;color:var(--htisa-text);margin-bottom:4px;" id="pin-role-label">PIN invoeren</div>
+        <div style="font-size:12px;color:var(--htisa-muted);margin-bottom:16px;">Voer je 4-cijferige PIN in</div>
+        <div style="display:flex;justify-content:center;gap:8px;margin-bottom:16px;" id="pin-dots">
+          <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:240px;margin:0 auto 12px;">
+          <button class="pin-key" onclick="pinKey('1')">1</button><button class="pin-key" onclick="pinKey('2')">2</button><button class="pin-key" onclick="pinKey('3')">3</button>
+          <button class="pin-key" onclick="pinKey('4')">4</button><button class="pin-key" onclick="pinKey('5')">5</button><button class="pin-key" onclick="pinKey('6')">6</button>
+          <button class="pin-key" onclick="pinKey('7')">7</button><button class="pin-key" onclick="pinKey('8')">8</button><button class="pin-key" onclick="pinKey('9')">9</button>
+          <button class="pin-key" onclick="pinKey('←')" style="font-size:18px;">←</button><button class="pin-key" onclick="pinKey('0')">0</button><button class="pin-key" onclick="pinKey('X')" style="color:var(--s-ko);">✕</button>
+        </div>
+        <div id="pin-error" style="color:var(--s-ko);font-size:12px;font-weight:600;min-height:18px;margin-bottom:10px;"></div>
+        <button class="btn-cancel" onclick="logoutRole()" style="width:100%;margin-top:4px;">← Terug naar keuze</button>
+      </div>
+    </div>
+
+    <!-- LEERLING: naam instellen -->
+    <div id="leerling-naam-screen" style="display:none;">
+      <div class="panel open">
+        <div style="font-size:15px;font-weight:800;color:var(--htisa-text);margin-bottom:10px;">👨‍🎓 Jouw naam</div>
+        <div style="font-size:13px;color:var(--htisa-muted);margin-bottom:10px;">Voer je naam in zodat je jouw aanwezigheden kunt zien.</div>
+        <input class="form-input" id="leerling-naam-input" type="text" placeholder="bv. Ahmed El Mansouri" style="margin-bottom:8px;"/>
+        <button class="btn-save" onclick="saveLeerlingNaam()" style="width:100%;margin-bottom:8px;">Bevestigen</button>
+        <button class="btn-cancel" onclick="logoutRole()" style="width:100%;">← Terug naar keuze</button>
+      </div>
+    </div>
+
+    <!-- LEERLING VIEW -->
+    <div id="view-leerling" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div>
+          <div style="font-size:12px;color:var(--htisa-muted);">Jouw aanwezigheden</div>
+          <div style="font-size:16px;font-weight:800;color:var(--htisa-text);" id="leerling-naam-display"></div>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="cal-nav-btn" onclick="changeCalMonth(-1)">‹</button>
+          <div style="font-size:13px;font-weight:700;color:var(--htisa-text);padding:0 8px;display:flex;align-items:center;" id="leerling-month-label"></div>
+          <button class="cal-nav-btn" onclick="changeCalMonth(1)">›</button>
+        </div>
+      </div>
+      <div class="cal-legend" style="margin-bottom:10px;">
+        <div class="leg-item"><div class="leg-dot leg-ok"></div>Aanwezig</div>
+        <div class="leg-item"><div class="leg-dot leg-ko"></div>Afwezig</div>
+        <div class="leg-item"><div class="leg-dot leg-late"></div>Te laat</div>
+      </div>
+      <div class="cal-grid" id="leerling-cal-grid"></div>
+      <div class="cal-stats">
+        <div class="stat-card s-ok">  <span class="stat-num s-ok"   id="ll-ok">0</span>  <span class="stat-label">Aanwezig</span></div>
+        <div class="stat-card s-ko">  <span class="stat-num s-ko"   id="ll-ko">0</span>  <span class="stat-label">Afwezig</span></div>
+        <div class="stat-card s-late"><span class="stat-num s-late" id="ll-late">0</span><span class="stat-label">Te laat</span></div>
+      </div>
+      <div id="ll-loading" style="text-align:center;color:var(--htisa-muted);font-size:12px;padding:10px 0;"></div>
+      <button class="terug-btn" onclick="logoutRole()">← Terug naar keuze</button>
+    </div>
+
+    <!-- WERKGEVER VIEW -->
+    <div id="view-werkgever" style="display:none;">
+      <div style="font-size:16px;font-weight:800;color:var(--htisa-text);margin-bottom:14px;">🏭 Aanwezigheid registreren</div>
+      <div class="panel open" style="margin-bottom:10px;">
+
+        <label class="form-label">Naam leerling</label>
+        <!-- Dropdown als er leerlingen opgeslagen zijn, anders tekstveld -->
+        <div id="wg-leerling-wrap" style="margin-bottom:10px;">
+          <div style="display:flex;gap:6px;">
+            <select class="form-input" id="wg-leerling-select" style="margin-bottom:0;flex:1;display:none;" onchange="wgSelectLeerling(this.value)">
+              <option value="">— Kies een leerling —</option>
+            </select>
+            <input class="form-input" id="wg-leerling" type="text" placeholder="bv. Ahmed El Mansouri" style="margin-bottom:0;flex:1;"/>
+            <button onclick="wgToggleLeerlingInput()" id="wg-leerling-toggle" style="background:var(--htisa);border:none;color:white;border-radius:6px;padding:0 10px;font-size:16px;cursor:pointer;flex-shrink:0;" title="Nieuwe leerling toevoegen">+</button>
+          </div>
+          <div id="wg-leerling-lijst" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;"></div>
+        </div>
+
+        <label class="form-label">Datum</label>
+        <input class="form-input" id="wg-datum" type="date" style="margin-bottom:10px;"/>
+        <label class="form-label">Status</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
+          <button class="status-select-btn" id="sb-aanwezig" onclick="selectStatus('Aanwezig')" style="background:var(--s-ok-bg);border:1.5px solid var(--s-ok);color:var(--s-ok);">✅ Aanwezig</button>
+          <button class="status-select-btn" id="sb-afwezig"  onclick="selectStatus('Afwezig')"  style="background:var(--s-ko-bg);border:1.5px solid var(--s-ko);color:var(--s-ko);">❌ Afwezig</button>
+          <button class="status-select-btn" id="sb-telaat"   onclick="selectStatus('Te laat')"  style="background:var(--s-late-bg);border:1.5px solid var(--s-late);color:var(--s-late);">⏱ Te laat</button>
+        </div>
+        <label class="form-label">Opmerking (optioneel)</label>
+        <input class="form-input" id="wg-opmerking" type="text" placeholder="bv. Ziek gemeld, attest volgt" style="margin-bottom:10px;"/>
+        <label class="form-label">Uw naam / bedrijf</label>
+        <input class="form-input" id="wg-naam" type="text" placeholder="bv. Garage Van Damme" style="margin-bottom:12px;"/>
+        <button class="btn-save" id="wg-save-btn" onclick="saveAanwezigheid()" style="width:100%;">Opslaan in Airtable</button>
+        <div id="wg-feedback" style="margin-top:8px;font-size:12px;font-weight:600;min-height:18px;text-align:center;"></div>
+      </div>
+      <button class="terug-btn" onclick="logoutRole()">← Terug naar keuze</button>
+    </div>
+
+    <!-- BEGELEIDER VIEW -->
+    <div id="view-begeleider" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:16px;font-weight:800;color:var(--htisa-text);">👨‍🏫 Overzicht aanwezigheden</div>
+        <button class="cal-nav-btn" onclick="loadBegeleiderData()" title="Ververs" style="font-size:14px;">↻</button>
+      </div>
+      <!-- Filter -->
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+        <input class="form-input" id="bg-filter-leerling" type="text" placeholder="Filter op naam..." oninput="filterBegeleider()" style="margin-bottom:0;flex:1;min-width:130px;"/>
+        <select class="form-input" id="bg-filter-status" onchange="filterBegeleider()" style="margin-bottom:0;flex:0 0 auto;">
+          <option value="">Alle statussen</option>
+          <option value="Aanwezig">Aanwezig</option>
+          <option value="Afwezig">Afwezig</option>
+          <option value="Te laat">Te laat</option>
+        </select>
+      </div>
+      <div id="bg-loading" style="text-align:center;color:var(--htisa-muted);font-size:12px;padding:20px 0;"></div>
+      <div id="bg-records"></div>
+      <!-- Stats begeleider -->
+      <div class="cal-stats" style="margin-top:10px;">
+        <div class="stat-card s-ok">  <span class="stat-num s-ok"   id="bg-ok">0</span>  <span class="stat-label">Aanwezig</span></div>
+        <div class="stat-card s-ko">  <span class="stat-num s-ko"   id="bg-ko">0</span>  <span class="stat-label">Afwezig</span></div>
+        <div class="stat-card s-late"><span class="stat-num s-late" id="bg-late">0</span><span class="stat-label">Te laat</span></div>
+      </div>
+      <button class="terug-btn" onclick="logoutRole()">← Terug naar keuze</button>
+    </div>
+
+  </div>
 </div>
 
 <script>
-function setRol(rol){
-  localStorage.setItem('htisa_rol', rol);
+// ── SPLASH SCREEN ──
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    document.getElementById('splash').classList.add('hidden');
+  }, 2000);
+});
+
+
+// ── PWA SERVICE WORKER ──
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function() { navigator.serviceWorker.register('sw.js'); });
 }
 
-// Android install knop
-var installPrompt = null;
-window.addEventListener('beforeinstallprompt', function(e) {
-  e.preventDefault();
-  installPrompt = e;
-  document.getElementById('install-btn').classList.add('show');
-});
-document.getElementById('install-btn').addEventListener('click', async function() {
-  if(!installPrompt) return;
-  installPrompt.prompt();
-  var result = await installPrompt.userChoice;
-  installPrompt = null;
-  document.getElementById('install-btn').classList.remove('show');
-  if(result.outcome === 'accepted') {
-    document.getElementById('status').textContent = '✅ App geïnstalleerd!';
+// ── FRIS VOOR DE DAG ──
+var frisTips=[
+  {emoji:'⏰',text:'Kom altijd op tijd of liever vijf minuten vroeger.',sub:'Een goede eerste indruk begint bij stiptheid — elke dag opnieuw.'},
+  {emoji:'👗',text:'Zorg voor propere en nette werkkledij.',sub:'Vlekken, scheuren of verkreukeld? Leg je kledij de avond voordien klaar.'},
+  {emoji:'🙋',text:'Groet iedereen vriendelijk bij aankomst.',sub:'"Goedemorgen" zeggen kost niets maar maakt een groot verschil.'},
+  {emoji:'📵',text:'Leg je gsm weg tijdens het werk.',sub:'Gebruik je telefoon alleen tijdens officiële pauzes, tenzij anders afgesproken.'},
+  {emoji:'🧹',text:'Laat je werkplek altijd netjes achter.',sub:'Opruimen na jezelf toont respect voor collega\'s en de werkplek.'},
+  {emoji:'🙂',text:'Toon initiatief: vraag wat je kunt doen als je niets meer hebt.',sub:'Nooit stilzitten — vraag proactief aan je mentor wat er nog gedaan moet worden.'},
+  {emoji:'👂',text:'Luister goed naar instructies en vraag door als iets onduidelijk is.',sub:'Iets niet begrijpen en vragen is slim. Iets fout doen zonder te vragen is duur.'},
+  {emoji:'🤝',text:'Spreek collega\'s aan met hun naam en wees beleefd.',sub:'Een "alstublieft" en "dank u" vallen altijd positief op.'},
+  {emoji:'🚭',text:'Rook alleen op de daarvoor bestemde plek.',sub:'Vraag op je eerste dag waar de rookzone is, en rook nooit binnen of op het terrein.'},
+  {emoji:'💬',text:'Bespreek problemen altijd rustig en op het juiste moment.',sub:'Nooit boos reageren op de werkvloer — wacht, kalmeer, en praat het uit.'},
+];
+var frisIdx=0, frisOpen=false, frisTimer=null;
+
+function renderFrisTip(){
+  var t=frisTips[frisIdx];
+  document.getElementById('fris-emoji').textContent=t.emoji;
+  document.getElementById('fris-text').textContent=t.text;
+  document.getElementById('fris-sub').textContent=t.sub;
+  document.getElementById('fris-num').textContent='Tip '+(frisIdx+1)+' / '+frisTips.length;
+  var dots=document.getElementById('fris-dots');
+  dots.innerHTML='';
+  frisTips.forEach(function(_,i){
+    var d=document.createElement('button');
+    d.className='fris-dot'+(i===frisIdx?' active':'');
+    d.onclick=function(){frisIdx=i;renderFrisTip();resetFrisTimer();};
+    dots.appendChild(d);
+  });
+}
+function frisNext(){frisIdx=(frisIdx+1)%frisTips.length;renderFrisTip();}
+function frisPrev(){frisIdx=(frisIdx-1+frisTips.length)%frisTips.length;renderFrisTip();}
+function resetFrisTimer(){
+  if(frisTimer)clearInterval(frisTimer);
+  frisTimer=setInterval(function(){if(frisOpen)frisNext();},8000);
+}
+
+var veiligOpen=false;
+function toggleFris(btn){
+  frisOpen=!frisOpen;
+  if(frisOpen&&veiligOpen){veiligOpen=false;document.getElementById('panel-veilig').classList.remove('open');document.getElementById('btn-veilig').classList.remove('active-veilig');}
+  closeSosPanels();
+  document.getElementById('panel-fris').classList.toggle('open',frisOpen);
+  btn.classList.toggle('active-fris',frisOpen);
+  if(frisOpen){
+    frisIdx=Math.floor(Math.random()*frisTips.length);
+    renderFrisTip();
+    resetFrisTimer();
+    showBackBar('Fris voor de dag');
+    document.getElementById('panel-fris').scrollIntoView({behavior:'smooth',block:'nearest'});
+  } else {
+    if(frisTimer){clearInterval(frisTimer);frisTimer=null;}
+    hideBackBar();
+  }
+}
+function toggleVeilig(btn){
+  veiligOpen=!veiligOpen;
+  if(veiligOpen&&frisOpen){frisOpen=false;document.getElementById('panel-fris').classList.remove('open');document.getElementById('btn-fris').classList.remove('active-fris');if(frisTimer){clearInterval(frisTimer);frisTimer=null;}}
+  closeSosPanels();
+  document.getElementById('panel-veilig').classList.toggle('open',veiligOpen);
+  btn.classList.toggle('active-veilig',veiligOpen);
+  if(veiligOpen){
+    showBackBar('Veiligheid op de werkplek');
+    document.getElementById('panel-veilig').scrollIntoView({behavior:'smooth',block:'nearest'});
+  } else {
+    hideBackBar();
+  }
+}
+
+// ── VEILIGHEID TIPS ──
+var veiligTips=[
+  {bold:'Draag altijd je persoonlijke beschermingsmiddelen (PBM)',text:'Helm, veiligheidsschoenen, handschoenen, veiligheidsbril... Trek ze aan vóór je aan de slag gaat.',hint:'Nooit weglaten, ook al lijkt het even snel.'},
+  {bold:'Ken de nooduitgangen en het evacuatieplan',text:'Weet hoe je het gebouw snel en veilig kunt verlaten. Bekijk de evacuatieplannen bij aankomst.',hint:'Vraag je mentor om uitleg op dag 1.'},
+  {bold:'Meld onveilige situaties onmiddellijk',text:'Zie je een gevaar, lek, of beschadigd materiaal? Meld het meteen aan je leidinggevende.',hint:'Liever één keer te veel melden dan één keer te weinig.'},
+  {bold:'Gebruik machines alleen waarvoor je bent opgeleid',text:'Gebruik nooit een machine of gereedschap dat je niet kent zonder opleiding of begeleiding.',hint:'Vraag altijd eerst een demonstratie.'},
+  {bold:'Hou doorgangen en nooduitgangen vrij',text:'Leg nooit materialen of dozen voor een nooduitgang of in een gang.',hint:'Dit kan levens kosten.'},
+  {bold:'Zorg voor een nette en opgeruimde werkplek',text:'Rommel op de vloer veroorzaakt valpartijen. Ruim direct op na gebruik en hou looppaden vrij.',hint:'Struikelgevaar is de meest voorkomende oorzaak van arbeidsongevallen.'},
+  {bold:'Til op de juiste manier',text:'Rug recht, knieën buigen, last dicht bij het lichaam. Vraag hulp bij zware lasten.',hint:'Rugblessures door verkeerd tillen zijn erg frequent.'},
+  {bold:'Ken de locatie van de EHBO-doos en brandblusser',text:'Weet waar de eerste hulp materialen zijn en hoe je een brandblusser gebruikt.',hint:'Vraag een rondleiding op je eerste werkdag.'},
+  {bold:'Gebruik geen gsm tijdens het werken met machines',text:'Afleiding door een smartphone kan leiden tot ernstige verwondingen. Leg je telefoon altijd weg.',hint:''},
+  {bold:'Bij een arbeidsongeval: meld het altijd',text:'Elke verwonding op het werk, hoe klein ook, moet gemeld worden aan je werkgever én trajectbegeleider.',hint:'Dit is wettelijk verplicht en beschermt jou.'},
+];
+(function(){
+  var list=document.getElementById('veilig-list');
+  list.innerHTML=veiligTips.map(function(t,i){
+    return '<li class="veilig-step"><div class="veilig-num">'+(i+1)+'</div><div class="veilig-text"><span class="veilig-bold">'+t.bold+'</span>'+t.text+(t.hint?'<span class="veilig-hint">'+t.hint+'</span>':'')+'</div></li>';
+  }).join('');
+})();
+
+// ── CONTACTEN — alle 3 aanpasbaar ──
+var contacts = {
+  traj: { naam: 'HTiSA Begeleider', tel: '0488779222' },
+  lb:   { naam: 'HTiSA',            tel: '092241620'  },
+  werk: { naam: '',                  tel: ''           }
+};
+var editingContact = null;
+
+// Laad opgeslagen contacten
+(function(){
+  var s = localStorage.getItem('htisa_contacts');
+  if(s){ try{ contacts = JSON.parse(s); }catch(e){} }
+  // Fallback voor oude werkgever opslag
+  var old = localStorage.getItem('htisa_werkgever');
+  if(old && !contacts.werk.tel){ try{ var o=JSON.parse(old); contacts.werk=o; }catch(e){} }
+  renderContacts();
+})();
+
+function renderContacts(){
+  // Tewerkstellingsbegeleider
+  document.getElementById('traj-naam').textContent = contacts.traj.naam || 'Tewerkstellingsbeg.';
+  document.getElementById('traj-tel-display').textContent = formatTel(contacts.traj.tel);
+  document.getElementById('traj-call').href = 'tel:' + contacts.traj.tel.replace(/\s/g,'');
+
+  // Leerlingenbegeleider
+  document.getElementById('lb-naam').textContent = contacts.lb.naam || 'Leerlingenbegeleider';
+  document.getElementById('lb-tel-display').textContent = formatTel(contacts.lb.tel);
+  document.getElementById('lb-call').href = 'tel:' + contacts.lb.tel.replace(/\s/g,'');
+
+  // Werkgever
+  var hasWerk = contacts.werk.tel;
+  document.getElementById('werk-naam').textContent = contacts.werk.naam || '+ Toevoegen';
+  document.getElementById('werk-tel-display').textContent = hasWerk ? formatTel(contacts.werk.tel) : 'Toevoegen';
+  if(hasWerk){
+    document.getElementById('werk-call').href = 'tel:' + contacts.werk.tel.replace(/\s/g,'');
+    document.getElementById('werk-call').style.opacity = '1';
+  } else {
+    document.getElementById('werk-call').href = '#';
+    document.getElementById('werk-call').style.opacity = '0.6';
+  }
+}
+
+function formatTel(tel){
+  if(!tel) return '—';
+  return tel.replace(/(\d{4})(\d{2})(\d{2})(\d{2})/,'$1 $2 $3 $4')
+            .replace(/(\d{3})(\d{2})(\d{2})(\d{2})/,'$1 $2 $3 $4')
+            .replace(/(\d{2})(\d{3})(\d{4})/,'$1 $2 $3');
+}
+
+var cfLabels = {
+  traj: { title:'Tewerkstellingsbegeleider aanpassen', naam:'Naam begeleider', tel:'Telefoonnummer', naamph:'bv. Jan Peeters', telph:'bv. 0488 77 92 22' },
+  lb:   { title:'Leerlingenbegeleider aanpassen',      naam:'Naam begeleider', tel:'Telefoonnummer', naamph:'bv. Marie Janssen', telph:'bv. 09 224 16 20' },
+  werk: { title:'Werkgever / mentor toevoegen',        naam:'Naam werkgever of mentor', tel:'Telefoonnummer werkplek', naamph:'bv. Marc Pieters', telph:'bv. 0471 23 45 67' }
+};
+
+function openContactForm(type){
+  editingContact = type;
+  var lbl = cfLabels[type];
+  document.getElementById('contact-form-title').textContent = lbl.title;
+  document.getElementById('cf-naam').value = contacts[type].naam || '';
+  document.getElementById('cf-tel').value  = contacts[type].tel  || '';
+  document.getElementById('cf-naam').placeholder = lbl.naamph;
+  document.getElementById('cf-tel').placeholder  = lbl.telph;
+  document.getElementById('contact-form').classList.add('open');
+  document.getElementById('contact-form').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function closeContactForm(){
+  document.getElementById('contact-form').classList.remove('open');
+  editingContact = null;
+  document.getElementById('cf-naam').value = '';
+  document.getElementById('cf-tel').value  = '';
+}
+function saveContactForm(){
+  if(!editingContact) return;
+  var naam = document.getElementById('cf-naam').value.trim();
+  var tel  = document.getElementById('cf-tel').value.trim();
+  if(!tel) return;
+  contacts[editingContact] = { naam: naam, tel: tel };
+  localStorage.setItem('htisa_contacts', JSON.stringify(contacts));
+  renderContacts();
+  closeContactForm();
+  if(openPanel) renderPanel(openPanel);
+}
+
+// Legacy stubs (voor zekerheid)
+function openForm(){ openContactForm('werk'); }
+function closeForm(){ closeContactForm(); }
+function saveContact(){ saveContactForm(); }
+var werkContact = { get tel(){ return contacts.werk.tel; }, get naam(){ return contacts.werk.naam; } };
+
+var openPanel=null;
+
+var panels={
+  ziekwerk:{color:'danger',title:'Ziek op de stageplaats',icon:'🏭',callWerk:true,topAlert:'Bel de werkplek — doe dit VOOR je werkdag begint!',
+    steps:[
+      {ico:'📞',bold:'Bel je werkgever',text:'Bel naar het werk. Doe dit voor je werkdag begint. Niet sms\'en — bellen!',alert:'Bel voor je start!'},
+      {ico:'🚪',bold:'Vraag of je mag vertrekken',text:'Ben je al op het werk en voel je je ziek? Vraag of je naar huis mag gaan.',hint:'Vertrek nooit zomaar'},
+      {ico:'💬',bold:'Bel je begeleider van school',text:'Bel of stuur een bericht naar HTiSA.',hint:''},
+      {ico:'🩺',bold:'Ga naar de dokter',text:'Vraag een doktersattest. Zonder attest ben je ongewettigd afwezig.',hint:'Attest is verplicht!'},
+      {ico:'📄',bold:'Stuur het attest op',text:'Stuur een foto van je attest naar school én naar het werk.',hint:'Doe dit dezelfde dag'}]},
+  ziekschool:{color:'danger',title:'Ziek op een schooldag',icon:'🏫',callWerk:false,
+    steps:[
+      {ico:'👨‍👩‍👧',bold:'Zeg het thuis',text:'Zeg het aan je ouders voor je vertrekt. Of bel hen.',hint:''},
+      {ico:'📱',bold:'Bel de school',text:'Bel HTiSA voor 08u00. Of stuur een bericht.',hint:'Voor 08u00!'},
+      {ico:'🚪',bold:'Ga naar de leerlingenbegeleiding',text:'Ben je al op school? Ga eerst naar de leerlingenbegeleiding. Vertrek nooit zomaar.',hint:'Altijd melden!'},
+      {ico:'🩺',bold:'Ga naar de dokter',text:'Vraag een doktersattest.',hint:''},
+      {ico:'📄',bold:'Geef het attest af',text:'Geef het attest af aan school. Doe dit op de dag dat je terugkomt.',hint:''}]},
+  laat:{color:'warning',title:'Te laat op het werk',icon:'⏱',callWerk:true,
+    steps:[
+      {ico:'📞',bold:'Bel nu!',text:'Bel naar het werk. Doe dit meteen. Wacht niet.',hint:'Elke minuut telt!'},
+      {ico:'💬',bold:'Zeg waarom je te laat bent',text:'Zeg kort de reden: bus vertraagd, file, fiets kapot...',hint:'Wees eerlijk'},
+      {ico:'⏰',bold:'Zeg hoe laat je aankomt',text:'Zeg zo goed mogelijk hoe laat je er zal zijn.',hint:''},
+      {ico:'📸',bold:'Maak een foto als bewijs',text:'Zie je de vertraging in de bus-app of op het bord? Maak een foto.',hint:''},
+      {ico:'🤝',bold:'Praat er later over',text:'Vraag hoe je dit kunt vermijden: eerder vertrekken, wekker vroeger...',hint:''}]},
+  laats:{color:'warning',title:'Te laat op school',icon:'🏫',callWerk:false,
+    steps:[
+      {ico:'💬',bold:'Stuur een bericht naar je begeleider',text:'Stuur een bericht via WhatsApp of sms. Doe dit voor je aankomt op school.',hint:'Niet wachten!'},
+      {ico:'🚪',bold:'Ga naar de leerlingenbegeleiding',text:'Als je aankomt op school, ga dan eerst naar de leerlingenbegeleiding. Ga niet rechtstreeks naar de klas.',hint:'Dit is verplicht!'},
+      {ico:'📸',bold:'Maak een foto van de vertraging',text:'Zie je een vertraging in de bus-app of op het bord? Maak een foto als bewijs.',hint:''}]},
+  kledij:{color:'info',title:'Werkkledij vergeten',icon:'👕',callWerk:true,
+    steps:[
+      {ico:'📞',bold:'Bel je werkgever',text:'Bel naar het werk en zeg dat je je kledij vergeten bent. Doe dit voor je aankomt.',hint:''},
+      {ico:'👕',bold:'Vraag of er reservekledij is',text:'Vraag of het bedrijf extra werkkledij heeft die je mag gebruiken.',hint:''},
+      {ico:'🏠',bold:'Vraag of je thuis mag gaan halen',text:'Woon je dichtbij? Vraag of je snel thuis kunt gaan halen.',hint:'Vraag het!'},
+      {ico:'😊',bold:'Zeg sorry',text:'Zeg dat het je spijt en dat het niet meer zal gebeuren.',hint:''},
+      {ico:'✅',bold:'Leg je kledij klaar vanavond',text:'Leg je werkkleding vanavond al klaar. Dan vergeet je het niet meer.',hint:''}]},
+  vergeten:{color:'success',title:'Materiaal vergeten',icon:'📋',callWerk:false,
+    steps:[
+      {ico:'😌',bold:'Blijf rustig',text:'Panikeer niet. Kijk wat je wél hebt.',hint:''},
+      {ico:'💬',bold:'Zeg het aan je mentor',text:'Zeg eerlijk wat je vergeten bent.',hint:''},
+      {ico:'🔍',bold:'Zoek een oplossing',text:'Kan iemand helpen? Kan je het digitaal doen?',hint:''},
+      {ico:'⏰',bold:'Breng het morgen mee',text:'Schrijf het op of zet een alarm op je gsm.',hint:''},
+      {ico:'✅',bold:'Maak een lijstje',text:'Schrijf op wat je elke dag nodig hebt. Check het elke ochtend.',hint:''}]},
+  conflict:{color:'danger',title:'Conflict op het werk',icon:'😤',callWerk:true,
+    steps:[
+      {ico:'😮‍💨',bold:'Blijf rustig',text:'Zeg niets als je boos bent. Ga even weg als je kan.',hint:''},
+      {ico:'📝',bold:'Schrijf op wat er is gebeurd',text:'Schrijf de datum op en wat er precies is gebeurd.',hint:''},
+      {ico:'💬',bold:'Praat met iemand die je vertrouwt',text:'Vertel het aan een collega, je mentor of je begeleider van school.',hint:'Zwijg niet!'},
+      {ico:'📞',bold:'Bel je begeleider van school',text:'Bel of stuur een bericht naar HTiSA. Je begeleider helpt je.',hint:''},
+      {ico:'🚫',bold:'Reageer niet op pesten',text:'Reageer niet op roddels of pesterijen. Meld het en laat de volwassenen het oplossen.',hint:''},
+      {ico:'🤝',bold:'Vraag een gesprek',text:'Als het veilig is, vraag dan rustig een gesprek met de persoon.',hint:''}]},
+  bedrijfsbezoek:{color:'info',title:'Op zoek naar een stageplaats',icon:'🏢',callWerk:false,
+    steps:[
+      {ico:'🏢',bold:'Naam en adres van het bedrijf',text:'Vraag de naam en het adres. Schrijf het op of maak een foto.',hint:''},
+      {ico:'👤',bold:'Naam van je contactpersoon',text:'Wie is jouw begeleider op het werk? Vraag zijn of haar naam.',hint:'bv. Jan Peeters'},
+      {ico:'📞',bold:'Telefoonnummer',text:'Vraag het telefoonnummer. Wie bel je als je ziek bent?',hint:''},
+      {ico:'⏰',bold:'Werkuren',text:'Hoe laat begin en stop je? Wanneer is je pauze?',hint:''},
+      {ico:'👕',bold:'Werkkleding',text:'Moet je eigen kleding meebrengen? Geeft het bedrijf schoenen of handschoenen?',hint:''},
+      {ico:'🚌',bold:'Hoe geraak ik er?',text:'Hoe kom je met de bus of de trein? Vraag het adres voor in Google Maps.',hint:''},
+      {ico:'📋',bold:'Wat ga ik doen?',text:'Vraag welke taken je zal uitvoeren.',hint:''},
+      {ico:'❓',bold:'Andere vragen?',text:'Vraag of er nog andere dingen zijn die je moet weten.',hint:''}]},
+};
+function phIcon(){return '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><path d="M3 1h3l1.5 4L6 6.5a9 9 0 0 0 3.5 3.5L11 8.5l4 1.5v3c0 1.1-.9 2-2 2A15 15 0 0 1 1 3c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';}
+function contactButtons(d){
+  var trajTel = contacts.traj.tel.replace(/\s/g,'') || '0488779222';
+  var lbTel   = contacts.lb.tel.replace(/\s/g,'')   || '092241620';
+  var t  = '<a class="panel-call-btn pct" href="tel:'+trajTel+'">'+phIcon()+' Tewerkst.</a>';
+  var lb = '<a class="panel-call-btn pcl" href="tel:'+lbTel+'">'+phIcon()+' L.Beg.</a>';
+  if(!d.callWerk) return '<div class="panel-contacts">'+t+lb+'</div>';
+  var w = contacts.werk.tel
+    ? '<a class="panel-call-btn pcw" href="tel:'+contacts.werk.tel.replace(/\s/g,'')+'">'+phIcon()+' '+(contacts.werk.naam||'Werkgever')+'</a>'
+    : '<div class="panel-call-btn pce" onclick="openContactForm(\'werk\')">'+phIcon()+' + Werkgever</div>';
+  return '<div class="panel-contacts">'+t+lb+w+'</div>';
+}
+function renderPanel(key){
+  var d=panels[key],p=document.getElementById('panel-'+key);
+  var al=d.topAlert?'<div class="top-alert">⚠️ '+d.topAlert+'</div>':'';
+  var steps=d.steps.map(function(s,i){
+    var ex='';
+    if(s.alert) ex+='<span class="step-alert">'+s.alert+'</span>';
+    if(s.hint)  ex+='<span class="step-hint">'+s.hint+'</span>';
+    var ico = s.ico ? '<div class="step-ico">'+s.ico+'</div>' : '';
+    return '<li class="step">'+ico+'<div class="step-num '+d.color+'">'+(i+1)+'</div><div class="step-text"><span class="step-bold">'+s.bold+'</span>'+s.text+ex+'</div></li>';
+  }).join('');
+  p.innerHTML='<div class="panel-title"><span style="font-size:18px">'+d.icon+'</span>'+d.title+'<span class="badge badge-'+d.color+'">SOS</span></div>'+al+'<ul class="steps">'+steps+'</ul>'+contactButtons(d)+'<div class="callout">Eerlijkheid en snel communiceren zijn altijd de beste aanpak. Je begeleider bij HTiSA is er om je te helpen!</div>';
+}
+function showBackBar(title){
+  var bar=document.getElementById('back-bar');
+  document.getElementById('back-bar-title').textContent=title;
+  bar.classList.add('show');
+}
+function hideBackBar(){
+  document.getElementById('back-bar').classList.remove('show');
+  document.getElementById('back-bar-title').textContent='';
+}
+function closeAllPanels(){
+  // Sluit SOS panels
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('open');});
+  document.querySelectorAll('.sos-btn').forEach(function(b){b.classList.remove('active','active-warning','active-info','active-success','active-fris','active-veilig');});
+  openPanel=null;
+  // Sluit fris
+  if(frisOpen){frisOpen=false;document.getElementById('panel-fris').classList.remove('open');document.getElementById('btn-fris').classList.remove('active-fris');if(frisTimer){clearInterval(frisTimer);frisTimer=null;}}
+  // Sluit veilig
+  if(veiligOpen){veiligOpen=false;document.getElementById('panel-veilig').classList.remove('open');document.getElementById('btn-veilig').classList.remove('active-veilig');}
+  hideBackBar();
+  // Scroll terug naar boven
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function closeSosPanels(){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('open');});
+  document.querySelectorAll('.sos-btn').forEach(function(b){b.classList.remove('active','active-warning','active-info','active-success');});
+  openPanel=null;
+}
+function toggle(key,btn,cls){
+  if(frisOpen){frisOpen=false;document.getElementById('panel-fris').classList.remove('open');document.getElementById('btn-fris').classList.remove('active-fris');if(frisTimer){clearInterval(frisTimer);frisTimer=null;}}
+  if(veiligOpen){veiligOpen=false;document.getElementById('panel-veilig').classList.remove('open');document.getElementById('btn-veilig').classList.remove('active-veilig');}
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('open');});
+  document.querySelectorAll('.sos-btn').forEach(function(b){b.classList.remove('active','active-warning','active-info','active-success');});
+  if(openPanel===key){openPanel=null;hideBackBar();return;}
+  renderPanel(key);
+  document.getElementById('panel-'+key).classList.add('open');
+  btn.classList.add(cls);
+  openPanel=key;
+  showBackBar(panels[key].title);
+  document.getElementById('panel-'+key).scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function openForm(){document.getElementById('add-form').classList.add('open');if(werkContact){document.getElementById('inp-naam').value=werkContact.naam;document.getElementById('inp-tel').value=werkContact.tel;}}
+function closeForm(){document.getElementById('add-form').classList.remove('open');document.getElementById('inp-naam').value='';document.getElementById('inp-tel').value='';}
+function saveContact(){
+  var naam=document.getElementById('inp-naam').value.trim(),tel=document.getElementById('inp-tel').value.trim();
+  if(!naam||!tel)return;
+  werkContact={naam:naam,tel:tel};
+  localStorage.setItem('htisa_werkgever',JSON.stringify(werkContact));
+  document.getElementById('werk-naam-display').textContent=naam;
+  document.getElementById('werk-num-display').textContent=tel;
+  document.getElementById('werk-call-btn').href='tel:'+tel.replace(/\s/g,'');
+  document.getElementById('werkgever-display').style.display='block';
+  document.getElementById('werkgever-add').style.display='none';
+  closeForm();if(openPanel)renderPanel(openPanel);
+}
+function switchTab(n,btn){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
+  btn.classList.add('active');
+  document.getElementById('view-'+n).classList.add('active');
+  // Als leerling-modus: verberg werkgever/begeleider knoppen en ga direct naar leerling
+  if(n==='cal'){
+    var isLeerlingModus = isLeerlingLink();
+    document.getElementById('role-knoppen').style.gridTemplateColumns = isLeerlingModus ? '1fr' : '1fr 1fr 1fr';
+    if(isLeerlingModus){
+      // Verberg werkgever en begeleider knoppen
+      var btns = document.querySelectorAll('#role-knoppen .role-btn');
+      btns.forEach(function(b,i){ b.style.display = i===0 ? 'block' : 'none'; });
+    } else {
+      var btns = document.querySelectorAll('#role-knoppen .role-btn');
+      btns.forEach(function(b){ b.style.display = 'block'; });
+      document.getElementById('role-knoppen').style.gridTemplateColumns = '1fr 1fr 1fr';
+    }
+  }
+}
+function isLeerlingLink(){
+  var params = new URLSearchParams(window.location.search);
+  return params.get('rol')==='leerling' || localStorage.getItem('htisa_rol')==='leerling';
+}
+// ── EERSTE DAG CHECKLIST ──
+var checklistItems = [
+  {ico:'🪪', tekst:'Identiteitskaart of documenten bij'},
+  {ico:'👕', tekst:'Propere werkkledij aan'},
+  {ico:'👟', tekst:'Veiligheidsschoenen mee'},
+  {ico:'🥤', tekst:'Ontbijt gegeten en iets te drinken mee'},
+  {ico:'📱', tekst:'Gsm opgeladen'},
+  {ico:'⏰', tekst:'Vroeg genoeg vertrokken'},
+  {ico:'📍', tekst:'Adres van de werkplek geweten'},
+  {ico:'👤', tekst:'Naam van de mentor/contactpersoon geweten'},
+  {ico:'💬', tekst:'Nummer van de trajectbegeleider opgeslagen'},
+  {ico:'😊', tekst:'Positieve instelling — succes!'},
+];
+var checklistState = JSON.parse(localStorage.getItem('htisa_checklist') || '{}');
+var eerstedagOpen = false;
+
+function toggleEersteDag(btn) {
+  eerstedagOpen = !eerstedagOpen;
+  // Sluit SOS panels maar NIET via closeSosPanels (die sluit ook eerstedag)
+  document.querySelectorAll('.panel').forEach(function(p){if(p.id!=='panel-eerstedag')p.classList.remove('open');});
+  document.querySelectorAll('.sos-btn').forEach(function(b){if(b.id!=='btn-eerstedag')b.classList.remove('active','active-warning','active-info','active-success','active-fris','active-veilig');});
+  openPanel=null;
+  if(frisOpen){frisOpen=false;document.getElementById('panel-fris').classList.remove('open');document.getElementById('btn-fris').classList.remove('active-fris');if(frisTimer){clearInterval(frisTimer);frisTimer=null;}}
+  if(veiligOpen){veiligOpen=false;document.getElementById('panel-veilig').classList.remove('open');document.getElementById('btn-veilig').classList.remove('active-veilig');}
+  if(woordenOpen){woordenOpen=false;document.getElementById('panel-woorden').classList.remove('open');document.getElementById('btn-woorden').classList.remove('active-info');}
+  if(reflectieOpen){reflectieOpen=false;document.getElementById('panel-reflectie').classList.remove('open');document.getElementById('btn-reflectie').classList.remove('active-fris');}
+  var panel = document.getElementById('panel-eerstedag');
+  if(eerstedagOpen) {
+    panel.classList.add('open');
+    btn.classList.add('active-info');
+    renderChecklist();
+    showBackBar('Eerste dag checklist');
+    setTimeout(function(){panel.scrollIntoView({behavior:'smooth',block:'nearest'});},50);
+  } else {
+    panel.classList.remove('open');
+    btn.classList.remove('active-info');
+    hideBackBar();
+  }
+}
+function renderChecklist() {
+  var html = checklistItems.map(function(item, i) {
+    var checked = checklistState[i];
+    return '<div onclick="toggleCheck('+i+')" style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--htisa-border);cursor:pointer;">' +
+      '<div style="font-size:24px;width:36px;text-align:center;flex-shrink:0;">'+item.ico+'</div>' +
+      '<div style="flex:1;font-size:13px;font-weight:500;color:'+(checked?'var(--htisa-muted)':'var(--htisa-text)')+';text-decoration:'+(checked?'line-through':'none')+';">'+item.tekst+'</div>' +
+      '<div style="width:24px;height:24px;border-radius:6px;border:2px solid '+(checked?'var(--s-ok)':'var(--htisa-border)')+';background:'+(checked?'var(--s-ok)':'transparent')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;color:white;">'+(checked?'✓':'')+'</div>' +
+    '</div>';
+  }).join('');
+  var done = Object.values(checklistState).filter(Boolean).length;
+  document.getElementById('checklist-items').innerHTML = 
+    '<div style="font-size:12px;color:var(--htisa-muted);margin-bottom:8px;text-align:right;">'+done+' / '+checklistItems.length+' klaar</div>' + html;
+}
+function toggleCheck(i) {
+  checklistState[i] = !checklistState[i];
+  localStorage.setItem('htisa_checklist', JSON.stringify(checklistState));
+  renderChecklist();
+}
+function resetChecklist() {
+  checklistState = {};
+  localStorage.setItem('htisa_checklist', JSON.stringify(checklistState));
+  renderChecklist();
+}
+
+// ── BEELDWOORDENBOEK ──
+var woordenOpen = false;
+var woorden = [
+  {ico:'⏰', nl:'Prikklok',            fr:'Pointeuse',               en:'Time clock',         ar:'ساعة الدوام',       tr:'Mesai saati'},
+  {ico:'📅', nl:'Dienstrooster',       fr:'Planning / horaire',      en:'Work schedule',      ar:'جدول العمل',        tr:'Çalışma programı'},
+  {ico:'☕', nl:'Pauze',               fr:'Pause',                   en:'Break',              ar:'استراحة',           tr:'Mola'},
+  {ico:'🍱', nl:'Middagpauze',         fr:'Pause déjeuner',          en:'Lunch break',        ar:'استراحة الغداء',    tr:'Öğle molası'},
+  {ico:'💰', nl:'Loon / salaris',      fr:'Salaire',                 en:'Salary / wage',      ar:'راتب',              tr:'Maaş'},
+  {ico:'🏖️', nl:'Verlof / vakantie',  fr:'Congé',                   en:'Leave / holiday',    ar:'إجازة',             tr:'İzin'},
+  {ico:'⌛', nl:'Overuren',            fr:'Heures supp.',            en:'Overtime',           ar:'ساعات إضافية',      tr:'Fazla mesai'},
+  {ico:'👔', nl:'Werkgever',           fr:'Employeur',               en:'Employer',           ar:'صاحب العمل',        tr:'İşveren'},
+  {ico:'🤝', nl:'Collega',             fr:'Collègue',                en:'Colleague',          ar:'زميل',              tr:'Meslektaş'},
+  {ico:'👷', nl:'Mentor / begeleider', fr:'Tuteur',                  en:'Supervisor',         ar:'مشرف',              tr:'Mentor'},
+  {ico:'📋', nl:'Opdracht / taak',     fr:'Tâche',                   en:'Task / assignment',  ar:'مهمة',              tr:'Görev'},
+  {ico:'🛠️', nl:'Gereedschap',        fr:'Outil',                   en:'Tool',               ar:'أداة',              tr:'Alet'},
+  {ico:'🏭', nl:'Magazijn / stock',    fr:'Entrepôt / stock',        en:'Warehouse / stock',  ar:'مستودع',            tr:'Depo'},
+  {ico:'🦺', nl:'Veiligheidsjas',      fr:'Veste de sécurité',       en:'Safety vest',        ar:'سترة أمان',         tr:'Güvenlik yeleği'},
+  {ico:'😎', nl:'Veiligheidsbril',     fr:'Lunettes de sécurité',    en:'Safety glasses',     ar:'نظارات السلامة',    tr:'Güvenlik gözlüğü'},
+  {ico:'👟', nl:'Veiligheidsschoenen', fr:'Chaussures de sécurité',  en:'Safety shoes',       ar:'حذاء السلامة',      tr:'Güvenlik ayakkabısı'},
+  {ico:'⛑️', nl:'Helm',               fr:'Casque',                  en:'Helmet / hard hat',  ar:'خوذة',              tr:'Kask'},
+  {ico:'🧤', nl:'Handschoenen',        fr:'Gants',                   en:'Gloves',             ar:'قفازات',            tr:'Eldiven'},
+  {ico:'🚨', nl:'Nooduitgang',         fr:'Sortie de secours',       en:'Emergency exit',     ar:'مخرج طوارئ',        tr:'Acil çıkış'},
+  {ico:'🔥', nl:'Brandblusser',        fr:'Extincteur',              en:'Fire extinguisher',  ar:'طفاية الحريق',      tr:'Yangın söndürücü'},
+  {ico:'🏥', nl:'Doktersattest',       fr:'Certificat médical',      en:'Doctor\'s note',     ar:'شهادة طبية',        tr:'Doktor raporu'},
+  {ico:'🤕', nl:'Arbeidsongeval',      fr:'Accident du travail',     en:'Work accident',      ar:'حادث عمل',          tr:'İş kazası'},
+  {ico:'👕', nl:'Werkkleding',         fr:'Vêtements de travail',    en:'Work clothes',       ar:'ملابس العمل',       tr:'İş kıyafeti'},
+  {ico:'📄', nl:'Contract',            fr:'Contrat',                 en:'Contract',           ar:'عقد',               tr:'Sözleşme'},
+  {ico:'🤒', nl:'Ziek / afwezig',      fr:'Malade / absent',         en:'Sick / absent',      ar:'مريض / غائب',       tr:'Hasta / devamsız'},
+  {ico:'🏃', nl:'Te laat',             fr:'En retard',               en:'Late',               ar:'متأخر',             tr:'Geç'},
+  {ico:'🗣️', nl:'Vergadering',        fr:'Réunion',                 en:'Meeting',            ar:'اجتماع',            tr:'Toplantı'},
+  {ico:'🚿', nl:'Kleedkamer / WC',     fr:'Vestiaire / toilettes',   en:'Locker room / WC',   ar:'غرفة تبديل الملابس', tr:'Soyunma odası / WC'},
+  {ico:'🔩', nl:'Schroef',             fr:'Vis',                     en:'Screw',              ar:'مسمار لولبي',       tr:'Vida'},
+  {ico:'🔨', nl:'Hamer',               fr:'Marteau',                 en:'Hammer',             ar:'مطرقة',             tr:'Çekiç'},
+  {ico:'🪛', nl:'Schroevendraaier',    fr:'Tournevis',               en:'Screwdriver',        ar:'مفك البراغي',       tr:'Tornavida'},
+  {ico:'🔧', nl:'Moersleutel',         fr:'Clé à molette',           en:'Wrench / spanner',   ar:'مفتاح ربط',         tr:'İngiliz anahtarı'},
+  {ico:'🪚', nl:'Zaag',                fr:'Scie',                    en:'Saw',                ar:'منشار',              tr:'Testere'},
+  {ico:'⚡', nl:'Boormachine',         fr:'Perceuse',                en:'Drill',              ar:'مثقاب كهربائي',     tr:'Matkap'},
+  {ico:'📐', nl:'Meetlint / winkelhaak',fr:'Mètre / équerre',        en:'Tape measure / square',ar:'شريط قياس',        tr:'Metre / gönye'},
+  {ico:'🧱', nl:'Materiaal / grondstof',fr:'Matériau / matière première',en:'Material / raw material',ar:'مواد خام',    tr:'Malzeme / hammadde'},
+  {ico:'✅', nl:'Klaar / afgewerkt',   fr:'Terminé / fini',          en:'Done / finished',    ar:'انتهيت',            tr:'Bitti / tamamlandı'},
+];
+var woordenFilter = '';
+
+function toggleWoorden(btn) {
+  woordenOpen = !woordenOpen;
+  // Sluit andere panels
+  closeSosPanels();
+  if(frisOpen){frisOpen=false;document.getElementById('panel-fris').classList.remove('open');document.getElementById('btn-fris').classList.remove('active-fris');if(frisTimer){clearInterval(frisTimer);frisTimer=null;}}
+  if(veiligOpen){veiligOpen=false;document.getElementById('panel-veilig').classList.remove('open');document.getElementById('btn-veilig').classList.remove('active-veilig');}
+  if(eerstedagOpen){eerstedagOpen=false;document.getElementById('panel-eerstedag').classList.remove('open');document.getElementById('btn-eerstedag').classList.remove('active-info');}
+  if(reflectieOpen){reflectieOpen=false;document.getElementById('panel-reflectie').classList.remove('open');document.getElementById('btn-reflectie').classList.remove('active-fris');}
+  var panel = document.getElementById('panel-woorden');
+  btn.classList.toggle('active-info', woordenOpen);
+  if(woordenOpen) {
+    panel.classList.add('open');
+    woordenFilter = '';
+    var zoek = document.getElementById('woorden-zoek');
+    zoek.value = '';
+    renderWoorden();
+    showBackBar('Beeldwoordenboek werkvloer');
+    setTimeout(function(){ panel.scrollIntoView({behavior:'smooth',block:'nearest'}); zoek.focus(); }, 100);
+  } else {
+    panel.classList.remove('open');
+    hideBackBar();
+  }
+}
+
+// Zorg dat zoekfunctie live werkt via addEventListener (betrouwbaarder dan oninput attribuut)
+document.addEventListener('DOMContentLoaded', function() {
+  var zoek = document.getElementById('woorden-zoek');
+  if(zoek) {
+    zoek.addEventListener('input', function() {
+      woordenFilter = this.value.toLowerCase().trim();
+      renderWoorden();
+    });
+    zoek.addEventListener('keyup', function() {
+      woordenFilter = this.value.toLowerCase().trim();
+      renderWoorden();
+    });
   }
 });
+
+function filterWoorden() {
+  woordenFilter = (document.getElementById('woorden-zoek').value || '').toLowerCase().trim();
+  renderWoorden();
+}
+function renderWoorden() {
+  var container = document.getElementById('woorden-list');
+  if(!container) return;
+  var filtered = woorden.filter(function(w) {
+    if(!woordenFilter) return true;
+    return w.nl.toLowerCase().includes(woordenFilter) ||
+           w.fr.toLowerCase().includes(woordenFilter) ||
+           w.en.toLowerCase().includes(woordenFilter) ||
+           w.ar.includes(woordenFilter) ||
+           w.tr.toLowerCase().includes(woordenFilter);
+  });
+  if(!filtered.length) {
+    container.innerHTML = '<div style="text-align:center;color:var(--htisa-muted);padding:20px;font-size:13px;">Geen woorden gevonden voor "'+woordenFilter+'"</div>';
+    return;
+  }
+  var rows = filtered.map(function(w) {
+    return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--htisa-border);">' +
+      '<div style="font-size:28px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--htisa-off);border-radius:8px;flex-shrink:0;">'+w.ico+'</div>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="font-size:14px;font-weight:800;color:var(--htisa-text);margin-bottom:5px;">'+w.nl+'</div>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:4px;">' +
+          '<span style="background:#fff3e0;color:#e65100;border-radius:4px;padding:2px 6px;font-size:10px;font-weight:600;">🇫🇷 '+w.fr+'</span>' +
+          '<span style="background:#e3f0fc;color:#1565c0;border-radius:4px;padding:2px 6px;font-size:10px;font-weight:600;">🇬🇧 '+w.en+'</span>' +
+          '<span style="background:#fce4ec;color:#c62828;border-radius:4px;padding:2px 6px;font-size:10px;font-weight:600;">🇲🇦 '+w.ar+'</span>' +
+          '<span style="background:#e8f5e9;color:#2e7d32;border-radius:4px;padding:2px 6px;font-size:10px;font-weight:600;">🇹🇷 '+w.tr+'</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  container.innerHTML = '<div style="font-size:11px;color:var(--htisa-muted);margin-bottom:8px;font-weight:600;">'+filtered.length+' woorden'+(woordenFilter?' voor "'+woordenFilter+'"':'')+'</div>' + rows;
+}
+
+// ── WEEKREFLECTIE ──
+var reflectieOpen = false;
+var AT_REFL_TABLE = 'Reflecties'; // naam van de tabel in Airtable
+
+function toggleReflectie(btn) {
+  reflectieOpen = !reflectieOpen;
+  closeSosPanels();
+  if(frisOpen){frisOpen=false;document.getElementById('panel-fris').classList.remove('open');document.getElementById('btn-fris').classList.remove('active-fris');if(frisTimer){clearInterval(frisTimer);frisTimer=null;}}
+  if(veiligOpen){veiligOpen=false;document.getElementById('panel-veilig').classList.remove('open');document.getElementById('btn-veilig').classList.remove('active-veilig');}
+  if(eerstedagOpen){eerstedagOpen=false;document.getElementById('panel-eerstedag').classList.remove('open');document.getElementById('btn-eerstedag').classList.remove('active-info');}
+  if(woordenOpen){woordenOpen=false;document.getElementById('panel-woorden').classList.remove('open');document.getElementById('btn-woorden').classList.remove('active-info');}
+  var panel = document.getElementById('panel-reflectie');
+  panel.classList.toggle('open', reflectieOpen);
+  btn.classList.toggle('active-fris', reflectieOpen);
+  if(reflectieOpen) {
+    initReflectie();
+    showBackBar('Weekreflectie');
+    panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+  } else hideBackBar();
+}
+function initReflectie() {
+  var n = new Date();
+  var dag = n.getDay(); // 0=zo, 1=ma ... 5=vr, 6=za
+  var vrijdag = new Date(n);
+  vrijdag.setDate(n.getDate() - ((dag + 2) % 7)); // vorige vrijdag
+  var weekLabel = 'Week van ' + vrijdag.toLocaleDateString('nl-BE', {day:'numeric', month:'long', year:'numeric'});
+  document.getElementById('refl-week-label').textContent = weekLabel;
+  // Laad eventuele opgeslagen waarden
+  var saved = JSON.parse(localStorage.getItem('htisa_refl_' + vrijdag.toISOString().split('T')[0]) || '{}');
+  document.getElementById('refl-goed').value = saved.goed || '';
+  document.getElementById('refl-moeilijk').value = saved.moeilijk || '';
+  document.getElementById('refl-volgend').value = saved.volgend || '';
+}
+async function saveReflectie() {
+  var goed = document.getElementById('refl-goed').value.trim();
+  var moeilijk = document.getElementById('refl-moeilijk').value.trim();
+  var volgend = document.getElementById('refl-volgend').value.trim();
+  var fb = document.getElementById('refl-feedback');
+  if(!goed && !moeilijk && !volgend) { fb.style.color='var(--s-ko)'; fb.textContent='⚠️ Vul minstens één veld in'; return; }
+  var leerling = localStorage.getItem('htisa_leerling_naam') || 'Onbekend';
+  var n = new Date();
+  var dag = n.getDay();
+  var vrijdag = new Date(n);
+  vrijdag.setDate(n.getDate() - ((dag + 2) % 7));
+  var datum = vrijdag.toISOString().split('T')[0];
+  // Sla ook lokaal op
+  localStorage.setItem('htisa_refl_' + datum, JSON.stringify({goed:goed, moeilijk:moeilijk, volgend:volgend}));
+  document.getElementById('refl-save-btn').disabled = true;
+  fb.style.color = 'var(--htisa-muted)'; fb.textContent = 'Opslaan...';
+  try {
+    var reflUrl = 'https://api.airtable.com/v0/' + AT_BASE + '/Reflecties';
+    var resp = await fetch(reflUrl, {
+      method: 'POST',
+      headers: {'Authorization':'Bearer '+AT_TOKEN,'Content-Type':'application/json'},
+      body: JSON.stringify({fields:{Leerling:leerling, Datum:datum, WatGingGoed:goed, WatWasMoeilijk:moeilijk, VolgendeWeek:volgend}})
+    });
+    if(resp.ok) { fb.style.color='var(--s-ok)'; fb.textContent='✅ Reflectie opgeslagen!'; }
+    else { fb.style.color='var(--htisa-muted)'; fb.textContent='✅ Lokaal opgeslagen (Airtable tabel "Reflecties" nog niet aangemaakt)'; }
+  } catch(e) {
+    fb.style.color = 'var(--htisa-muted)'; fb.textContent = '✅ Lokaal opgeslagen';
+  }
+  document.getElementById('refl-save-btn').disabled = false;
+}
+var AT_TOKEN='patF9mAQo7N9aJeHD.cdba4d69632eb2c9d34de28825bb05303a9ccaf685e86f8336654c8d61000f60';
+var AT_BASE='appN0oikU56MoIJpJ';
+var AT_TABLE='tbl3Zbf2z8Ud37mJd';
+var AT_URL='https://api.airtable.com/v0/'+AT_BASE+'/'+AT_TABLE;
+
+// PINs
+var PINS=JSON.parse(localStorage.getItem('htisa_pins')||'{"werkgever":"1234","begeleider":"5678"}');
+var currentRole=null,pinBuffer='',selectedStatusWg='',allRecords=[];
+var calYear,calMonth;
+var MN=['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'];
+var DN=['Ma','Di','Wo','Do','Vr','Za','Zo'];
+
+// ROLE SELECTION
+function selectRole(role){
+  // Sla rol op als het een leerling-link is, zodat het na installatie blijft
+  var params = new URLSearchParams(window.location.search);
+  if(params.get('rol')==='leerling') localStorage.setItem('htisa_rol','leerling');
+
+  document.getElementById('role-chooser').style.display='none';
+  if(role==='leerling'){
+    var naam=localStorage.getItem('htisa_leerling_naam');
+    if(!naam){document.getElementById('leerling-naam-screen').style.display='block';}
+    else{showLeerlingView(naam);}
+  } else {
+    currentRole=role; pinBuffer='';
+    document.getElementById('pin-icon').textContent=role==='werkgever'?'🏭':'👨‍🏫';
+    document.getElementById('pin-role-label').textContent=role==='werkgever'?'Werkgever — PIN invoeren':'Begeleider — PIN invoeren';
+    document.getElementById('pin-error').textContent='';
+    updatePinDots();
+    document.getElementById('pin-screen').style.display='block';
+  }
+}
+function pinKey(k){
+  if(k==='←'){pinBuffer=pinBuffer.slice(0,-1);}
+  else if(k==='X'){pinBuffer='';document.getElementById('pin-error').textContent='';}
+  else if(pinBuffer.length<4){pinBuffer+=k;}
+  updatePinDots();
+  if(pinBuffer.length===4)checkPin();
+}
+function updatePinDots(){document.querySelectorAll('.pin-dot').forEach(function(d,i){d.classList.toggle('filled',i<pinBuffer.length);});}
+function checkPin(){
+  if(pinBuffer===PINS[currentRole]){
+    document.getElementById('pin-screen').style.display='none';
+    if(currentRole==='werkgever')showWerkgeverView();
+    else showBegeleiderView();
+  } else {
+    document.getElementById('pin-error').textContent='❌ Verkeerde PIN — probeer opnieuw';
+    pinBuffer='';
+    setTimeout(updatePinDots,100);
+  }
+}
+function logoutRole(){
+  currentRole=null; pinBuffer='';
+  document.getElementById('role-chooser').style.display='block';
+  ['view-leerling','view-werkgever','view-begeleider','leerling-naam-screen','pin-screen'].forEach(function(id){document.getElementById(id).style.display='none';});
+}
+
+// LEERLING
+function saveLeerlingNaam(){
+  var naam=document.getElementById('leerling-naam-input').value.trim();
+  if(!naam)return;
+  localStorage.setItem('htisa_leerling_naam',naam);
+  document.getElementById('leerling-naam-screen').style.display='none';
+  showLeerlingView(naam);
+}
+function showLeerlingView(naam){
+  document.getElementById('leerling-naam-display').textContent=naam;
+  var n=new Date(); calYear=n.getFullYear(); calMonth=n.getMonth();
+  document.getElementById('view-leerling').style.display='block';
+  loadLeerlingData(naam);
+}
+function changeCalMonth(d){calMonth+=d;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}loadLeerlingData(localStorage.getItem('htisa_leerling_naam'));}
+async function loadLeerlingData(naam){
+  document.getElementById('ll-loading').textContent='Gegevens ophalen...';
+  try{
+    var filter=encodeURIComponent("{Leerling}='"+naam.replace(/'/g,"\\'")+"'");
+    var resp=await fetch(AT_URL+'?filterByFormula='+filter,{headers:{'Authorization':'Bearer '+AT_TOKEN}});
+    var data=await resp.json();
+    renderLeerlingCal(data.records||[]);
+    document.getElementById('ll-loading').textContent='';
+  }catch(e){document.getElementById('ll-loading').textContent='⚠️ Verbinding mislukt';}
+}
+function renderLeerlingCal(records){
+  var map={};
+  records.forEach(function(r){if(r.fields&&r.fields.Datum)map[r.fields.Datum]=r.fields.Status;});
+  document.getElementById('leerling-month-label').textContent=MN[calMonth]+' '+calYear;
+  var g=document.getElementById('leerling-cal-grid');g.innerHTML='';
+  DN.forEach(function(d){var e=document.createElement('div');e.className='cal-dow';e.textContent=d;g.appendChild(e);});
+  var first=new Date(calYear,calMonth,1).getDay(),offset=(first===0)?6:first-1;
+  var dim=new Date(calYear,calMonth+1,0).getDate(),today=new Date();
+  for(var i=0;i<offset;i++){var e=document.createElement('div');e.className='cal-day cal-empty';g.appendChild(e);}
+  var cnt={ok:0,ko:0,late:0};
+  for(var day=1;day<=dim;day++){
+    var dt=new Date(calYear,calMonth,day),dow=dt.getDay(),isWE=(dow===0||dow===6);
+    var key=calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+    var isTd=(day===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear());
+    var el=document.createElement('div');el.className='cal-day';
+    if(isWE)el.classList.add('cal-weekend');
+    else if(isTd)el.classList.add('cal-today');
+    var st=map[key];
+    if(st==='Aanwezig'){el.classList.add('s-ok');cnt.ok++;}
+    else if(st==='Afwezig'){el.classList.add('s-ko');cnt.ko++;}
+    else if(st==='Te laat'){el.classList.add('s-late');cnt.late++;}
+    el.textContent=day;g.appendChild(el);
+  }
+  document.getElementById('ll-ok').textContent=cnt.ok;
+  document.getElementById('ll-ko').textContent=cnt.ko;
+  document.getElementById('ll-late').textContent=cnt.late;
+}
+
+// WERKGEVER
+var wgLeerlingen = JSON.parse(localStorage.getItem('htisa_wg_leerlingen') || '[]');
+var wgNieuwModus = false;
+
+function renderWgLeerlingen() {
+  var select = document.getElementById('wg-leerling-select');
+  var input  = document.getElementById('wg-leerling');
+  var toggle = document.getElementById('wg-leerling-toggle');
+  var lijst  = document.getElementById('wg-leerling-lijst');
+
+  // Bouw dropdown
+  select.innerHTML = '<option value="">— Kies een leerling —</option>';
+  wgLeerlingen.forEach(function(naam) {
+    var opt = document.createElement('option');
+    opt.value = naam; opt.textContent = naam;
+    select.appendChild(opt);
+  });
+
+  if(wgLeerlingen.length > 0 && !wgNieuwModus) {
+    // Toon dropdown, verberg tekstveld
+    select.style.display = 'block';
+    input.style.display  = 'none';
+    toggle.textContent   = '+';
+    toggle.title         = 'Nieuwe leerling toevoegen';
+    // Herselecteer vorige leerling
+    var last = localStorage.getItem('htisa_wg_last_leerling');
+    if(last) select.value = last;
+  } else {
+    // Toon tekstveld
+    select.style.display = 'none';
+    input.style.display  = 'block';
+    input.value = '';
+    toggle.textContent = wgLeerlingen.length > 0 ? '←' : '';
+    toggle.title = 'Terug naar lijst';
+    toggle.style.display = wgLeerlingen.length > 0 ? 'block' : 'none';
+  }
+
+  // Toon leerlingen als verwijderbare chips
+  lijst.innerHTML = '';
+  if(wgLeerlingen.length > 0 && !wgNieuwModus) {
+    lijst.innerHTML = '<span style="font-size:10px;color:var(--htisa-muted);width:100%;display:block;margin-bottom:3px;">Opgeslagen leerlingen:</span>';
+    wgLeerlingen.forEach(function(naam) {
+      var chip = document.createElement('span');
+      chip.style.cssText = 'background:var(--htisa-pale);border:1px solid var(--htisa-border);border-radius:12px;padding:2px 8px;font-size:11px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;';
+      chip.innerHTML = naam + ' <span style="color:var(--s-ko);font-weight:700;cursor:pointer;" onclick="wgVerwijderLeerling(\''+naam.replace(/'/g,"\\'")+'\')" title="Verwijder">×</span>';
+      lijst.appendChild(chip);
+    });
+  }
+}
+
+function wgSelectLeerling(naam) {
+  if(naam) localStorage.setItem('htisa_wg_last_leerling', naam);
+}
+
+function wgToggleLeerlingInput() {
+  wgNieuwModus = !wgNieuwModus;
+  renderWgLeerlingen();
+  if(wgNieuwModus) document.getElementById('wg-leerling').focus();
+}
+
+function wgVerwijderLeerling(naam) {
+  wgLeerlingen = wgLeerlingen.filter(function(n){ return n !== naam; });
+  localStorage.setItem('htisa_wg_leerlingen', JSON.stringify(wgLeerlingen));
+  if(localStorage.getItem('htisa_wg_last_leerling') === naam) localStorage.removeItem('htisa_wg_last_leerling');
+  renderWgLeerlingen();
+}
+
+function wgGetLeerlingNaam() {
+  if(wgLeerlingen.length > 0 && !wgNieuwModus) {
+    return document.getElementById('wg-leerling-select').value;
+  }
+  return document.getElementById('wg-leerling').value.trim();
+}
+
+function wgSlaLeerlingOp(naam) {
+  if(naam && !wgLeerlingen.includes(naam)) {
+    wgLeerlingen.push(naam);
+    localStorage.setItem('htisa_wg_leerlingen', JSON.stringify(wgLeerlingen));
+  }
+  localStorage.setItem('htisa_wg_last_leerling', naam);
+  wgNieuwModus = false;
+  renderWgLeerlingen();
+  document.getElementById('wg-leerling-select').value = naam;
+}
+
+function showWerkgeverView(){
+  document.getElementById('view-werkgever').style.display='block';
+  document.getElementById('wg-datum').value=new Date().toISOString().split('T')[0];
+  document.getElementById('wg-naam').value=localStorage.getItem('htisa_wg_naam')||'';
+  wgNieuwModus = false;
+  renderWgLeerlingen();
+}
+function selectStatus(s){
+  selectedStatusWg=s;
+  var map={'Aanwezig':'aanwezig','Afwezig':'afwezig','Te laat':'telaat'};
+  Object.values(map).forEach(function(id){document.getElementById('sb-'+id).classList.remove('selected');});
+  document.getElementById('sb-'+map[s]).classList.add('selected');
+}
+async function saveAanwezigheid(){
+  var leerling=wgGetLeerlingNaam();
+  var datum=document.getElementById('wg-datum').value;
+  var opmerking=document.getElementById('wg-opmerking').value.trim();
+  var werkgever=document.getElementById('wg-naam').value.trim();
+  var fb=document.getElementById('wg-feedback');
+  if(!leerling||!datum||!selectedStatusWg){fb.style.color='var(--s-ko)';fb.textContent='⚠️ Vul naam, datum en status in';return;}
+  localStorage.setItem('htisa_wg_naam',werkgever);
+  document.getElementById('wg-save-btn').disabled=true;
+  fb.style.color='var(--htisa-muted)';fb.textContent='Opslaan...';
+  try{
+    var filter=encodeURIComponent("AND({Leerling}='"+leerling.replace(/'/g,"\\'")+"',{Datum}='"+datum+"')");
+    var check=await fetch(AT_URL+'?filterByFormula='+filter,{headers:{'Authorization':'Bearer '+AT_TOKEN}});
+    var chData=await check.json();
+    var existing=chData.records&&chData.records[0];
+    var fields={Leerling:leerling,Datum:datum,Status:selectedStatusWg,Opmerking:opmerking,Werkgever:werkgever};
+    var resp;
+    if(existing){
+      resp=await fetch(AT_URL+'/'+existing.id,{method:'PATCH',headers:{'Authorization':'Bearer '+AT_TOKEN,'Content-Type':'application/json'},body:JSON.stringify({fields:fields})});
+    } else {
+      resp=await fetch(AT_URL,{method:'POST',headers:{'Authorization':'Bearer '+AT_TOKEN,'Content-Type':'application/json'},body:JSON.stringify({fields:fields})});
+    }
+    if(resp.ok){
+      // Sla leerling op voor volgende keer
+      wgSlaLeerlingOp(leerling);
+      fb.style.color='var(--s-ok)';
+      fb.textContent='✅ Opgeslagen! '+selectedStatusWg+' — '+leerling+' — '+datum;
+      document.getElementById('wg-opmerking').value='';
+      selectedStatusWg='';
+      ['aanwezig','afwezig','telaat'].forEach(function(id){document.getElementById('sb-'+id).classList.remove('selected');});
+    } else {var err=await resp.json();fb.style.color='var(--s-ko)';fb.textContent='❌ '+(err.error&&err.error.message||'Fout bij opslaan');}
+  }catch(e){fb.style.color='var(--s-ko)';fb.textContent='❌ Geen verbinding met Airtable';}
+  document.getElementById('wg-save-btn').disabled=false;
+}
+
+// BEGELEIDER
+function showBegeleiderView(){
+  document.getElementById('view-begeleider').style.display='block';
+  loadBegeleiderData();
+}
+async function loadBegeleiderData(){
+  var el=document.getElementById('bg-loading');
+  el.textContent='Gegevens ophalen...';
+  document.getElementById('bg-records').innerHTML='';
+  try{
+    var all=[],offset='';
+    do{
+      var url=AT_URL+'?sort[0][field]=Datum&sort[0][direction]=desc'+(offset?'&offset='+offset:'');
+      var resp=await fetch(url,{headers:{'Authorization':'Bearer '+AT_TOKEN}});
+      var data=await resp.json();
+      all=all.concat(data.records||[]);
+      offset=data.offset||'';
+    }while(offset);
+    allRecords=all;
+    el.textContent='';
+    filterBegeleider();
+  }catch(e){el.textContent='❌ Verbinding mislukt — probeer opnieuw';}
+}
+function filterBegeleider(){
+  var naam=(document.getElementById('bg-filter-leerling').value||'').toLowerCase();
+  var status=document.getElementById('bg-filter-status').value||'';
+  var filtered=allRecords.filter(function(r){
+    var f=r.fields||{};
+    if(naam&&!(f.Leerling||'').toLowerCase().includes(naam))return false;
+    if(status&&f.Status!==status)return false;
+    return true;
+  });
+  renderBegeleiderRows(filtered);
+}
+function renderBegeleiderRows(records){
+  var c=document.getElementById('bg-records');c.innerHTML='';
+  var cnt={ok:0,ko:0,late:0};
+  if(!records.length){c.innerHTML='<div style="text-align:center;color:var(--htisa-muted);font-size:13px;padding:20px 0;">Geen records gevonden</div>';}
+  records.forEach(function(r){
+    var f=r.fields||{};var st=f.Status||'?';
+    var cls=st==='Aanwezig'?'bg-badge-ok':st==='Afwezig'?'bg-badge-ko':'bg-badge-late';
+    if(st==='Aanwezig')cnt.ok++;else if(st==='Afwezig')cnt.ko++;else if(st==='Te laat')cnt.late++;
+    var row=document.createElement('div');row.className='bg-row';
+    row.innerHTML='<div class="bg-info"><span class="bg-naam">'+esc(f.Leerling||'—')+'</span><span class="bg-meta">'+esc(f.Datum||'')+(f.Werkgever?' · '+esc(f.Werkgever):'')+(f.Opmerking?' · '+esc(f.Opmerking):'')+'</span></div><span class="bg-badge '+cls+'">'+esc(st)+'</span>';
+    c.appendChild(row);
+  });
+  document.getElementById('bg-ok').textContent=cnt.ok;
+  document.getElementById('bg-ko').textContent=cnt.ko;
+  document.getElementById('bg-late').textContent=cnt.late;
+}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 </script>
 </body>
 </html>

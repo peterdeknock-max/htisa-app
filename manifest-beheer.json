@@ -1,8 +1,8 @@
 {
-  "name": "HTiSA \u2013 Aanwezigheden Beheer",
-  "short_name": "HTiSA Beheer",
-  "description": "Aanwezigheidsregistratie voor werkgevers en begeleiders HTiSA",
-  "start_url": "/htisa-app/beheer.html",
+  "name": "HTiSA \u2013 Duaal Leren To The Rescue",
+  "short_name": "HTiSA Rescue",
+  "description": "SOS hulp en aanwezigheidskalender voor duaal leren leerlingen van HTiSA",
+  "start_url": "/htisa-app/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2596be",

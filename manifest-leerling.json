@@ -1,8 +1,8 @@
 {
-  "name": "HTiSA \u2013 Duaal Leren",
-  "short_name": "HTiSA Leerling",
-  "description": "SOS hulp op de werkvloer voor leerlingen HTiSA",
-  "start_url": "/htisa-app/leerling.html",
+  "name": "HTiSA \u2013 Aanwezigheden Beheer",
+  "short_name": "HTiSA Beheer",
+  "description": "Aanwezigheidsregistratie voor werkgevers en begeleiders HTiSA",
+  "start_url": "/htisa-app/beheer.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2596be",
