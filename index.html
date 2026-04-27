@@ -422,6 +422,14 @@
       <div class="callout" style="margin-top:10px;">Vink alles af voor je vertrekt — succes op je eerste dag! 💪</div>
     </div>
 
+    <div class="grid grid-single" style="margin-bottom:6px">
+      <button class="sos-btn" onclick="toggle('bedrijfsbezoek',this,'active-info')">
+        <span class="btn-icon">🏢</span>
+        <span class="btn-text"><span class="btn-label">Op zoek naar een stageplaats</span><span class="btn-sub">Vragen voor het bedrijfsbezoek</span></span>
+      </button>
+    </div>
+    <div id="panel-bedrijfsbezoek" class="panel"></div>
+
     <!-- 4. TIPS -->
     <div class="section-label">Tips voor de werkplek</div>
     <div class="grid" style="margin-bottom:6px">
@@ -480,81 +488,6 @@
       <div id="woorden-list"></div>
     </div>
 
-    <!-- WEEKREFLECTIE BUTTON -->
-    <div class="section-label">Mijn week</div>
-    <div class="grid grid-single" style="margin-bottom:6px">
-      <button class="sos-btn" id="btn-reflectie" onclick="toggleReflectie(this)">
-        <span class="btn-icon">💭</span>
-        <span class="btn-text"><span class="btn-label">Weekreflectie</span><span class="btn-sub">Hoe was mijn week?</span></span>
-      </button>
-    </div>
-
-    <!-- WEEKREFLECTIE PANEL -->
-    <div id="panel-reflectie" class="panel">
-      <div class="panel-title"><span style="font-size:18px">💭</span> Weekreflectie <span class="badge" style="background:#6a3b9c;color:white;">WEEK</span></div>
-      <div id="refl-naam-check" style="display:none;">
-        <div style="font-size:12px;color:var(--htisa-muted);margin-bottom:8px;">Log eerst in als leerling om je reflectie op te slaan.</div>
-      </div>
-      <div id="refl-form">
-        <div style="font-size:12px;color:var(--htisa-muted);margin-bottom:12px;" id="refl-week-label"></div>
-        <label class="form-label">😊 Wat ging goed deze week?</label>
-        <textarea class="form-input" id="refl-goed" rows="2" placeholder="bv. Ik was elke dag op tijd..." style="margin-bottom:10px;resize:none;"></textarea>
-        <label class="form-label">😓 Wat was moeilijk?</label>
-        <textarea class="form-input" id="refl-moeilijk" rows="2" placeholder="bv. De machinewerking begrijpen..." style="margin-bottom:10px;resize:none;"></textarea>
-        <label class="form-label">🎯 Wat wil ik volgende week beter doen?</label>
-        <textarea class="form-input" id="refl-volgend" rows="2" placeholder="bv. Meer vragen stellen aan mijn mentor..." style="margin-bottom:12px;resize:none;"></textarea>
-        <button class="btn-save" id="refl-save-btn" onclick="saveReflectie()" style="width:100%;">Opslaan</button>
-        <div id="refl-feedback" style="font-size:12px;font-weight:600;margin-top:8px;text-align:center;min-height:18px;"></div>
-      </div>
-    </div>
-
-    <!-- 4. OPENBAAR VERVOER – onderaan -->
-    <div class="section-label">Openbaar vervoer</div>
-    <div class="transport-grid">
-      <!-- DE LIJN -->
-      <div class="transport-col">
-        <a class="transport-card lijn" href="https://www.delijn.be" target="_blank">
-          <div class="transport-logo ll">
-            <svg width="52" height="36" viewBox="0 0 52 36" xmlns="http://www.w3.org/2000/svg">
-              <rect width="52" height="36" rx="4" fill="#E2000F"/>
-              <text x="5" y="14" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="10" fill="white">De</text>
-              <text x="5" y="28" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="13" fill="white" letter-spacing="-0.3">Lijn</text>
-              <polygon points="38,22 52,22 52,36 38,36" fill="#b8000c"/>
-              <polygon points="42,36 52,25 52,36" fill="white" opacity="0.9"/>
-            </svg>
-          </div>
-          <div class="transport-info"><span class="transport-name lijn">De Lijn</span><span class="transport-sub">Bus &amp; tram</span></div>
-          <span class="transport-arrow lijn">→</span>
-        </a>
-        <div class="store-links">
-          <a class="store-btn ls" href="https://apps.apple.com/be/app/de-lijn/id371327848" target="_blank">🍎 iOS</a>
-          <a class="store-btn ls" href="https://play.google.com/store/apps/details?id=be.delijn.android" target="_blank">▶ Android</a>
-        </div>
-      </div>
-
-      <!-- NMBS -->
-      <div class="transport-col">
-        <a class="transport-card nmbs" href="https://www.belgiantrain.be" target="_blank">
-          <div class="transport-logo nl">
-            <svg width="52" height="36" viewBox="0 0 52 36" xmlns="http://www.w3.org/2000/svg">
-              <rect width="52" height="36" rx="4" fill="#003082"/>
-              <circle cx="14" cy="18" r="10" fill="none" stroke="white" stroke-width="1.8"/>
-              <text x="9.5" y="23" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="14" fill="white">B</text>
-              <text x="27" y="15" font-family="Arial,sans-serif" font-weight="700" font-size="8.5" fill="white" letter-spacing="0.5">NMBS</text>
-              <text x="27" y="26" font-family="Arial,sans-serif" font-weight="700" font-size="8.5" fill="white" letter-spacing="0.5">SNCB</text>
-            </svg>
-          </div>
-          <div class="transport-info"><span class="transport-name nmbs">NMBS</span><span class="transport-sub">Trein</span></div>
-          <span class="transport-arrow nmbs">→</span>
-        </a>
-        <div class="store-links">
-          <a class="store-btn ns" href="https://apps.apple.com/be/app/nmbs-sncb/id1155225868" target="_blank">🍎 iOS</a>
-          <a class="store-btn ns" href="https://play.google.com/store/apps/details?id=be.sncb.android" target="_blank">▶ Android</a>
-        </div>
-      </div>
-    </div>
-
-    <button class="ask-btn">Andere situatie? Vraag het hier →</button>
   </div>
 
   <!-- AANWEZIGHEDEN -->
@@ -938,7 +871,18 @@ var panels={
       {ico:'💬',bold:'Praat er met een vertrouwenspersoon over',text:'Vertel het aan iemand die je vertrouwt: een collega, je mentor of je trajectbegeleider. Zwijgen maakt het erger.',hint:''},
       {ico:'📞',bold:'Neem contact op met je trajectbegeleider',text:'Je begeleider bij HTiSA is er om je te helpen bij dit soort situaties. Bel of stuur een bericht.',hint:'Dit is waarvoor je begeleider er is'},
       {ico:'🚫',bold:'Ga niet in op pesterijen of provocaties',text:'Reageer niet op roddels, pestkopperij of uitdagingen. Meld het en laat de volwassenen het oplossen.',hint:''},
-      {ico:'🤝',bold:'Vraag om een gesprek',text:'Als het veilig is, vraag dan een rustig gesprek aan met de persoon of je werkgever erbij. Problemen lossen zich niet zelf op.',hint:''}]}
+      {ico:'🤝',bold:'Vraag om een gesprek',text:'Als het veilig is, vraag dan een rustig gesprek aan met de persoon of je werkgever erbij. Problemen lossen zich niet zelf op.',hint:''}]},
+  bedrijfsbezoek:{color:'info',title:'Op zoek naar een stageplaats',icon:'🏢',callWerk:false,
+    steps:[
+      {ico:'🏢',bold:'Naam en adres van het bedrijf',text:'Vraag de volledige naam van het bedrijf en het adres waar je zou werken.',hint:'Schrijf het meteen op of neem een foto van de gevel'},
+      {ico:'👤',bold:'Naam en functie van je contactpersoon',text:'Wie is jouw begeleider of mentor op de werkvloer? Vraag zijn of haar naam en functie.',hint:'bv. "Jan Peeters — technisch verantwoordelijke"'},
+      {ico:'📞',bold:'Telefoonnummer van het bedrijf',text:'Vraag het directe telefoonnummer van je contactpersoon of het bedrijf. Wat bel je als je ziek bent of te laat?',hint:'Vraag ook of je mag bellen of eerder een bericht stuurt'},
+      {ico:'📧',bold:'E-mailadres',text:'Vraag een e-mailadres voor correspondentie, bv. voor het opsturen van een attest.',hint:''},
+      {ico:'⏰',bold:'Werkuren en rooster',text:'Van hoe laat tot hoe laat werk je? Zijn er vaste pauzes? Werk je ook op zaterdagen?',hint:'Schrijf het rooster op of vraag een kopie'},
+      {ico:'👕',bold:'Werkkleding en veiligheidsuitrusting',text:'Moet je eigen werkkleding meebrengen? Voorziet het bedrijf veiligheidsschoenen, handschoenen of een helm?',hint:'Zorg dat je dit weet voor je eerste dag'},
+      {ico:'🚌',bold:'Hoe geraak ik er?',text:'Hoe bereik je de werkplek met het openbaar vervoer? Is er een bushalte of treinstation in de buurt?',hint:'Zoek de route op voor je eerste dag'},
+      {ico:'📋',bold:'Wat ga ik er doen?',text:'Vraag welke taken je zal uitvoeren. Wat leer je er? Past het bij je opleiding?',hint:'Noteer de belangrijkste taken'},
+      {ico:'❓',bold:'Zijn er nog vragen?',text:'Vraag of er nog andere praktische zaken zijn die je moet weten voor je start.',hint:'Beter één keer te veel vragen dan verrast worden'}]},
 };
 function phIcon(){return '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><path d="M3 1h3l1.5 4L6 6.5a9 9 0 0 0 3.5 3.5L11 8.5l4 1.5v3c0 1.1-.9 2-2 2A15 15 0 0 1 1 3c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';}
 function contactButtons(d){
