@@ -36,12 +36,11 @@
   .app-header::after{content:'';position:absolute;bottom:-25px;left:30%;width:200px;height:70px;border-radius:50%;background:rgba(255,255,255,0.05);}
   .header-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;position:relative;z-index:1;}
   .logo-block{background:var(--htisa-white);border-radius:8px;padding:8px 12px;display:inline-flex;flex-direction:column;align-items:flex-start;}
-  .logo-main{font-size:22px;font-weight:900;color:var(--htisa);letter-spacing:-0.5px;line-height:1;}
-  .logo-main em{font-style:italic;font-weight:400;font-size:20px;}
-  .duaal-badge{background:#FFE900;border-radius:8px;padding:5px 8px;display:flex;align-items:center;justify-content:center;}
-  .duaal-badge img{height:44px;width:44px;object-fit:contain;display:block;}
+  .logo-main{font-size:22px;font-weight:900;color:var(--htisa);letter-spacing:-0.5px;line-height:1;font-style:normal;}
+  .duaal-badge{background:#FFE900;border-radius:6px;padding:3px 6px;display:inline-flex;align-items:center;justify-content:center;}
+  .duaal-badge img{height:26px;width:auto;object-fit:contain;display:block;}
   .header-title{font-size:24px;font-weight:900;color:#fff;line-height:1.15;position:relative;z-index:1;}
-  .header-title span{font-size:13px;font-weight:500;color:rgba(255,255,255,0.75);display:block;margin-top:3px;}
+  .header-title span{font-size:12px;font-weight:400;color:rgba(255,255,255,0.8);display:block;margin-top:5px;font-style:italic;border-left:2px solid rgba(255,255,255,0.4);padding-left:8px;line-height:1.5;}
   .tabs-wrap{background:var(--htisa-white);border-bottom:2px solid var(--htisa-border);padding:0 16px;display:flex;}
   .tab{padding:13px 18px;font-size:12px;font-weight:800;color:var(--htisa-muted);cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;margin-bottom:-2px;text-transform:uppercase;letter-spacing:0.08em;font-family:var(--font);transition:color .15s;}
   .tab.active{color:var(--htisa);border-bottom-color:var(--htisa);}
@@ -52,7 +51,6 @@
   .contact-card{background:var(--htisa-white);border:1.5px solid var(--htisa-border);border-radius:var(--r);padding:8px 6px;min-width:0;}
   .contact-label{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .contact-label.blue{color:var(--htisa);} .contact-label.purple{color:var(--lb);} .contact-label.dark{color:var(--htisa-darker);}
-  .contact-name{font-size:11px;font-weight:700;color:var(--htisa-text);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .call-btn{display:flex;align-items:center;justify-content:center;gap:3px;width:100%;border:none;border-radius:6px;padding:7px 4px;font-size:10px;font-weight:700;color:#fff;cursor:pointer;text-decoration:none;font-family:var(--font);transition:background .15s;white-space:nowrap;overflow:hidden;}
   .call-btn.blue{background:var(--htisa);} .call-btn.blue:hover{background:var(--htisa-dark);}
   .call-btn.purple{background:var(--lb);} .call-btn.purple:hover{background:var(--lb-dark);}
@@ -258,14 +256,16 @@
 <div class="app">
   <div class="app-header">
     <div class="header-top">
-      <div class="logo-block">
-        <div class="logo-main">HT<em>i</em>SA</div>
-      </div>
-      <div class="duaal-badge">
-        <img src="icons/duaal-leren.png" alt="Duaal Leren"/>
+      <div>
+        <div class="logo-block">
+          <div class="logo-main">HTISA</div>
+        </div>
+        <div class="duaal-badge" style="margin-top:6px;display:inline-flex;">
+          <img src="icons/duaal-leren.png" alt="Duaal Leren" style="height:28px;width:auto;"/>
+        </div>
       </div>
     </div>
-    <div class="header-title">To the rescue<span>Hulp voor elke noodsituatie</span></div>
+    <div class="header-title">To the rescue<span id="week-quote"></span></div>
   </div>
 
   <div class="tabs-wrap">
@@ -290,7 +290,6 @@
       <!-- Tewerkstellingsbegeleider -->
       <div class="contact-card" id="card-traj">
         <div class="contact-label blue">Tewerkstelling</div>
-        <div class="contact-name" id="traj-naam">HTiSA Begeleider</div>
         <a class="call-btn blue" id="traj-call" href="tel:0488779222">
           <svg class="call-icon" viewBox="0 0 16 16" fill="none"><path d="M3 1h3l1.5 4L6 6.5a9 9 0 0 0 3.5 3.5L11 8.5l4 1.5v3c0 1.1-.9 2-2 2A15 15 0 0 1 1 3c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
           <span id="traj-tel-display">0488 77 92 22</span>
@@ -301,7 +300,6 @@
       <!-- Leerlingenbegeleider -->
       <div class="contact-card" id="card-lb">
         <div class="contact-label purple">Leerlingenbeg.</div>
-        <div class="contact-name" id="lb-naam">HTiSA</div>
         <a class="call-btn purple" id="lb-call" href="tel:092241620">
           <svg class="call-icon" viewBox="0 0 16 16" fill="none"><path d="M3 1h3l1.5 4L6 6.5a9 9 0 0 0 3.5 3.5L11 8.5l4 1.5v3c0 1.1-.9 2-2 2A15 15 0 0 1 1 3c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
           <span id="lb-tel-display">09 224 16 20</span>
@@ -312,7 +310,6 @@
       <!-- Werkgever -->
       <div class="contact-card" id="card-werk">
         <div class="contact-label dark">Werkgever</div>
-        <div class="contact-name" id="werk-naam">+ Toevoegen</div>
         <a class="call-btn dark" id="werk-call" href="#" onclick="if(!contacts.werk.tel){openContactForm('werk');return false;}">
           <svg class="call-icon" viewBox="0 0 16 16" fill="none"><path d="M3 1h3l1.5 4L6 6.5a9 9 0 0 0 3.5 3.5L11 8.5l4 1.5v3c0 1.1-.9 2-2 2A15 15 0 0 1 1 3c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
           <span id="werk-tel-display">Toevoegen</span>
@@ -365,7 +362,7 @@
     <div id="panel-ziekschool" class="panel"></div>
 
     <!-- 3. ANDERE SITUATIES -->
-    <div class="section-label">Andere situaties</div>
+    <div class="section-label">Werk</div>
     <div class="grid" style="margin-bottom:6px">
       <button class="sos-btn" onclick="toggle('kledij',this,'active-info')">
         <span class="btn-icon">👕</span>
@@ -404,7 +401,7 @@
     <div class="grid grid-single" style="margin-bottom:6px">
       <button class="sos-btn" id="btn-bedrijfsbezoek" onclick="toggleBedrijfsbezoek(this)">
         <span class="btn-icon">🏢</span>
-        <span class="btn-text"><span class="btn-label">Op zoek naar een stageplaats</span><span class="btn-sub">Noteer de gegevens en stuur op</span></span>
+        <span class="btn-text"><span class="btn-label">Op zoek naar werk</span><span class="btn-sub">Noteer de gegevens en stuur op</span></span>
       </button>
     </div>
 
@@ -644,6 +641,52 @@
 </div>
 
 <script>
+// ── DAGQUOTE ──
+var weekQuotes = [
+  'Elke dag op het werk is een dag dat je iets nieuws leert.',
+  'Every expert was once a beginner.',
+  'Fouten maken is oké. Ervan leren is verplicht.',
+  'Hard work beats talent when talent doesn\'t work hard.',
+  'Vragen stellen is niet zwak — het is slim.',
+  'Success is the sum of small efforts, repeated day in and day out.',
+  'Een goede werkhouding opent meer deuren dan een diploma.',
+  'The only way to do great work is to love what you do.',
+  'Trots zijn op je werk begint met op tijd komen.',
+  'Don\'t watch the clock — do what it does. Keep going.',
+  'Leren op school én op de werkvloer — dat is jouw voordeel.',
+  'Opportunities don\'t happen — you create them.',
+  'Elke meester was ooit een beginner.',
+  'It always seems impossible until it\'s done.',
+  'Respect verdien je door hard te werken, niet door er te zijn.',
+  'Dream it. Wish it. Do it.',
+  'Jouw mentor was ook ooit jouw leeftijd.',
+  'Start where you are. Use what you have. Do what you can.',
+  'Goed werk wordt altijd opgemerkt.',
+  'The secret of getting ahead is getting started.',
+  'Duaal leren is het beste van twee werelden.',
+  'You don\'t have to be great to start, but you have to start to be great.',
+  'Wie luistert, leert. Wie leert, groeit.',
+  'Believe you can and you\'re halfway there.',
+  'Op de werkvloer tel je mee van dag één.',
+  'Work hard in silence, let success make the noise.',
+  'Wees de stagiair waar iedereen positief over praat.',
+  'A little progress each day adds up to big results.',
+  'Elke week op het werk is een stap richting je toekomst.',
+  'You are capable of more than you know.',
+  'Nieuwsgierig zijn op het werk is je grootste troef.',
+  'Learn as if you will live forever.',
+  'Je leert niet alleen uit boeken — ook van mensen naast je.',
+  'Be the change you wish to see.',
+  'Een glimlach en punctualiteit gaan een lange weg.',
+  'Your future is created by what you do today.',
+];
+(function() {
+  var dagNr = Math.floor(Date.now() / (24 * 60 * 60 * 1000));
+  var quote = weekQuotes[dagNr % weekQuotes.length];
+  var el = document.getElementById('week-quote');
+  if(el) el.textContent = '"' + quote + '"';
+})();
+
 // ── SPLASH SCREEN ──
 window.addEventListener('load', function() {
   setTimeout(function() {
@@ -766,18 +809,15 @@ var editingContact = null;
 
 function renderContacts(){
   // Tewerkstellingsbegeleider
-  document.getElementById('traj-naam').textContent = contacts.traj.naam || 'Tewerkstellingsbeg.';
   document.getElementById('traj-tel-display').textContent = formatTel(contacts.traj.tel);
   document.getElementById('traj-call').href = 'tel:' + contacts.traj.tel.replace(/\s/g,'');
 
   // Leerlingenbegeleider
-  document.getElementById('lb-naam').textContent = contacts.lb.naam || 'Leerlingenbegeleider';
   document.getElementById('lb-tel-display').textContent = formatTel(contacts.lb.tel);
   document.getElementById('lb-call').href = 'tel:' + contacts.lb.tel.replace(/\s/g,'');
 
   // Werkgever
   var hasWerk = contacts.werk.tel;
-  document.getElementById('werk-naam').textContent = contacts.werk.naam || '+ Toevoegen';
   document.getElementById('werk-tel-display').textContent = hasWerk ? formatTel(contacts.werk.tel) : 'Toevoegen';
   if(hasWerk){
     document.getElementById('werk-call').href = 'tel:' + contacts.werk.tel.replace(/\s/g,'');
@@ -859,7 +899,7 @@ var panels={
       {ico:'💬',bold:'Zeg waarom je te laat bent',text:'Zeg kort de reden: bus vertraagd, file, fiets kapot...',hint:'Wees eerlijk'},
       {ico:'⏰',bold:'Zeg hoe laat je aankomt',text:'Zeg zo goed mogelijk hoe laat je er zal zijn.',hint:''},
       {ico:'📸',bold:'Maak een foto als bewijs',text:'Zie je de vertraging in de bus-app of op het bord? Maak een foto.',hint:''},
-      {ico:'🤝',bold:'Praat er later over',text:'Vraag hoe je dit kunt vermijden: eerder vertrekken, wekker vroeger...',hint:''}]},
+      {ico:'🕐',bold:'Stel voor om langer te werken',text:'Bied aan om iets langer te blijven om de verloren tijd te compenseren.',hint:'Dat toont dat je het meent'}]},
   laats:{color:'warning',title:'Te laat op school',icon:'🏫',callWerk:false,
     steps:[
       {ico:'💬',bold:'Stuur een bericht naar je begeleider',text:'Stuur een bericht via WhatsApp of sms. Doe dit voor je aankomt op school.',hint:'Niet wachten!'},
@@ -887,7 +927,7 @@ var panels={
       {ico:'📞',bold:'Bel je begeleider van school',text:'Bel of stuur een bericht naar HTiSA. Je begeleider helpt je.',hint:''},
       {ico:'🚫',bold:'Reageer niet op pesten',text:'Reageer niet op roddels of pesterijen. Meld het en laat de volwassenen het oplossen.',hint:''},
       {ico:'🤝',bold:'Vraag een gesprek',text:'Als het veilig is, vraag dan rustig een gesprek met de persoon.',hint:''}]},
-  bedrijfsbezoek:{color:'info',title:'Op zoek naar een stageplaats',icon:'🏢',callWerk:false,
+  bedrijfsbezoek:{color:'info',title:'Op zoek naar werk',icon:'🏢',callWerk:false,
     steps:[
       {ico:'🏢',bold:'Naam van het bedrijf',text:'Schrijf de naam op.',hint:''},
       {ico:'👤',bold:'Naam contactpersoon',text:'Wie is jouw begeleider? Vraag zijn of haar naam.',hint:''},
