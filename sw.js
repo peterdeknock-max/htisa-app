@@ -1,65 +1,47 @@
 // ── HTiSA Service Worker ──
-// Versienummer automatisch op huidige datum/tijd — elke upload is een nieuwe versie
-const CACHE_NAME = 'htisa-rescue-v' + '20250428';
+// Versienummer = huidige datum/tijd van upload → elke nieuwe upload = automatische update
+const CACHE_NAME = 'htisa-v20260428-1244' + '20250428-1645';
 const BASE = '/htisa-app';
 
-// Network-first strategie: altijd proberen de nieuwste versie te laden
-// Cache enkel als fallback bij geen internet
 self.addEventListener('install', event => {
-  self.skipWaiting(); // activeer meteen, wacht niet op oud tabblad
+  self.skipWaiting(); // activeer meteen zonder wachten
 });
 
 self.addEventListener('activate', event => {
-  // Verwijder alle oude caches
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => {
-        console.log('[SW] Oude cache verwijderd:', k);
-        return caches.delete(k);
-      }))
-    ).then(() => self.clients.claim()) // claim alle open tabs meteen
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', event => {
-  // HTML pagina's: altijd netwerk-first (nieuwste versie)
-  if (event.request.mode === 'navigate') {
+  // HTML: altijd netwerk-first zodat je altijd de nieuwste versie krijgt
+  if(event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          // Sla nieuwe versie op in cache
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          caches.open(CACHE_NAME).then(c => c.put(event.request, response.clone()));
           return response;
         })
-        .catch(() => {
-          // Geen internet? Gebruik gecachte versie
-          return caches.match(event.request) || caches.match(BASE + '/index.html');
-        })
+        .catch(() => caches.match(event.request) || caches.match(BASE + '/index.html'))
     );
     return;
   }
-
-  // Alle andere bestanden (CSS, JS, afbeeldingen): cache-first maar update op achtergrond
+  // Andere bestanden: cache maar update op achtergrond
   event.respondWith(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.match(event.request).then(cached => {
-        const networkFetch = fetch(event.request).then(response => {
-          if (response && response.status === 200) {
-            cache.put(event.request, response.clone());
-          }
-          return response;
+    caches.open(CACHE_NAME).then(cache =>
+      cache.match(event.request).then(cached => {
+        var net = fetch(event.request).then(r => {
+          if(r && r.status === 200) cache.put(event.request, r.clone());
+          return r;
         }).catch(() => null);
-
-        return cached || networkFetch;
-      });
-    })
+        return cached || net;
+      })
+    )
   );
 });
 
-// Stuur bericht naar app als nieuwe versie beschikbaar is
 self.addEventListener('message', event => {
-  if (event.data === 'skipWaiting') {
-    self.skipWaiting();
-  }
+  if(event.data === 'skipWaiting') self.skipWaiting();
 });
