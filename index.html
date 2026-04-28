@@ -617,6 +617,31 @@
         <div style="font-size:16px;font-weight:800;color:var(--htisa-text);">👨‍🏫 Overzicht aanwezigheden</div>
         <button class="cal-nav-btn" onclick="loadBegeleiderData()" title="Ververs" style="font-size:14px;">↻</button>
       </div>
+
+      <!-- LEERLINGENLIJST BEHEER -->
+      <div class="panel open" style="margin-bottom:14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="font-size:13px;font-weight:800;color:var(--htisa-text);">👨‍🎓 Leerlingenlijst</div>
+          <span id="import-leerling-count" style="font-size:11px;color:var(--htisa-muted);"></span>
+        </div>
+
+        <!-- Import knop -->
+        <label id="import-leerling-label" style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--htisa);color:white;border-radius:var(--r);padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;text-align:center;">
+          📥 Importeer lijst (Excel / CSV)
+          <input type="file" id="import-leerling-file" accept=".xlsx,.xls,.csv" style="display:none;" onchange="importeerLeerlingen(this)"/>
+        </label>
+        <div style="font-size:11px;color:var(--htisa-muted);margin-bottom:10px;text-align:center;">Exporteer in Smartschool of Informat als CSV of Excel. Zorg dat de eerste kolom de namen bevat.</div>
+
+        <!-- Leerlingen chips -->
+        <div id="import-leerling-lijst" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
+
+        <!-- Manueel toevoegen -->
+        <div style="display:flex;gap:6px;">
+          <input class="form-input" id="import-manueel" type="text" placeholder="Manueel toevoegen..." style="margin-bottom:0;flex:1;"/>
+          <button class="btn-save" onclick="voegLeerlingToe()" style="flex-shrink:0;padding:0 14px;">+</button>
+        </div>
+        <div id="import-feedback" style="font-size:11px;font-weight:600;margin-top:6px;min-height:16px;"></div>
+      </div>
       <!-- Filter -->
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
         <input class="form-input" id="bg-filter-leerling" type="text" placeholder="Filter op naam..." oninput="filterBegeleider()" style="margin-bottom:0;flex:1;min-width:130px;"/>
@@ -1281,6 +1306,108 @@ async function saveReflectie() {
   document.getElementById('refl-save-btn').disabled = false;
 }
 
+// ── LEERLINGENLIJST BEHEER ──
+function renderImportLijst() {
+  var lijst = document.getElementById('import-leerling-lijst');
+  var count = document.getElementById('import-leerling-count');
+  if(!lijst) return;
+  count.textContent = wgLeerlingen.length + ' leerlingen';
+  if(wgLeerlingen.length === 0) {
+    lijst.innerHTML = '<span style="font-size:11px;color:var(--htisa-muted);">Nog geen leerlingen toegevoegd.</span>';
+    return;
+  }
+  lijst.innerHTML = wgLeerlingen.map(function(naam) {
+    return '<span style="background:var(--htisa-pale);border:1px solid var(--htisa-border);border-radius:12px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--htisa-text);display:inline-flex;align-items:center;gap:5px;">' +
+      naam +
+      '<span onclick="wgVerwijderLeerling(\''+naam.replace(/'/g,"\\'")+'\');renderImportLijst();" style="color:var(--s-ko);cursor:pointer;font-weight:700;font-size:13px;line-height:1;">×</span>' +
+    '</span>';
+  }).join('');
+}
+
+function voegLeerlingToe() {
+  var input = document.getElementById('import-manueel');
+  var naam = input.value.trim();
+  var fb = document.getElementById('import-feedback');
+  if(!naam) return;
+  if(wgLeerlingen.includes(naam)) {
+    fb.style.color = 'var(--s-ko)';
+    fb.textContent = '⚠️ ' + naam + ' staat al in de lijst';
+    return;
+  }
+  wgLeerlingen.push(naam);
+  localStorage.setItem('htisa_wg_leerlingen', JSON.stringify(wgLeerlingen));
+  input.value = '';
+  fb.style.color = 'var(--s-ok)';
+  fb.textContent = '✅ ' + naam + ' toegevoegd';
+  renderImportLijst();
+  renderWgLeerlingen();
+}
+
+function importeerLeerlingen(input) {
+  var fb = document.getElementById('import-feedback');
+  var file = input.files[0];
+  if(!file) return;
+  fb.style.color = 'var(--htisa-muted)';
+  fb.textContent = 'Bezig met importeren...';
+
+  var ext = file.name.split('.').pop().toLowerCase();
+
+  if(ext === 'csv') {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var lines = e.target.result.split(/\r?\n/).filter(function(l){ return l.trim(); });
+      var namen = [];
+      lines.forEach(function(line, i) {
+        // Skip header rij als die "naam" bevat
+        var cel = line.split(/[;,\t]/)[0].replace(/"/g,'').trim();
+        if(i === 0 && /naam|name|leerling/i.test(cel)) return;
+        if(cel) namen.push(cel);
+      });
+      verwerkNamen(namen);
+    };
+    reader.readAsText(file, 'UTF-8');
+  } else {
+    // Excel via SheetJS
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        var wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+        var ws = wb.Sheets[wb.SheetNames[0]];
+        var data = XLSX.utils.sheet_to_json(ws, {header:1});
+        var namen = [];
+        data.forEach(function(row, i) {
+          if(!row || !row[0]) return;
+          var cel = String(row[0]).trim();
+          if(i === 0 && /naam|name|leerling/i.test(cel)) return;
+          if(cel) namen.push(cel);
+        });
+        verwerkNamen(namen);
+      } catch(err) {
+        document.getElementById('import-feedback').style.color = 'var(--s-ko)';
+        document.getElementById('import-feedback').textContent = '❌ Kan bestand niet lezen. Probeer CSV.';
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+  input.value = '';
+}
+
+function verwerkNamen(namen) {
+  var fb = document.getElementById('import-feedback');
+  var nieuw = 0;
+  namen.forEach(function(naam) {
+    if(naam && !wgLeerlingen.includes(naam)) {
+      wgLeerlingen.push(naam);
+      nieuw++;
+    }
+  });
+  localStorage.setItem('htisa_wg_leerlingen', JSON.stringify(wgLeerlingen));
+  fb.style.color = nieuw > 0 ? 'var(--s-ok)' : 'var(--htisa-muted)';
+  fb.textContent = nieuw > 0 ? '✅ ' + nieuw + ' nieuwe leerlingen geïmporteerd!' : '⚠️ Alle namen stonden al in de lijst';
+  renderImportLijst();
+  renderWgLeerlingen();
+}
+
 // ── BEDRIJFSBEZOEK ──
 var bedrijfsbezoekOpen = false;
 function toggleBedrijfsbezoek(btn) {
@@ -1578,6 +1705,7 @@ async function saveAanwezigheid(){
 // BEGELEIDER
 function showBegeleiderView(){
   document.getElementById('view-begeleider').style.display='block';
+  renderImportLijst();
   loadBegeleiderData();
 }
 async function loadBegeleiderData(){
@@ -1627,5 +1755,6 @@ function renderBegeleiderRows(records){
 }
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 </script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </body>
 </html>
