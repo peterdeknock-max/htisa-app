@@ -37,8 +37,7 @@
   .header-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;position:relative;z-index:1;}
   .logo-block{background:var(--htisa-white);border-radius:8px;padding:8px 12px;display:inline-flex;flex-direction:column;align-items:flex-start;}
   .logo-main{font-size:22px;font-weight:900;color:var(--htisa);letter-spacing:-0.5px;line-height:1;font-style:normal;}
-  .duaal-badge{background:#FFE900;border-radius:6px;padding:3px 6px;display:inline-flex;align-items:center;justify-content:center;}
-  .duaal-badge img{height:26px;width:auto;object-fit:contain;display:block;}
+  .duaal-badge{background:#FFE900;border-radius:6px;padding:4px 8px;display:flex;align-items:center;justify-content:center;width:100%;}
   .header-title{font-size:24px;font-weight:900;color:#fff;line-height:1.15;position:relative;z-index:1;}
   .header-title span{font-size:12px;font-weight:400;color:rgba(255,255,255,0.8);display:block;margin-top:5px;font-style:italic;border-left:2px solid rgba(255,255,255,0.4);padding-left:8px;line-height:1.5;}
   .tabs-wrap{background:var(--htisa-white);border-bottom:2px solid var(--htisa-border);padding:0 16px;display:flex;}
@@ -256,13 +255,12 @@
 <div class="app">
   <div class="app-header">
     <div class="header-top">
-      <div>
+      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;">
         <div class="logo-block">
           <div class="logo-main">HTISA</div>
         </div>
-        <div class="duaal-badge" style="margin-top:6px;display:inline-flex;">
-          <img src="icons/duaal-leren.png" alt="Duaal Leren" style="height:28px;width:auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
-          <span style="display:none;font-family:Arial Black,Arial,sans-serif;font-size:10px;font-weight:900;color:#111;line-height:1.1;">DUAAL<br>LEREN</span>
+        <div class="duaal-badge" style="width:100%;">
+          <span style="font-family:Arial Black,Arial,sans-serif;font-size:11px;font-weight:900;color:#111;letter-spacing:0.05em;">DUAAL LEREN</span>
         </div>
       </div>
     </div>
