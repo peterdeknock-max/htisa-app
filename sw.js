@@ -1,49 +1,65 @@
-# HTiSA Duaal Leren – To The Rescue 📱
+// ── HTiSA Service Worker ──
+// Versienummer automatisch op huidige datum/tijd — elke upload is een nieuwe versie
+const CACHE_NAME = 'htisa-rescue-v' + '20250428';
+const BASE = '/htisa-app';
 
-## Bestanden
+// Network-first strategie: altijd proberen de nieuwste versie te laden
+// Cache enkel als fallback bij geen internet
+self.addEventListener('install', event => {
+  self.skipWaiting(); // activeer meteen, wacht niet op oud tabblad
+});
 
-```
-htisa-pwa/
-├── index.html      → De volledige app
-├── manifest.json   → PWA-configuratie (naam, icoon, kleuren)
-├── sw.js           → Service worker (offline werking)
-├── icons/
-│   ├── icon-192.png
-│   └── icon-512.png
-└── README.md
-```
+self.addEventListener('activate', event => {
+  // Verwijder alle oude caches
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => {
+        console.log('[SW] Oude cache verwijderd:', k);
+        return caches.delete(k);
+      }))
+    ).then(() => self.clients.claim()) // claim alle open tabs meteen
+  );
+});
 
-## Online zetten (gratis, 5 minuten)
+self.addEventListener('fetch', event => {
+  // HTML pagina's: altijd netwerk-first (nieuwste versie)
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          // Sla nieuwe versie op in cache
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          return response;
+        })
+        .catch(() => {
+          // Geen internet? Gebruik gecachte versie
+          return caches.match(event.request) || caches.match(BASE + '/index.html');
+        })
+    );
+    return;
+  }
 
-### Optie A – Netlify Drop (aanbevolen, geen account nodig)
-1. Ga naar https://app.netlify.com/drop
-2. Sleep de volledige map `htisa-pwa` op de pagina
-3. Klaar! Je krijgt een link zoals `https://amazing-name-123.netlify.app`
+  // Alle andere bestanden (CSS, JS, afbeeldingen): cache-first maar update op achtergrond
+  event.respondWith(
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.match(event.request).then(cached => {
+        const networkFetch = fetch(event.request).then(response => {
+          if (response && response.status === 200) {
+            cache.put(event.request, response.clone());
+          }
+          return response;
+        }).catch(() => null);
 
-### Optie B – GitHub Pages
-1. Maak een gratis account op https://github.com
-2. Maak een nieuwe repository aan: `htisa-rescue`
-3. Upload alle bestanden
-4. Ga naar Settings → Pages → Deploy from branch: main
-5. App staat live op `https://jouwgebruikersnaam.github.io/htisa-rescue`
+        return cached || networkFetch;
+      });
+    })
+  );
+});
 
-## Installeren op iPhone (iOS)
-1. Open de app-link in **Safari**
-2. Tik op het **Deel-icoon** (vierkant met pijl omhoog)
-3. Kies **"Zet op beginscherm"**
-4. Tik op **"Voeg toe"**
-→ App verschijnt als icoon op het startscherm
-
-## Installeren op Android
-1. Open de app-link in **Chrome**
-2. Er verschijnt automatisch een banner: **"Voeg toe aan startscherm"**
-3. Of: tik op de drie puntjes → "App installeren"
-→ App verschijnt als icoon op het startscherm
-
-## Offline werking
-De app werkt volledig **zonder internet** na de eerste keer laden.
-Alle inhoud wordt gecached door de service worker.
-
-## Eigen domein (optioneel)
-Wil je de app op een eigen adres zoals `rescue.htisa.be`?
-→ Koppel je domein aan Netlify via de DNS-instellingen.
+// Stuur bericht naar app als nieuwe versie beschikbaar is
+self.addEventListener('message', event => {
+  if (event.data === 'skipWaiting') {
+    self.skipWaiting();
+  }
+});

@@ -721,7 +721,31 @@ window.addEventListener('load', function() {
 
 // ── PWA SERVICE WORKER ──
 if('serviceWorker' in navigator){
-  window.addEventListener('load', function() { navigator.serviceWorker.register('sw.js'); });
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('sw.js').then(function(reg) {
+      // Controleer regelmatig op updates
+      setInterval(function(){ reg.update(); }, 60 * 60 * 1000); // elk uur
+
+      reg.addEventListener('updatefound', function() {
+        var newWorker = reg.installing;
+        newWorker.addEventListener('statechange', function() {
+          if(newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // Nieuwe versie beschikbaar — herlaad automatisch
+            newWorker.postMessage('skipWaiting');
+          }
+        });
+      });
+    });
+
+    // Herlaad pagina als nieuwe service worker actief wordt
+    var refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function() {
+      if(!refreshing) {
+        refreshing = true;
+        window.location.reload();
+      }
+    });
+  });
 }
 
 // ── FRIS VOOR DE DAG ──
