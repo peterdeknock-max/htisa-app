@@ -410,26 +410,39 @@
 
     <!-- BEDRIJFSBEZOEK PANEL -->
     <div id="panel-bedrijfsbezoek" class="panel" style="display:none;">
-      <div class="panel-title"><span style="font-size:18px">🏢</span> Gegevens bedrijf <span class="badge badge-info">STAGEPLAATS</span></div>
+      <div class="panel-title"><span style="font-size:18px">🏢</span> Een stageplaats zoeken <span class="badge badge-info">INFO</span></div>
+      <div style="font-size:12px;color:var(--htisa-muted);margin-bottom:14px;">Welke info heb ik nodig?</div>
 
-      <label class="form-label">🏢 Naam van het bedrijf</label>
-      <input class="form-input" id="bb-firma" type="text" placeholder="bv. Garage Van Damme" style="margin-bottom:10px;"/>
+      <!-- Stap 1 -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <div style="background:var(--htisa);color:white;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">1</div>
+        <span style="font-size:13px;font-weight:700;color:var(--htisa-text);">🏢 Naam van het bedrijf</span>
+      </div>
+      <input class="form-input" id="bb-firma" type="text" placeholder="bv. Garage Van Damme" style="margin-bottom:14px;"/>
 
-      <label class="form-label">👤 Naam contactpersoon</label>
-      <input class="form-input" id="bb-contact" type="text" placeholder="bv. Jan Peeters" style="margin-bottom:10px;"/>
+      <!-- Stap 2 -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <div style="background:var(--htisa);color:white;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">2</div>
+        <span style="font-size:13px;font-weight:700;color:var(--htisa-text);">👤 Naam en functie contactpersoon</span>
+      </div>
+      <input class="form-input" id="bb-contact" type="text" placeholder="bv. Jan Peeters — technisch verantwoordelijke" style="margin-bottom:14px;"/>
 
-      <label class="form-label">📞 Telefoonnummer</label>
-      <input class="form-input" id="bb-tel" type="tel" placeholder="bv. 09 123 45 67" style="margin-bottom:10px;"/>
-
-      <label class="form-label">📸 Foto van het bedrijf (optioneel)</label>
-      <input type="file" id="bb-foto" accept="image/*" capture="environment" style="margin-bottom:10px;width:100%;font-size:13px;color:var(--htisa-muted);"/>
-      <div id="bb-preview" style="margin-bottom:10px;display:none;">
-        <img id="bb-preview-img" style="width:100%;border-radius:8px;border:1.5px solid var(--htisa-border);max-height:200px;object-fit:cover;" alt="Foto bedrijf"/>
+      <!-- Stap 3 -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <div style="background:var(--htisa);color:white;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">3</div>
+        <span style="font-size:13px;font-weight:700;color:var(--htisa-text);">📸 Maak een foto van het bedrijf</span>
+      </div>
+      <label id="bb-foto-label" style="display:block;background:var(--htisa-off);border:1.5px dashed var(--htisa-border2);border-radius:var(--r);padding:16px;text-align:center;cursor:pointer;margin-bottom:10px;">
+        <div style="font-size:28px;margin-bottom:4px;">📷</div>
+        <div style="font-size:12px;color:var(--htisa-muted);">Tik hier om een foto te nemen</div>
+        <input type="file" id="bb-foto" accept="image/*" capture="environment" style="display:none;"/>
+      </label>
+      <div id="bb-preview" style="margin-bottom:14px;display:none;">
+        <img id="bb-preview-img" style="width:100%;border-radius:var(--r);border:1.5px solid var(--htisa-border);max-height:200px;object-fit:cover;" alt="Foto bedrijf"/>
       </div>
 
       <button class="btn-save" onclick="stuurBedrijfsgegevens()" style="width:100%;margin-bottom:8px;">📧 Verstuur naar begeleider</button>
       <div id="bb-feedback" style="font-size:12px;font-weight:600;text-align:center;min-height:18px;"></div>
-      <div class="callout" style="margin-top:10px;">De gegevens worden rechtstreeks naar je begeleider gestuurd.</div>
     </div>
 
     <!-- 4. TIPS -->
@@ -1240,9 +1253,8 @@ function toggleBedrijfsbezoek(btn) {
   panel.style.display = bedrijfsbezoekOpen ? 'block' : 'none';
   btn.classList.toggle('active-info', bedrijfsbezoekOpen);
   if(bedrijfsbezoekOpen) {
-    showBackBar('Gegevens bedrijf');
+    showBackBar('Een stageplaats zoeken');
     setTimeout(function(){ panel.scrollIntoView({behavior:'smooth',block:'nearest'}); }, 50);
-    // Foto preview listener
     var fotoInput = document.getElementById('bb-foto');
     fotoInput.onchange = function() {
       var file = this.files[0];
@@ -1251,6 +1263,7 @@ function toggleBedrijfsbezoek(btn) {
         reader.onload = function(e) {
           document.getElementById('bb-preview-img').src = e.target.result;
           document.getElementById('bb-preview').style.display = 'block';
+          document.getElementById('bb-foto-label').style.display = 'none';
         };
         reader.readAsDataURL(file);
       }
@@ -1261,10 +1274,9 @@ function toggleBedrijfsbezoek(btn) {
 function stuurBedrijfsgegevens() {
   var firma   = document.getElementById('bb-firma').value.trim();
   var contact = document.getElementById('bb-contact').value.trim();
-  var tel     = document.getElementById('bb-tel').value.trim();
   var fb      = document.getElementById('bb-feedback');
   var leerling = localStorage.getItem('htisa_leerling_naam') || 'een leerling';
-  if(!firma && !contact && !tel) {
+  if(!firma && !contact) {
     fb.style.color = 'var(--s-ko)';
     fb.textContent = '⚠️ Vul minstens één veld in';
     return;
@@ -1273,7 +1285,6 @@ function stuurBedrijfsgegevens() {
   var body = 'Beste begeleider,\n\n' + leerling + ' heeft volgende gegevens genoteerd:\n\n';
   if(firma)   body += '🏢 Bedrijf: ' + firma + '\n';
   if(contact) body += '👤 Contactpersoon: ' + contact + '\n';
-  if(tel)     body += '📞 Telefoonnummer: ' + tel + '\n';
   body += '\nMet vriendelijke groeten,\n' + leerling;
   window.location.href = 'mailto:peter.deknock@htisa.be?subject=' + onderwerp + '&body=' + encodeURIComponent(body);
   fb.style.color = 'var(--s-ok)';
