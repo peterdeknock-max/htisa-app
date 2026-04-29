@@ -700,8 +700,8 @@ var weekQuotes = [
   'Your future is created by what you do today.',
 ];
 (function() {
-  var dagNr = Math.floor(Date.now() / (24 * 60 * 60 * 1000));
-  var quote = weekQuotes[dagNr % weekQuotes.length];
+  var idx = Math.floor(Math.random() * weekQuotes.length);
+  var quote = weekQuotes[idx];
   var el = document.getElementById('week-quote');
   if(el) el.textContent = '"' + quote + '"';
 })();
