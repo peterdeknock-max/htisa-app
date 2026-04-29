@@ -1,107 +1,27 @@
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="HTiSA Rescue">
-<meta name="theme-color" content="#ffffff">
-<link rel="manifest" href="manifest-leerling.json">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
-<title>HTiSA – Duaal Leren</title>
-<style>
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
-  .logo{width:160px;height:160px;object-fit:contain;margin-bottom:16px;animation:pop .6s cubic-bezier(0.34,1.56,0.64,1) forwards;}
-  @keyframes pop{from{transform:scale(0.8);opacity:0;}to{transform:scale(1);opacity:1;}}
-  h1{font-size:22px;font-weight:800;color:#2596be;margin-bottom:6px;text-align:center;}
-  p{font-size:14px;color:#5b8fa0;text-align:center;margin-bottom:20px;line-height:1.6;}
-  .rol-grid{display:grid;grid-template-columns:1fr;gap:10px;width:100%;max-width:320px;margin-bottom:16px;}
-  .btn{display:block;width:100%;background:#2596be;color:white;border:none;border-radius:12px;padding:14px 16px;font-size:15px;font-weight:700;cursor:pointer;text-align:left;text-decoration:none;transition:background .15s;display:flex;align-items:center;gap:12px;}
-  .btn:hover{background:#1a7295;}
-  .btn.werkgever{background:#f59e0b;}
-  .btn.werkgever:hover{background:#d97706;}
-  .btn.begeleider{background:#7b1fa2;}
-  .btn.begeleider:hover{background:#6a1891;}
-  .btn-ico{font-size:24px;}
-  .btn-text{flex:1;}
-  .btn-label{display:block;font-size:15px;font-weight:700;}
-  .btn-sub{display:block;font-size:11px;opacity:0.85;margin-top:2px;}
-  .divider{width:100%;max-width:320px;display:flex;align-items:center;gap:10px;margin:4px 0 12px;color:#5b8fa0;font-size:12px;}
-  .divider::before,.divider::after{content:'';flex:1;height:1px;background:#c2dfe9;}
-  .btn-install{display:none;width:100%;max-width:320px;background:#34a853;color:white;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;margin-bottom:10px;font-family:inherit;}
-  .btn-install.show{display:block;}
-  .install-tip{background:#eef7fb;border:1.5px solid #c2dfe9;border-radius:10px;padding:14px;width:100%;max-width:320px;margin-top:4px;}
-  .install-tip-titel{font-size:12px;font-weight:800;color:#2596be;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
-  .install-stap{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#2a6070;margin-bottom:6px;line-height:1.5;}
-  .install-stap:last-child{margin-bottom:0;}
-  #status{font-size:12px;color:#2e7d32;font-weight:600;margin-bottom:8px;text-align:center;}
-</style>
-</head>
-<body>
-
-<img src="icons/icon-512.png" class="logo" alt="HTiSA logo"/>
-<h1>HTiSA – Duaal Leren</h1>
-<p>Kies jouw rol om de app te openen:</p>
-
-<div class="rol-grid">
-  <a href="index.html" class="btn" onclick="setRol('leerling')">
-    <span class="btn-ico">👨‍🎓</span>
-    <span class="btn-text">
-      <span class="btn-label">Leerling</span>
-      <span class="btn-sub">SOS-hulp en eigen aanwezigheidskalender</span>
-    </span>
-  </a>
-  <a href="index.html" class="btn werkgever" onclick="setRol('werkgever')">
-    <span class="btn-ico">🏭</span>
-    <span class="btn-text">
-      <span class="btn-label">Werkgever</span>
-      <span class="btn-sub">Aanwezigheid registreren · PIN vereist</span>
-    </span>
-  </a>
-  <a href="index.html" class="btn begeleider" onclick="setRol('begeleider')">
-    <span class="btn-ico">👨‍🏫</span>
-    <span class="btn-text">
-      <span class="btn-label">Begeleider</span>
-      <span class="btn-sub">Alle leerlingen opvolgen · PIN vereist</span>
-    </span>
-  </a>
-</div>
-
-<div id="status"></div>
-
-<button class="btn-install" id="install-btn">📲 Installeer op startscherm</button>
-
-<div class="install-tip">
-  <div class="install-tip-titel">📲 Installeer op je startscherm</div>
-  <div class="install-stap"><span>🍎</span><span><strong>iPhone:</strong> tik op ⎋ onderaan → "Zet op beginscherm"</span></div>
-  <div class="install-stap"><span>🤖</span><span><strong>Android:</strong> tik op ⋮ → "Toevoegen aan startscherm" → "Installeren"</span></div>
-</div>
-
-<script>
-function setRol(rol){
-  localStorage.setItem('htisa_rol', rol);
+{
+  "name": "HTiSA – Duaal Leren To The Rescue",
+  "short_name": "HTiSA Rescue",
+  "description": "SOS hulp en aanwezigheidskalender voor duaal leren leerlingen van HTiSA",
+  "start_url": "/htisa-app/leerling.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2596be",
+  "orientation": "portrait",
+  "lang": "nl",
+  "icons": [
+    {
+      "src": "/htisa-app/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/htisa-app/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "scope": "/htisa-app/",
+  "id": "/htisa-app/"
 }
-
-// Android install knop
-var installPrompt = null;
-window.addEventListener('beforeinstallprompt', function(e) {
-  e.preventDefault();
-  installPrompt = e;
-  document.getElementById('install-btn').classList.add('show');
-});
-document.getElementById('install-btn').addEventListener('click', async function() {
-  if(!installPrompt) return;
-  installPrompt.prompt();
-  var result = await installPrompt.userChoice;
-  installPrompt = null;
-  document.getElementById('install-btn').classList.remove('show');
-  if(result.outcome === 'accepted') {
-    document.getElementById('status').textContent = '✅ App geïnstalleerd!';
-  }
-});
-</script>
-</body>
-</html>

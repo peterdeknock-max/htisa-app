@@ -1,8 +1,8 @@
 {
-  "name": "HTiSA \u2013 Aanwezigheden Beheer",
-  "short_name": "HTiSA Beheer",
-  "description": "Aanwezigheidsregistratie voor werkgevers en begeleiders HTiSA",
-  "start_url": "/htisa-app/beheer.html",
+  "name": "HTiSA – Duaal Leren",
+  "short_name": "HTiSA Leerling",
+  "description": "SOS hulp op de werkvloer voor leerlingen HTiSA",
+  "start_url": "/htisa-app/leerling.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2596be",
@@ -10,17 +10,18 @@
   "lang": "nl",
   "icons": [
     {
-      "src": "icons/icon-192.png",
+      "src": "/htisa-app/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "/htisa-app/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ],
-  "scope": "/htisa-app/"
+  "scope": "/htisa-app/",
+  "id": "/htisa-app/leerling.html"
 }
