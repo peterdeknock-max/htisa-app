@@ -368,14 +368,8 @@
       <button class="sos-btn" onclick="toggle('kledij',this,'active-info')">
         <span class="btn-icon">👕</span>
         <span class="btn-text"><span class="btn-label">Werkkledij vergeten</span><span class="btn-sub">Oplossingen</span></span>
-      </button>
-      <button class="sos-btn" onclick="toggle('vergeten',this,'active-success')">
-        <span class="btn-icon">📋</span>
-        <span class="btn-text"><span class="btn-label">Materiaal vergeten</span><span class="btn-sub">Wat doen?</span></span>
-      </button>
-    </div>
+      </button></div>
     <div id="panel-kledij" class="panel"></div>
-    <div id="panel-vergeten" class="panel"></div>
 
     <div class="grid" style="margin-bottom:6px">
       <button class="sos-btn" onclick="toggle('conflict',this,'active')">
@@ -966,13 +960,6 @@ var panels={
       {ico:'🏠',bold:'Vraag of je thuis mag gaan halen',text:'Woon je dichtbij? Vraag of je snel thuis kunt gaan halen.',hint:'Vraag het!'},
       {ico:'😊',bold:'Zeg sorry',text:'Zeg dat het je spijt en dat het niet meer zal gebeuren.',hint:''},
       {ico:'✅',bold:'Leg je kledij klaar vanavond',text:'Leg je werkkleding vanavond al klaar. Dan vergeet je het niet meer.',hint:''}]},
-  vergeten:{color:'success',title:'Materiaal vergeten',icon:'📋',callWerk:false,
-    steps:[
-      {ico:'😌',bold:'Blijf rustig',text:'Panikeer niet. Kijk wat je wél hebt.',hint:''},
-      {ico:'💬',bold:'Zeg het aan je mentor',text:'Zeg eerlijk wat je vergeten bent.',hint:''},
-      {ico:'🔍',bold:'Zoek een oplossing',text:'Kan iemand helpen? Kan je het digitaal doen?',hint:''},
-      {ico:'⏰',bold:'Breng het morgen mee',text:'Schrijf het op of zet een alarm op je gsm.',hint:''},
-      {ico:'✅',bold:'Maak een lijstje',text:'Schrijf op wat je elke dag nodig hebt. Check het elke ochtend.',hint:''}]},
   conflict:{color:'danger',title:'Conflict op het werk',icon:'😤',callWerk:true,
     steps:[
       {ico:'😮‍💨',bold:'Blijf rustig',text:'Zeg niets als je boos bent. Ga even weg als je kan.',hint:''},
