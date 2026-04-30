@@ -364,24 +364,14 @@
 
     <!-- 3. ANDERE SITUATIES -->
     <div class="section-label">Werk</div>
-    <div class="grid" style="margin-bottom:6px">
-      <button class="sos-btn" onclick="toggle('kledij',this,'active-info')">
-        <span class="btn-icon">👕</span>
-        <span class="btn-text"><span class="btn-label">Werkkledij vergeten</span><span class="btn-sub">Oplossingen</span></span>
-      </button></div>
-    <div id="panel-kledij" class="panel"></div>
 
-    <div class="grid" style="margin-bottom:6px">
-      <button class="sos-btn" onclick="toggle('conflict',this,'active')">
-        <span class="btn-icon">😤</span>
-        <span class="btn-text"><span class="btn-label">Conflict op het werk</span><span class="btn-sub">Ruzie of pesterij</span></span>
-      </button>
+    <!-- Eerste dag checklist - vol breed bovenaan -->
+    <div class="grid grid-single" style="margin-bottom:6px">
       <button class="sos-btn" id="btn-eerstedag" onclick="toggleEersteDag(this)">
         <span class="btn-icon">🎯</span>
         <span class="btn-text"><span class="btn-label">Eerste dag checklist</span><span class="btn-sub">Ben ik klaar?</span></span>
       </button>
     </div>
-    <div id="panel-conflict" class="panel"></div>
 
     <!-- EERSTE DAG PANEL -->
     <div id="panel-eerstedag" class="panel">
@@ -393,6 +383,21 @@
       <div class="callout" style="margin-top:10px;">Vink alles af voor je vertrekt — succes op je eerste dag! 💪</div>
     </div>
 
+    <!-- Werkkledij + Conflict naast elkaar -->
+    <div class="grid" style="margin-bottom:6px">
+      <button class="sos-btn" onclick="toggle('kledij',this,'active-info')">
+        <span class="btn-icon">👕</span>
+        <span class="btn-text"><span class="btn-label">Werkkledij vergeten</span><span class="btn-sub">Oplossingen</span></span>
+      </button>
+      <button class="sos-btn" onclick="toggle('conflict',this,'active')">
+        <span class="btn-icon">😤</span>
+        <span class="btn-text"><span class="btn-label">Conflict op het werk</span><span class="btn-sub">Ruzie of pesterij</span></span>
+      </button>
+    </div>
+    <div id="panel-kledij" class="panel"></div>
+    <div id="panel-conflict" class="panel"></div>
+
+    <!-- Op zoek naar werk - vol breed onderaan -->
     <div class="grid grid-single" style="margin-bottom:6px">
       <button class="sos-btn" id="btn-bedrijfsbezoek" onclick="toggleBedrijfsbezoek(this)">
         <span class="btn-icon">🏢</span>
