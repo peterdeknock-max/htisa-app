@@ -343,16 +343,23 @@
     <!-- 2. ZIEK -->
     <div class="section-label">Ik ben ziek</div>
     <div class="grid" style="margin-bottom:6px">
-      <button class="sos-btn" onclick="toggle('ziekwerk',this,'active')">
-        <span class="btn-icon">🏭</span>
-        <span class="btn-text"><span class="btn-label">Ziek op het werk</span><span class="btn-sub">Stageplaats</span></span>
+      <button class="sos-btn" onclick="toggle('ziekwerkstart',this,'active')">
+        <span class="btn-icon">🤒</span>
+        <span class="btn-text"><span class="btn-label">Ziek voor het werk</span><span class="btn-sub">Voor je start</span></span>
       </button>
+      <button class="sos-btn" onclick="toggle('ziekwerktijdens',this,'active')">
+        <span class="btn-icon">😷</span>
+        <span class="btn-text"><span class="btn-label">Ziek tijdens het werk</span><span class="btn-sub">Al op de werkplek</span></span>
+      </button>
+    </div>
+    <div id="panel-ziekwerkstart" class="panel"></div>
+    <div id="panel-ziekwerktijdens" class="panel"></div>
+    <div class="grid grid-single" style="margin-bottom:6px">
       <button class="sos-btn" onclick="toggle('ziekschool',this,'active')">
         <span class="btn-icon">🏫</span>
         <span class="btn-text"><span class="btn-label">Ziek op school</span><span class="btn-sub">Schooldag</span></span>
       </button>
     </div>
-    <div id="panel-ziekwerk" class="panel"></div>
     <div id="panel-ziekschool" class="panel"></div>
 
     <!-- 3. ANDERE SITUATIES -->
@@ -922,10 +929,16 @@ var werkContact = { get tel(){ return contacts.werk.tel; }, get naam(){ return c
 var openPanel=null;
 
 var panels={
-  ziekwerk:{color:'danger',title:'Ziek op de stageplaats',icon:'🏭',callWerk:true,topAlert:'Bel de werkplek — doe dit VOOR je werkdag begint!',
+  ziekwerkstart:{color:'danger',title:'Ziek voor het werk',icon:'🤒',callWerk:true,topAlert:'Bel de werkplek — doe dit VOOR je werkdag begint!',
     steps:[
-      {ico:'📞',bold:'Bel je werkgever',text:'Bel naar het werk. Doe dit voor je werkdag begint. Niet sms\'en — bellen!',alert:'Bel voor je start!'},
-      {ico:'🚪',bold:'Vraag of je mag vertrekken',text:'Ben je al op het werk en voel je je ziek? Vraag of je naar huis mag gaan.',hint:'Vertrek nooit zomaar'},
+      {ico:'📞',bold:'Bel je werkgever',text:'Bel naar het werk voor je werkdag begint. Niet sms\'en — bellen!',alert:'Bel voor je start!'},
+      {ico:'💬',bold:'Bel je begeleider van school',text:'Bel of stuur een bericht naar HTiSA.',hint:''},
+      {ico:'🩺',bold:'Ga naar de dokter',text:'Vraag een doktersattest. Zonder attest ben je ongewettigd afwezig.',hint:'Attest is verplicht!'},
+      {ico:'📄',bold:'Stuur het attest op',text:'Stuur een foto van je attest naar school én naar het werk.',hint:'Doe dit dezelfde dag'}]},
+  ziekwerktijdens:{color:'danger',title:'Ziek tijdens het werk',icon:'😷',callWerk:true,
+    steps:[
+      {ico:'🚪',bold:'Ga naar je werkgever',text:'Zeg aan je werkgever of mentor dat je je niet goed voelt.',hint:'Vertrek nooit zomaar!'},
+      {ico:'📞',bold:'Vraag of je mag vertrekken',text:'Vraag toestemming om naar huis te gaan. Wacht op het antwoord.',hint:'Altijd toestemming vragen'},
       {ico:'💬',bold:'Bel je begeleider van school',text:'Bel of stuur een bericht naar HTiSA.',hint:''},
       {ico:'🩺',bold:'Ga naar de dokter',text:'Vraag een doktersattest. Zonder attest ben je ongewettigd afwezig.',hint:'Attest is verplicht!'},
       {ico:'📄',bold:'Stuur het attest op',text:'Stuur een foto van je attest naar school én naar het werk.',hint:'Doe dit dezelfde dag'}]},
