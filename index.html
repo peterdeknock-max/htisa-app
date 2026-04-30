@@ -48,7 +48,7 @@
   .view.active{display:block;}
   .contacts-bar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:16px;}
   .contact-card{background:var(--htisa-white);border:1.5px solid var(--htisa-border);border-radius:var(--r);padding:8px 6px;min-width:0;}
-  .contact-label{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .contact-label{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;text-align:center;}
   .contact-label.blue{color:var(--htisa);} .contact-label.purple{color:var(--lb);} .contact-label.dark{color:var(--htisa-darker);}
   .call-btn{display:flex;align-items:center;justify-content:center;gap:3px;width:100%;border:none;border-radius:6px;padding:7px 4px;font-size:10px;font-weight:700;color:#fff;cursor:pointer;text-decoration:none;font-family:var(--font);transition:background .15s;white-space:nowrap;overflow:hidden;}
   .call-btn.blue{background:var(--htisa);} .call-btn.blue:hover{background:var(--htisa-dark);}
@@ -69,9 +69,15 @@
   .btn-save{background:var(--htisa);border:none;color:#fff;border-radius:6px;padding:9px 14px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);text-transform:uppercase;}
   .btn-save:hover{background:var(--htisa-dark);}
   .btn-cancel{background:var(--htisa-off);border:1.5px solid var(--htisa-border);color:var(--htisa-sec);border-radius:6px;padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);}
-  .section-label{font-size:9px;font-weight:900;color:var(--htisa);text-transform:uppercase;letter-spacing:0.14em;margin-bottom:8px;margin-top:14px;display:flex;align-items:center;gap:8px;}
-  .section-label::before{content:'';width:16px;height:2.5px;background:var(--htisa);border-radius:2px;}
+  .section-label{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:0.14em;margin-bottom:8px;margin-top:14px;display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 8px;border-radius:20px;color:white;}
+  .section-label::before{content:'';width:12px;height:2.5px;background:rgba(255,255,255,0.7);border-radius:2px;}
   .section-label:first-of-type{margin-top:0;}
+  .section-label.oranje{background:#f7941d;}
+  .section-label.blauw{background:#6dcff6;color:#0d4a5e;}
+  .section-label.blauw::before{background:rgba(0,0,0,0.2);}
+  .section-label.groen{background:#00a99d;}
+  .section-label.geel{background:#FFE900;color:#5a4000;}
+  .section-label.geel::before{background:rgba(0,0,0,0.2);}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px;}
   .grid-single{grid-template-columns:1fr;}
   .sos-btn{background:var(--htisa-white);border:1.5px solid var(--htisa-border);border-radius:var(--r);padding:13px 14px;cursor:pointer;text-align:left;width:100%;display:flex;align-items:center;gap:11px;transition:all .15s;font-family:var(--font);}
@@ -326,7 +332,7 @@
     </div>
 
     <!-- 1. TE LAAT -->
-    <div class="section-label">Ik ben te laat</div>
+    <div class="section-label oranje">Ik ben te laat</div>
     <div class="grid" style="margin-bottom:6px">
       <button class="sos-btn" onclick="toggle('laat',this,'active-warning')">
         <span class="btn-icon">⏱</span>
@@ -341,7 +347,7 @@
     <div id="panel-laats" class="panel"></div>
 
     <!-- 2. ZIEK -->
-    <div class="section-label">Ik ben ziek</div>
+    <div class="section-label blauw">Ik ben ziek</div>
     <div class="grid" style="margin-bottom:6px">
       <button class="sos-btn" onclick="toggle('ziekwerkstart',this,'active')">
         <span class="btn-icon">🤒</span>
@@ -363,7 +369,7 @@
     <div id="panel-ziekschool" class="panel"></div>
 
     <!-- 3. ANDERE SITUATIES -->
-    <div class="section-label">Werk</div>
+    <div class="section-label groen">Werk</div>
 
     <!-- Eerste dag checklist - vol breed bovenaan -->
     <div class="grid grid-single" style="margin-bottom:6px">
@@ -443,7 +449,7 @@
     </div>
 
     <!-- 4. TIPS -->
-    <div class="section-label">Tips voor de werkplek</div>
+    <div class="section-label geel">Tips voor de werkplek</div>
     <div class="grid" style="margin-bottom:6px">
       <button class="sos-btn" id="btn-fris" onclick="toggleFris(this)">
         <span class="btn-icon">✨</span>
