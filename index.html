@@ -375,13 +375,13 @@
     <div class="grid grid-single" style="margin-bottom:6px">
       <button class="sos-btn" id="btn-eerstedag" onclick="toggleEersteDag(this)">
         <span class="btn-icon">🎯</span>
-        <span class="btn-text"><span class="btn-label">Eerste dag checklist</span><span class="btn-sub">Ben ik klaar?</span></span>
+        <span class="btn-text"><span class="btn-label">First days on the job</span><span class="btn-sub">Ben ik klaar?</span></span>
       </button>
     </div>
 
     <!-- EERSTE DAG PANEL -->
     <div id="panel-eerstedag" class="panel">
-      <div class="panel-title"><span style="font-size:18px">🎯</span> Eerste dag checklist <span class="badge badge-info">CHECKLIST</span></div>
+      <div class="panel-title"><span style="font-size:18px">🎯</span> First days on the job <span class="badge badge-info">CHECKLIST</span></div>
       <div id="checklist-items"></div>
       <div style="margin-top:10px;display:flex;gap:8px;">
         <button class="btn-save" onclick="resetChecklist()" style="flex:1;font-size:12px;">↺ Opnieuw</button>
@@ -1095,16 +1095,17 @@ function isLeerlingLink(){
 }
 // ── EERSTE DAG CHECKLIST ──
 var checklistItems = [
-  {ico:'🪪', tekst:'Identiteitskaart of documenten bij'},
-  {ico:'👕', tekst:'Propere werkkledij aan'},
-  {ico:'👟', tekst:'Veiligheidsschoenen mee'},
-  {ico:'🥤', tekst:'Ontbijt gegeten en iets te drinken mee'},
-  {ico:'📱', tekst:'Gsm opgeladen'},
-  {ico:'⏰', tekst:'Vroeg genoeg vertrokken'},
-  {ico:'📍', tekst:'Adres van de werkplek geweten'},
-  {ico:'👤', tekst:'Naam van de mentor/contactpersoon geweten'},
-  {ico:'💬', tekst:'Nummer van de trajectbegeleider opgeslagen'},
-  {ico:'😊', tekst:'Positieve instelling — succes!'},
+  {ico:'⏰', tekst:'Ik vertrek op tijd van thuis'},
+  {ico:'🚌', tekst:'Ik weet welke bus of tram ik moet nemen'},
+  {ico:'👕', tekst:'Ik heb mijn werkkledij mee'},
+  {ico:'👟', tekst:'Ik heb mijn veiligheidsschoenen mee'},
+  {ico:'🧴', tekst:'Ik heb een luchtpakket mee'},
+  {ico:'🥤', tekst:'Ik heb ontbeten en iets te drinken mee'},
+  {ico:'📱', tekst:'Mijn gsm is opgeladen'},
+  {ico:'📍', tekst:'Ik weet het adres van de werkplek'},
+  {ico:'👤', tekst:'Ik heb het nummer van mijn baas'},
+  {ico:'💬', tekst:'Ik heb het nummer van mijn begeleider'},
+  {ico:'😊', tekst:'Ik ben klaar voor een goede eerste dag!'},
 ];
 var checklistState = JSON.parse(localStorage.getItem('htisa_checklist') || '{}');
 var eerstedagOpen = false;
@@ -1124,7 +1125,7 @@ function toggleEersteDag(btn) {
     panel.classList.add('open');
     btn.classList.add('active-info');
     renderChecklist();
-    showBackBar('Eerste dag checklist');
+    showBackBar('First days on the job');
     setTimeout(function(){panel.scrollIntoView({behavior:'smooth',block:'nearest'});},50);
   } else {
     panel.classList.remove('open');
