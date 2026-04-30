@@ -222,7 +222,13 @@
 
   /* ROLE CHOOSER */
   .role-btn{background:var(--htisa-white);border:1.5px solid var(--htisa-border);border-radius:var(--r);padding:12px 4px;cursor:pointer;font-family:var(--font);font-size:11px;font-weight:700;color:var(--htisa-text);transition:all .15s;text-align:center;height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:100%;}
-  .role-btn:hover{border-color:var(--htisa);background:var(--htisa-pale);color:var(--htisa);}
+  .role-btn:hover{opacity:0.85;}
+  .role-btn.leerling{border-color:#00a99d;color:#00a99d;}
+  .role-btn.leerling:hover{background:#e6f7f6;}
+  .role-btn.werkgever{border-color:#f7941d;color:#f7941d;}
+  .role-btn.werkgever:hover{background:#fff4e6;}
+  .role-btn.begeleider{border-color:#6dcff6;color:#0d4a5e;border-style:solid;}
+  .role-btn.begeleider:hover{background:#e8f8ff;}
 
   /* PIN SCREEN */
   .pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--htisa-border);background:transparent;transition:background .15s;}
@@ -515,9 +521,9 @@
     <div id="role-chooser">
       <div style="font-size:12px;font-weight:800;color:var(--htisa-muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Wie ben jij?</div>
       <div id="role-knoppen" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:6px;">
-        <button class="role-btn" onclick="selectRole('leerling')"><span style="font-size:22px;display:block;margin-bottom:4px;">👨‍🎓</span>Leerling</button>
-        <button class="role-btn" onclick="selectRole('werkgever')"><span style="font-size:22px;display:block;margin-bottom:4px;">🏭</span>Werkgever</button>
-        <button class="role-btn" onclick="selectRole('begeleider')"><span style="font-size:22px;display:block;margin-bottom:4px;">👨‍🏫</span>Begeleider</button>
+        <button class="role-btn leerling" onclick="selectRole('leerling')"><span style="font-size:22px;display:block;margin-bottom:4px;">👨‍🎓</span>Leerling</button>
+        <button class="role-btn werkgever" onclick="selectRole('werkgever')"><span style="font-size:22px;display:block;margin-bottom:4px;">🏭</span>Werkgever</button>
+        <button class="role-btn begeleider" onclick="selectRole('begeleider')"><span style="font-size:22px;display:block;margin-bottom:4px;">👨‍🏫</span>Begeleider</button>
       </div>
     </div>
 
