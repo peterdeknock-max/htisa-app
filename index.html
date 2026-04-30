@@ -1062,18 +1062,24 @@ function switchTab(n,btn){
   document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
   btn.classList.add('active');
   document.getElementById('view-'+n).classList.add('active');
-  // Als leerling-modus: verberg werkgever/begeleider knoppen en ga direct naar leerling
   if(n==='cal'){
     var isLeerlingModus = isLeerlingLink();
+    // Toon role-chooser altijd opnieuw bij wisselen naar aanwezigheden
+    document.getElementById('role-chooser').style.display='block';
+    // Verberg alle role-specifieke views
+    var werkView = document.getElementById('view-werkgever');
+    var leerView = document.getElementById('view-leerling-cal');
+    var begView  = document.getElementById('view-begeleider');
+    if(werkView) werkView.style.display='none';
+    if(leerView) leerView.style.display='none';
+    if(begView)  begView.style.display='none';
+    // Leerling modus: pas knoppen aan
     document.getElementById('role-knoppen').style.gridTemplateColumns = isLeerlingModus ? '1fr' : '1fr 1fr 1fr';
+    var rolBtns = document.querySelectorAll('#role-knoppen .role-btn');
     if(isLeerlingModus){
-      // Verberg werkgever en begeleider knoppen
-      var btns = document.querySelectorAll('#role-knoppen .role-btn');
-      btns.forEach(function(b,i){ b.style.display = i===0 ? 'block' : 'none'; });
+      rolBtns.forEach(function(b,i){ b.style.display = i===0 ? 'block' : 'none'; });
     } else {
-      var btns = document.querySelectorAll('#role-knoppen .role-btn');
-      btns.forEach(function(b){ b.style.display = 'block'; });
-      document.getElementById('role-knoppen').style.gridTemplateColumns = '1fr 1fr 1fr';
+      rolBtns.forEach(function(b){ b.style.display = 'block'; });
     }
   }
 }
