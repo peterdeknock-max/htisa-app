@@ -275,6 +275,7 @@
   <div class="tabs-wrap">
     <button class="tab active" onclick="switchTab('sos',this)">Work hard, work smart</button>
     <button class="tab" onclick="switchTab('cal',this)">Aanwezigheden</button>
+    <button class="tab" onclick="switchTab('progress',this)">My progress</button>
   </div>
 
   <!-- STICKY BACK BAR — verschijnt als een paneel open is -->
@@ -673,9 +674,320 @@
     </div>
 
   </div>
+
+  <!-- MY PROGRESS VIEW -->
+  <div id="view-progress" class="view">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div style="font-size:16px;font-weight:800;color:var(--htisa-text);">My progress</div>
+      <button onclick="toggleRoosterSetup()" style="font-size:11px;color:var(--htisa-muted);background:none;border:1px solid var(--htisa-border);border-radius:6px;padding:4px 8px;cursor:pointer;">⚙️ Rooster</button>
+    </div>
+
+    <!-- ROOSTER SETUP -->
+    <div id="progress-setup" style="display:none;background:white;border-radius:10px;padding:16px;border:0.5px solid var(--htisa-border);margin-bottom:12px;">
+      <div style="font-size:14px;font-weight:800;color:var(--htisa-text);margin-bottom:4px;">📅 Mijn werkrooster</div>
+      <div style="font-size:11px;color:var(--htisa-muted);margin-bottom:14px;">Kies voor elke dag of je werkt, naar school gaat of vrij bent.</div>
+      <div id="rooster-dagen"></div>
+      <button class="btn-save" onclick="slaRoosterOp()" style="width:100%;margin-top:12px;">Opslaan</button>
+    </div>
+
+    <!-- LEVEL -->
+    <div class="section-label groen" style="margin-bottom:10px;">⭐ Mijn level</div>
+    <div style="background:white;border-radius:10px;padding:14px;border:0.5px solid var(--htisa-border);margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <div id="level-ico" style="width:48px;height:48px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;"></div>
+        <div style="flex:1;">
+          <div id="level-naam" style="font-size:16px;font-weight:800;color:var(--htisa-text);"></div>
+          <div id="level-sub" style="font-size:11px;color:var(--htisa-muted);margin-top:2px;"></div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--htisa-muted);margin-bottom:4px;">
+        <span id="level-prev-naam"></span><span id="level-next-naam"></span>
+      </div>
+      <div style="background:#e0e8ed;border-radius:10px;height:8px;margin-bottom:4px;">
+        <div id="level-bar" style="background:#00a99d;height:8px;border-radius:10px;transition:width 0.5s ease;width:0%;"></div>
+      </div>
+      <div id="level-progress-txt" style="font-size:10px;color:var(--htisa-muted);text-align:right;"></div>
+    </div>
+
+    <!-- STREAK -->
+    <div class="section-label oranje" style="margin-bottom:10px;">🔥 Mijn streak</div>
+    <div style="background:white;border-radius:10px;padding:14px;border:0.5px solid var(--htisa-border);margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--htisa-text);">Op tijd op de werkplek</div>
+          <div style="font-size:11px;color:var(--htisa-muted);">Alleen werkdagen tellen mee</div>
+        </div>
+        <div style="text-align:right;">
+          <div id="streak-count" style="font-size:28px;font-weight:900;color:#f7941d;line-height:1;">0</div>
+          <div style="font-size:10px;color:var(--htisa-muted);">dagen op rij</div>
+        </div>
+      </div>
+      <div id="streak-week" style="display:flex;gap:5px;margin-bottom:12px;"></div>
+      <button class="btn-save" id="streak-btn" onclick="registreerOpTijd()" style="width:100%;background:#f7941d;"></button>
+      <div id="streak-feedback" style="font-size:11px;font-weight:600;text-align:center;margin-top:6px;min-height:16px;"></div>
+    </div>
+
+    <!-- BADGES -->
+    <div class="section-label blauw" style="margin-bottom:10px;">🏅 Mijn badges</div>
+    <div id="badges-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;"></div>
+
+    <!-- STATS -->
+    <div class="section-label" style="background:#6a3b9c;margin-bottom:10px;">📊 Mijn statistieken</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+      <div style="background:white;border-radius:10px;padding:12px;border:0.5px solid var(--htisa-border);text-align:center;">
+        <div id="stat-optijd" style="font-size:24px;font-weight:900;color:#00a99d;">0</div>
+        <div style="font-size:10px;color:var(--htisa-muted);">Keer op tijd</div>
+      </div>
+      <div style="background:white;border-radius:10px;padding:12px;border:0.5px solid var(--htisa-border);text-align:center;">
+        <div id="stat-streak-best" style="font-size:24px;font-weight:900;color:#f7941d;">0</div>
+        <div style="font-size:10px;color:var(--htisa-muted);">Beste streak</div>
+      </div>
+    </div>
+
+  </div>
+
 </div>
 
 <script>
+// ── MY PROGRESS MODULE ──
+
+// LEVELS definitie - gespreid over volledig schooljaar (180 werkdagen)
+var levels = [
+  {naam:'Starter',      ico:'🌱', min:0,   max:10,  kleur:'#e8f5e9', tekst:'#00a99d',  sub:'Je eerste stappen op de werkvloer!'},
+  {naam:'On the job',   ico:'⭐', min:10,  max:30,  kleur:'#fff3e0', tekst:'#f7941d',  sub:'Je vindt je weg — goed bezig!'},
+  {naam:'Getting there',ico:'💪', min:30,  max:60,  kleur:'#e3f0fc', tekst:'#1565c0',  sub:'Je bouwt echte werkervaring op!'},
+  {naam:'Pro worker',   ico:'🔥', min:60,  max:100, kleur:'#fce4ec', tekst:'#c62828',  sub:'Collega\'s rekenen op jou!'},
+  {naam:'Work hero',    ico:'🏆', min:100, max:140, kleur:'#f3e8ff', tekst:'#6a3b9c',  sub:'Bijna een volledig schooljaar!'},
+  {naam:'Legend',       ico:'🌟', min:140, max:999, kleur:'#FFE900', tekst:'#5a4000',  sub:'Je hebt het schooljaar doorgebeten — respect!'},
+];
+
+// BADGES definitie - schooljaar gebonden
+var badgeDefs = [
+  {id:'dag1',      ico:'🎯', naam:'Eerste dag',        check:function(s){return s.totaalOpTijd>=1;}},
+  {id:'week1',     ico:'📅', naam:'Eerste week',        check:function(s){return s.totaalOpTijd>=5;}},
+  {id:'maand1',    ico:'💼', naam:'Eerste maand',       check:function(s){return s.totaalOpTijd>=20;}},
+  {id:'streak5',   ico:'🔥', naam:'5 op rij',           check:function(s){return s.streakRecord>=5;}},
+  {id:'streak10',  ico:'⚡', naam:'10 op rij',          check:function(s){return s.streakRecord>=10;}},
+  {id:'streak20',  ico:'💪', naam:'20 op rij',          check:function(s){return s.streakRecord>=20;}},
+  {id:'dag50',     ico:'🌟', naam:'50 werkdagen',       check:function(s){return s.totaalOpTijd>=50;}},
+  {id:'halverwege',ico:'🏅', naam:'Halverwege',         check:function(s){return s.totaalOpTijd>=90;}},
+  {id:'dag100',    ico:'💯', naam:'100 werkdagen',      check:function(s){return s.totaalOpTijd>=100;}},
+  {id:'workhero',  ico:'🏆', naam:'Work hero',          check:function(s){return s.totaalOpTijd>=100;}},
+  {id:'schooljaar',ico:'🌟', naam:'Schooljaar voltooid',check:function(s){return s.totaalOpTijd>=140;}},
+  {id:'legend',    ico:'👑', naam:'Legend',             check:function(s){return s.totaalOpTijd>=140;}},
+];
+
+// ROOSTER
+var roosterDefault = {ma:'werk',di:'school',wo:'school',do:'vrij',vr:'vrij'};
+var roosterDagen = ['ma','di','wo','do','vr'];
+var roosterLabels = {ma:'Maandag',di:'Dinsdag',wo:'Woensdag',do:'Donderdag',vr:'Vrijdag'};
+
+function getRooster(){
+  return JSON.parse(localStorage.getItem('htisa_rooster') || JSON.stringify(roosterDefault));
+}
+
+function renderRooster(){
+  var r = getRooster();
+  var html = roosterDagen.map(function(dag){
+    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">' +
+      '<div style="width:80px;font-size:13px;font-weight:600;color:var(--htisa-text);flex-shrink:0;">'+roosterLabels[dag]+'</div>' +
+      '<div style="display:flex;gap:4px;flex:1;">' +
+        ['werk','school','vrij'].map(function(type){
+          var icons = {werk:'💼',school:'🏫',vrij:'😴'};
+          var labels = {werk:'Werk',school:'School',vrij:'Vrij'};
+          var colors = {
+            werk:{bg:'#e8f5e9',border:'#00a99d',color:'#00a99d'},
+            school:{bg:'#e3f0fc',border:'#6dcff6',color:'#1565c0'},
+            vrij:{bg:'#fff3e0',border:'#f7941d',color:'#f7941d'}
+          };
+          var sel = r[dag]===type;
+          var c = sel ? colors[type] : {};
+          return '<button onclick="setRoosterDag(\''+dag+'\',\''+type+'\')" style="flex:1;padding:7px 2px;font-size:10px;font-weight:'+(sel?'700':'500')+';border-radius:6px;border:1px solid '+(sel?c.border:'var(--htisa-border)')+';background:'+(sel?c.bg:'var(--htisa-off)')+';color:'+(sel?c.color:'var(--htisa-muted)')+';cursor:pointer;">' +
+            icons[type]+' '+labels[type]+'</button>';
+        }).join('') +
+      '</div>' +
+    '</div>';
+  }).join('');
+  document.getElementById('rooster-dagen').innerHTML = html;
+}
+
+function setRoosterDag(dag, type){
+  var r = getRooster();
+  r[dag] = type;
+  localStorage.setItem('htisa_rooster', JSON.stringify(r));
+  renderRooster();
+}
+
+function slaRoosterOp(){
+  document.getElementById('progress-setup').style.display='none';
+  renderProgress();
+}
+
+function toggleRoosterSetup(){
+  var el = document.getElementById('progress-setup');
+  var zichtbaar = el.style.display !== 'none';
+  el.style.display = zichtbaar ? 'none' : 'block';
+  if(!zichtbaar) renderRooster();
+}
+
+// STREAK DATA
+function getStreakData(){
+  return JSON.parse(localStorage.getItem('htisa_streak') || '{"streak":0,"streakRecord":0,"totaalOpTijd":0,"dagen":{}}');
+}
+
+function getDagKey(datum){
+  return datum.toISOString().split('T')[0];
+}
+
+function isWerkdag(datum){
+  var r = getRooster();
+  var dagNamen = ['zo','ma','di','wo','do','vr','za'];
+  var dagNaam = dagNamen[datum.getDay()];
+  return r[dagNaam] === 'werk';
+}
+
+function registreerOpTijd(){
+  var vandaag = new Date();
+  if(!isWerkdag(vandaag)){
+    document.getElementById('streak-feedback').style.color='var(--htisa-muted)';
+    document.getElementById('streak-feedback').textContent='ℹ️ Vandaag is geen werkdag volgens jouw rooster.';
+    return;
+  }
+  var key = getDagKey(vandaag);
+  var data = getStreakData();
+  if(data.dagen[key]){
+    document.getElementById('streak-feedback').style.color='var(--htisa-muted)';
+    document.getElementById('streak-feedback').textContent='✅ Al geregistreerd voor vandaag!';
+    return;
+  }
+  data.dagen[key] = 'optijd';
+  data.totaalOpTijd++;
+  // Bereken streak
+  var streak = 0;
+  var check = new Date(vandaag);
+  while(true){
+    if(isWerkdag(check)){
+      if(data.dagen[getDagKey(check)] === 'optijd') streak++;
+      else break;
+    }
+    check.setDate(check.getDate()-1);
+    if(streak > 200) break;
+  }
+  data.streak = streak;
+  if(streak > data.streakRecord) data.streakRecord = streak;
+  localStorage.setItem('htisa_streak', JSON.stringify(data));
+  var fb = document.getElementById('streak-feedback');
+  fb.style.color='var(--s-ok)';
+  fb.textContent='🔥 Top! Streak is nu '+streak+'!';
+  renderProgress();
+}
+
+function renderStreakWeek(){
+  var r = getRooster();
+  var data = getStreakData();
+  var dagNamen = ['zo','ma','di','wo','do','vr','za'];
+  var dagLabels = ['Zo','Ma','Di','Wo','Do','Vr','Za'];
+  var vandaag = new Date();
+  var maandag = new Date(vandaag);
+  maandag.setDate(vandaag.getDate() - ((vandaag.getDay()+6)%7));
+  var html = '';
+  for(var i=0;i<5;i++){
+    var dag = new Date(maandag);
+    dag.setDate(maandag.getDate()+i);
+    var dagNaam = dagNamen[dag.getDay()];
+    var type = r[dagNaam] || 'vrij';
+    var key = getDagKey(dag);
+    var isVandaag = getDagKey(dag) === getDagKey(vandaag);
+    var status = data.dagen[key];
+    var ico, bg, border, color;
+    if(type==='werk'){
+      if(status==='optijd'){ico='✅';bg='#e8f5e9';border='#00a99d';color='#00a99d';}
+      else if(isVandaag){ico='?';bg='#fff3e0';border='#f7941d';color='#f7941d';}
+      else if(dag<vandaag){ico='❌';bg='#ffebee';border='#ef9a9a';color='#c62828';}
+      else{ico='💼';bg='#f5f9fb';border='#c2dfe9';color='#5b8fa0';}
+    } else if(type==='school'){ico='🏫';bg:'#e3f0fc';bg='#e3f0fc';border='#6dcff6';color='#1565c0';}
+    else{ico='😴';bg='#f5f5f5';border='#e0e0e0';color='#9e9e9e';}
+    html+='<div style="flex:1;text-align:center;background:'+bg+';border:1.5px solid '+border+';border-radius:8px;padding:6px 2px;">' +
+      '<div style="font-size:16px;line-height:1.2;">'+ico+'</div>' +
+      '<div style="font-size:9px;font-weight:600;color:'+color+';">'+dagLabels[i+1]+'</div>' +
+    '</div>';
+  }
+  document.getElementById('streak-week').innerHTML = html;
+}
+
+function getCurrentLevel(totaal){
+  for(var i=levels.length-1;i>=0;i--){
+    if(totaal>=levels[i].min) return i;
+  }
+  return 0;
+}
+
+function renderProgress(){
+  var data = getStreakData();
+  var lvlIdx = getCurrentLevel(data.totaalOpTijd);
+  var lvl = levels[lvlIdx];
+  var next = levels[Math.min(lvlIdx+1, levels.length-1)];
+  var prev = levels[Math.max(lvlIdx-1, 0)];
+
+  // Level
+  document.getElementById('level-ico').textContent = lvl.ico;
+  document.getElementById('level-ico').style.background = lvl.kleur;
+  document.getElementById('level-naam').textContent = lvl.naam;
+  var aantalInLvl = data.totaalOpTijd - lvl.min;
+  var totaalInLvl = next.min - lvl.min;
+  var pct = lvlIdx===levels.length-1 ? 100 : Math.min(100, Math.round(aantalInLvl/totaalInLvl*100));
+  document.getElementById('level-sub').textContent = lvlIdx<levels.length-1 ? lvl.sub+' — Nog '+(next.min-data.totaalOpTijd)+' dagen tot '+next.naam : lvl.sub;
+  document.getElementById('level-bar').style.width = pct+'%';
+  document.getElementById('level-progress-txt').textContent = data.totaalOpTijd+' werkdagen op tijd geregistreerd';
+  document.getElementById('level-prev-naam').textContent = lvl.naam;
+  document.getElementById('level-next-naam').textContent = next.naam;
+
+  // Streak
+  document.getElementById('streak-count').textContent = data.streak;
+  renderStreakWeek();
+
+  // Streak knop
+  var vandaag = new Date();
+  var todayKey = getDagKey(vandaag);
+  var btn = document.getElementById('streak-btn');
+  if(data.dagen[todayKey]){
+    btn.textContent='✅ Vandaag al geregistreerd!';
+    btn.style.background='#00a99d';
+    btn.disabled=true;
+  } else if(!isWerkdag(vandaag)){
+    btn.textContent='😴 Vandaag geen werkdag';
+    btn.style.background='#9e9e9e';
+    btn.disabled=true;
+  } else {
+    btn.textContent='✅ Ik was vandaag op tijd!';
+    btn.style.background='#f7941d';
+    btn.disabled=false;
+  }
+
+  // Badges
+  var html = badgeDefs.map(function(b){
+    var earned = b.check(data);
+    return '<div style="background:white;border-radius:10px;padding:8px 4px;text-align:center;border:1px solid '+(earned?'#00a99d':'var(--htisa-border)')+';background:'+(earned?'#e8f5e9':'white')+';'+(earned?'':'opacity:0.45;')+'">'+
+      '<div style="font-size:22px;margin-bottom:3px;">'+b.ico+'</div>'+
+      '<div style="font-size:8px;font-weight:700;color:'+(earned?'#00a99d':'var(--htisa-muted)')+';line-height:1.3;">'+b.naam+'</div>'+
+    '</div>';
+  }).join('');
+  document.getElementById('badges-grid').innerHTML = html;
+
+  // Stats
+  document.getElementById('stat-optijd').textContent = data.totaalOpTijd;
+  document.getElementById('stat-streak-best').textContent = data.streakRecord;
+}
+
+// Initialiseer progress tab bij eerste keer openen
+document.addEventListener('DOMContentLoaded', function(){
+  if(!localStorage.getItem('htisa_rooster')){
+    // Stel default rooster in
+    localStorage.setItem('htisa_rooster', JSON.stringify(roosterDefault));
+  }
+});
+
 // ── DAGQUOTE ──
 // ── STICKY HEADER SCROLL EFFECT ──
 window.addEventListener('scroll', function() {
@@ -1081,18 +1393,18 @@ function switchTab(n,btn){
   document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
   btn.classList.add('active');
   document.getElementById('view-'+n).classList.add('active');
+  if(n==='progress'){
+    renderProgress();
+  }
   if(n==='cal'){
     var isLeerlingModus = isLeerlingLink();
-    // Toon role-chooser altijd opnieuw bij wisselen naar aanwezigheden
     document.getElementById('role-chooser').style.display='block';
-    // Verberg alle role-specifieke views
     var werkView = document.getElementById('view-werkgever');
     var leerView = document.getElementById('view-leerling-cal');
     var begView  = document.getElementById('view-begeleider');
     if(werkView) werkView.style.display='none';
     if(leerView) leerView.style.display='none';
     if(begView)  begView.style.display='none';
-    // Leerling modus: pas knoppen aan
     document.getElementById('role-knoppen').style.gridTemplateColumns = isLeerlingModus ? '1fr' : '1fr 1fr 1fr';
     var rolBtns = document.querySelectorAll('#role-knoppen .role-btn');
     if(isLeerlingModus){
