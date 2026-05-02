@@ -1,6 +1,6 @@
 // ── HTiSA Service Worker ──
 // Versienummer = huidige datum/tijd van upload → elke nieuwe upload = automatische update
-const CACHE_NAME = 'htisa-v20260502-1002' + '20250428-1645';
+const CACHE_NAME = 'htisa-v20260502-1027' + '20250428-1645';
 const BASE = '/htisa-app';
 
 self.addEventListener('install', event => {

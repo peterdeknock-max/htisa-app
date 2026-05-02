@@ -710,6 +710,45 @@
       <div id="level-progress-txt" style="font-size:10px;color:var(--htisa-muted);text-align:right;"></div>
     </div>
 
+    <!-- DAGELIJKSE CHECK-IN -->
+    <div class="section-label oranje" style="margin-bottom:10px;">📋 Check-in van vandaag</div>
+    <div id="checkin-panel" style="background:white;border-radius:10px;padding:14px;border:0.5px solid var(--htisa-border);margin-bottom:12px;">
+      <div id="checkin-datum" style="font-size:11px;color:var(--htisa-muted);margin-bottom:12px;"></div>
+
+      <!-- MOOD -->
+      <div style="font-size:10px;font-weight:800;color:#f7941d;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Hoe voel ik me vandaag?</div>
+      <div style="display:flex;gap:6px;margin-bottom:14px;" id="mood-row">
+        <div class="mood-opt" onclick="selectMood(0)" data-mood="0" style="flex:1;background:var(--htisa-off);border:1.5px solid var(--htisa-border);border-radius:8px;padding:8px 4px;text-align:center;cursor:pointer;">
+          <div style="font-size:20px;">😔</div><div style="font-size:9px;color:var(--htisa-muted);">Moeilijk</div>
+        </div>
+        <div class="mood-opt" onclick="selectMood(1)" data-mood="1" style="flex:1;background:var(--htisa-off);border:1.5px solid var(--htisa-border);border-radius:8px;padding:8px 4px;text-align:center;cursor:pointer;">
+          <div style="font-size:20px;">😐</div><div style="font-size:9px;color:var(--htisa-muted);">Oké</div>
+        </div>
+        <div class="mood-opt" onclick="selectMood(2)" data-mood="2" style="flex:1;background:var(--htisa-off);border:1.5px solid var(--htisa-border);border-radius:8px;padding:8px 4px;text-align:center;cursor:pointer;">
+          <div style="font-size:20px;">😊</div><div style="font-size:9px;color:var(--htisa-muted);">Goed</div>
+        </div>
+        <div class="mood-opt" onclick="selectMood(3)" data-mood="3" style="flex:1;background:var(--htisa-off);border:1.5px solid var(--htisa-border);border-radius:8px;padding:8px 4px;text-align:center;cursor:pointer;">
+          <div style="font-size:20px;">🤩</div><div style="font-size:9px;color:var(--htisa-muted);">Super!</div>
+        </div>
+      </div>
+
+      <!-- CHECKIN ITEMS -->
+      <div style="font-size:10px;font-weight:800;color:#00a99d;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Op de werkplek</div>
+      <div id="checkin-items-werk"></div>
+      <div style="font-size:10px;font-weight:800;color:#1565c0;text-transform:uppercase;letter-spacing:0.08em;margin:10px 0 8px;">Leren en groeien</div>
+      <div id="checkin-items-leren"></div>
+      <div style="font-size:10px;font-weight:800;color:#6a3b9c;text-transform:uppercase;letter-spacing:0.08em;margin:10px 0 8px;">Werkhouding</div>
+      <div id="checkin-items-houding"></div>
+
+      <!-- PUNTEN + OPSLAAN -->
+      <div style="display:flex;align-items:center;justify-content:space-between;background:var(--htisa-off);border-radius:8px;padding:10px 12px;margin-top:12px;margin-bottom:10px;">
+        <div style="font-size:12px;color:var(--htisa-muted);">Punten verdiend vandaag</div>
+        <div id="checkin-punten" style="font-size:18px;font-weight:900;color:#f7941d;">+0</div>
+      </div>
+      <button class="btn-save" id="checkin-save-btn" onclick="slaCheckinOp()" style="width:100%;">Check-in opslaan</button>
+      <div id="checkin-feedback" style="font-size:11px;font-weight:600;text-align:center;margin-top:6px;min-height:16px;"></div>
+    </div>
+
     <!-- STREAK -->
     <div class="section-label oranje" style="margin-bottom:10px;">🔥 Mijn streak</div>
     <div style="background:white;border-radius:10px;padding:14px;border:0.5px solid var(--htisa-border);margin-bottom:12px;">
@@ -750,6 +789,154 @@
 </div>
 
 <script>
+// ── DAGELIJKSE CHECK-IN ──
+var checkinItemsWerk = [
+  {id:'optijd',    tekst:'Ik was op tijd'},
+  {id:'gegroet',   tekst:'Ik heb vriendelijk gegroet'},
+  {id:'gsm',       tekst:'Ik heb mijn gsm weggelegd'},
+  {id:'initiatief',tekst:'Ik heb initiatief genomen'},
+];
+var checkinItemsLeren = [
+  {id:'geleerd',   tekst:'Ik heb iets nieuws geleerd'},
+  {id:'gevraagd',  tekst:'Ik heb een vraag gesteld aan mijn mentor'},
+  {id:'zelfstandig',tekst:'Ik heb een taak zelfstandig afgerond'},
+];
+var checkinItemsHouding = [
+  {id:'netjes',    tekst:'Ik heb mijn werkplek netjes achtergelaten'},
+  {id:'volledig',  tekst:'Ik heb de volledige dag doorgewerkt'},
+];
+
+var checkinState = {mood: -1, items: {}};
+var selectedMood = -1;
+
+function getCheckinKey(){
+  return 'htisa_checkin_' + getDagKey(new Date());
+}
+
+function renderCheckinItems(items, containerId){
+  var saved = JSON.parse(localStorage.getItem(getCheckinKey()) || '{}');
+  var alOpgeslagen = saved.opgeslagen;
+  var html = items.map(function(item){
+    var checked = checkinState.items[item.id] || false;
+    return '<div onclick="'+(alOpgeslagen?'':'toggleCheckinItem(\''+item.id+'\')')+'" style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:1px solid '+(checked?'#00a99d':'var(--htisa-border)')+';background:'+(checked?'#e8f5e9':'white')+';margin-bottom:5px;cursor:'+(alOpgeslagen?'default':'pointer')+';">'+
+      '<div style="width:22px;height:22px;border-radius:6px;border:1.5px solid '+(checked?'#00a99d':'var(--htisa-border)')+';background:'+(checked?'#00a99d':'transparent')+';display:flex;align-items:center;justify-content:center;font-size:12px;color:white;flex-shrink:0;">'+(checked?'✓':'')+'</div>'+
+      '<div style="font-size:12px;color:'+(checked?'#00a99d':'var(--htisa-text)')+';">'+item.tekst+'</div>'+
+    '</div>';
+  }).join('');
+  document.getElementById(containerId).innerHTML = html;
+  updateCheckinPunten();
+}
+
+function toggleCheckinItem(id){
+  var saved = JSON.parse(localStorage.getItem(getCheckinKey()) || '{}');
+  if(saved.opgeslagen) return;
+  checkinState.items[id] = !checkinState.items[id];
+  renderCheckinItems(checkinItemsWerk, 'checkin-items-werk');
+  renderCheckinItems(checkinItemsLeren, 'checkin-items-leren');
+  renderCheckinItems(checkinItemsHouding, 'checkin-items-houding');
+}
+
+function selectMood(m){
+  var saved = JSON.parse(localStorage.getItem(getCheckinKey()) || '{}');
+  if(saved.opgeslagen) return;
+  selectedMood = m;
+  document.querySelectorAll('.mood-opt').forEach(function(el){
+    var isSel = parseInt(el.dataset.mood) === m;
+    el.style.background = isSel ? '#fff3e0' : 'var(--htisa-off)';
+    el.style.borderColor = isSel ? '#f7941d' : 'var(--htisa-border)';
+  });
+  updateCheckinPunten();
+}
+
+function updateCheckinPunten(){
+  var punten = 0;
+  Object.values(checkinState.items).forEach(function(v){ if(v) punten++; });
+  if(selectedMood >= 0) punten++;
+  document.getElementById('checkin-punten').textContent = '+' + punten;
+}
+
+function slaCheckinOp(){
+  var fb = document.getElementById('checkin-feedback');
+  var punten = 0;
+  Object.values(checkinState.items).forEach(function(v){ if(v) punten++; });
+  if(selectedMood >= 0) punten++;
+  if(punten === 0){ fb.style.color='var(--s-ko)'; fb.textContent='⚠️ Vink minstens één ding aan'; return; }
+
+  var key = getCheckinKey();
+  var data = {mood: selectedMood, items: checkinState.items, punten: punten, opgeslagen: true};
+  localStorage.setItem(key, JSON.stringify(data));
+
+  // Voeg punten toe aan streak data
+  var streakData = getStreakData();
+  streakData.totaalOpTijd = (streakData.totaalOpTijd || 0) + (checkinState.items['optijd'] ? 1 : 0);
+  streakData.totaalPunten = (streakData.totaalPunten || 0) + punten;
+  if(checkinState.items['optijd']){
+    var vandaag = new Date();
+    var todayKey = getDagKey(vandaag);
+    streakData.dagen[todayKey] = 'optijd';
+    var streak = 0;
+    var check = new Date(vandaag);
+    for(var i=0;i<200;i++){
+      if(isWerkdag(check)){
+        if(streakData.dagen[getDagKey(check)]==='optijd') streak++;
+        else break;
+      }
+      check.setDate(check.getDate()-1);
+    }
+    streakData.streak = streak;
+    if(streak > streakData.streakRecord) streakData.streakRecord = streak;
+  }
+  localStorage.setItem('htisa_streak', JSON.stringify(streakData));
+
+  fb.style.color='var(--s-ok)';
+  fb.textContent='✅ Check-in opgeslagen! +'+punten+' punten verdiend!';
+  document.getElementById('checkin-save-btn').disabled = true;
+  document.getElementById('checkin-save-btn').style.background = '#00a99d';
+  document.getElementById('checkin-save-btn').textContent = '✅ Check-in gedaan!';
+  renderProgress();
+}
+
+function initCheckin(){
+  var key = getCheckinKey();
+  var saved = JSON.parse(localStorage.getItem(key) || '{}');
+  var vandaag = new Date();
+  var dagNamen = ['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];
+  var maandNamen = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+  document.getElementById('checkin-datum').textContent =
+    dagNamen[vandaag.getDay()] + ' ' + vandaag.getDate() + ' ' + maandNamen[vandaag.getMonth()] +
+    (isWerkdag(vandaag) ? ' — werkdag' : ' — geen werkdag vandaag');
+
+  if(saved.opgeslagen){
+    checkinState = {mood: saved.mood, items: saved.items};
+    selectedMood = saved.mood;
+    document.getElementById('checkin-save-btn').disabled = true;
+    document.getElementById('checkin-save-btn').style.background = '#00a99d';
+    document.getElementById('checkin-save-btn').textContent = '✅ Al ingecheckt vandaag!';
+    document.getElementById('checkin-feedback').style.color='var(--s-ok)';
+    document.getElementById('checkin-feedback').textContent = '+'+saved.punten+' punten verdiend!';
+  } else {
+    checkinState = {mood: -1, items: {}};
+    selectedMood = -1;
+    document.getElementById('checkin-save-btn').disabled = false;
+    document.getElementById('checkin-save-btn').style.background = '#2596be';
+    document.getElementById('checkin-save-btn').textContent = 'Check-in opslaan';
+    document.getElementById('checkin-feedback').textContent = '';
+  }
+
+  if(saved.mood >= 0){
+    document.querySelectorAll('.mood-opt').forEach(function(el){
+      var isSel = parseInt(el.dataset.mood) === saved.mood;
+      el.style.background = isSel ? '#fff3e0' : 'var(--htisa-off)';
+      el.style.borderColor = isSel ? '#f7941d' : 'var(--htisa-border)';
+    });
+  }
+
+  renderCheckinItems(checkinItemsWerk, 'checkin-items-werk');
+  renderCheckinItems(checkinItemsLeren, 'checkin-items-leren');
+  renderCheckinItems(checkinItemsHouding, 'checkin-items-houding');
+  updateCheckinPunten();
+}
+
 // ── MY PROGRESS MODULE ──
 
 // LEVELS definitie - gespreid over volledig schooljaar (180 werkdagen)
@@ -925,21 +1112,21 @@ function getCurrentLevel(totaal){
 
 function renderProgress(){
   var data = getStreakData();
-  var lvlIdx = getCurrentLevel(data.totaalOpTijd);
+  var totaalPunten = data.totaalPunten || data.totaalOpTijd || 0;
+  var lvlIdx = getCurrentLevel(totaalPunten);
   var lvl = levels[lvlIdx];
   var next = levels[Math.min(lvlIdx+1, levels.length-1)];
-  var prev = levels[Math.max(lvlIdx-1, 0)];
 
   // Level
   document.getElementById('level-ico').textContent = lvl.ico;
   document.getElementById('level-ico').style.background = lvl.kleur;
   document.getElementById('level-naam').textContent = lvl.naam;
-  var aantalInLvl = data.totaalOpTijd - lvl.min;
+  var aantalInLvl = totaalPunten - lvl.min;
   var totaalInLvl = next.min - lvl.min;
   var pct = lvlIdx===levels.length-1 ? 100 : Math.min(100, Math.round(aantalInLvl/totaalInLvl*100));
-  document.getElementById('level-sub').textContent = lvlIdx<levels.length-1 ? lvl.sub+' — Nog '+(next.min-data.totaalOpTijd)+' dagen tot '+next.naam : lvl.sub;
+  document.getElementById('level-sub').textContent = lvlIdx<levels.length-1 ? lvl.sub+' — Nog '+(next.min-totaalPunten)+' punten tot '+next.naam : lvl.sub;
   document.getElementById('level-bar').style.width = pct+'%';
-  document.getElementById('level-progress-txt').textContent = data.totaalOpTijd+' werkdagen op tijd geregistreerd';
+  document.getElementById('level-progress-txt').textContent = totaalPunten+' punten verdiend dit schooljaar';
   document.getElementById('level-prev-naam').textContent = lvl.naam;
   document.getElementById('level-next-naam').textContent = next.naam;
 
@@ -1395,6 +1582,7 @@ function switchTab(n,btn){
   document.getElementById('view-'+n).classList.add('active');
   if(n==='progress'){
     renderProgress();
+    initCheckin();
   }
   if(n==='cal'){
     var isLeerlingModus = isLeerlingLink();
