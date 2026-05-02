@@ -31,7 +31,7 @@
   html{height:100%;}
   body{background:var(--htisa-off);font-family:var(--font);min-height:100%;padding-bottom:env(safe-area-inset-bottom);}
   .app{max-width:480px;margin:0 auto;padding:0 0 2.5rem;}
-  .app-header{background:rgba(255,255,255,0.92);padding:0;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 1px 8px rgba(0,0,0,0.08);}
+  .app-header{background:rgba(255,255,255,0.75);padding:0;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);box-shadow:0 2px 20px rgba(0,0,0,0.12);border-bottom:1px solid rgba(255,255,255,0.5);}
   .app-header::before{display:none;}
   .app-header::after{display:none;}
   .header-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;position:relative;z-index:1;}
@@ -40,7 +40,7 @@
   .duaal-badge{background:#FFE900;border-radius:6px;padding:4px 8px;display:flex;align-items:center;justify-content:center;width:100%;}
   .header-title{font-size:17px;font-weight:900;color:var(--htisa);line-height:1.15;position:relative;z-index:1;margin-top:0;}
   .header-title span{font-size:10px;font-weight:400;color:#5b8fa0;display:block;margin-top:3px;font-style:italic;border-left:2px solid #c2dfe9;padding-left:6px;line-height:1.4;}
-  .tabs-wrap{background:rgba(255,255,255,0.95);border-bottom:2px solid var(--htisa-border);padding:0 16px;display:flex;position:sticky;top:0;z-index:99;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+  .tabs-wrap{background:rgba(255,255,255,0.8);border-bottom:2px solid rgba(0,0,0,0.06);padding:0 16px;display:flex;position:sticky;top:0;z-index:99;backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);}
   .tab{padding:8px 14px;font-size:11px;font-weight:800;color:var(--htisa-muted);cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;margin-bottom:-2px;text-transform:uppercase;letter-spacing:0.08em;font-family:var(--font);transition:color .15s;}
   .tab.active{color:var(--htisa);border-bottom-color:var(--htisa);}
   .tab:hover:not(.active){color:var(--htisa-text);}
@@ -264,8 +264,8 @@
 
 <div class="app">
   <div class="app-header">
-    <div style="background:white;width:100%;padding:4px 0 2px;">
-        <img src="icons/logo-htisa.png" alt="HTiSA" style="width:100%;max-height:70px;display:block;object-fit:cover;object-position:center;"/>
+    <div style="background:white;width:100%;padding:4px 8px 2px;box-sizing:border-box;">
+        <img src="icons/logo-htisa.png" alt="HTiSA" style="width:100%;max-height:80px;display:block;object-fit:contain;object-position:left center;"/>
     </div>
     <div style="padding:6px 16px 12px;">
       <div id="week-quote" style="font-size:11px;font-weight:600;color:#2596be;font-style:italic;border-left:2px solid #c2dfe9;padding-left:7px;line-height:1.4;"></div>
@@ -677,6 +677,15 @@
 
 <script>
 // ── DAGQUOTE ──
+// ── STICKY HEADER SCROLL EFFECT ──
+window.addEventListener('scroll', function() {
+  var header = document.querySelector('.app-header');
+  if(!header) return;
+  var scrolled = window.scrollY || document.documentElement.scrollTop;
+  var opacity = Math.max(0.55, 0.92 - scrolled / 250);
+  header.style.background = 'rgba(255,255,255,' + opacity + ')';
+}, {passive: true});
+
 var weekQuotes = [
   'Elke dag op het werk is een dag dat je iets nieuws leert.',
   'Every expert was once a beginner.',
