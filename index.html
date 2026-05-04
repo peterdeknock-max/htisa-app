@@ -670,6 +670,17 @@
         <div class="stat-card s-ko">  <span class="stat-num s-ko"   id="bg-ko">0</span>  <span class="stat-label">Afwezig</span></div>
         <div class="stat-card s-late"><span class="stat-num s-late" id="bg-late">0</span><span class="stat-label">Te laat</span></div>
       </div>
+
+      <!-- MOOD SIGNALEN -->
+      <div style="margin-top:18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="font-size:14px;font-weight:800;color:var(--htisa-text);">💬 Mood signalen leerlingen</div>
+          <button class="cal-nav-btn" onclick="laadMoodSignalen()" title="Ververs" style="font-size:14px;">↻</button>
+        </div>
+        <div id="mood-loading" style="text-align:center;color:var(--htisa-muted);font-size:12px;padding:10px 0;"></div>
+        <div id="mood-signalen" style="display:flex;flex-direction:column;gap:8px;"></div>
+      </div>
+
       <button class="terug-btn" onclick="logoutRole()">← Terug naar keuze</button>
     </div>
 
@@ -855,6 +866,72 @@ function updateCheckinPunten(){
   document.getElementById('checkin-punten').textContent = '+' + punten;
 }
 
+// ── AIRTABLE PROGRESS SYNC ────────────────────────────────────────────────────
+
+async function slaProgressOpInAirtable(leerling, datum, mood, punten, streak, totaalPunten, opTijd){
+  if(!leerling || leerling==='Onbekend') return;
+  try {
+    // Check if record for this leerling+datum already exists
+    var filter = encodeURIComponent("AND({Leerling}='"+leerling+"',{Datum}='"+datum+"')");
+    var check = await fetch(AT_PROGRESS_URL+'?filterByFormula='+filter, {headers: AT_HEADERS});
+    var checkData = await check.json();
+    var moodLabels = ['😔 Moeilijk','😐 Oké','😊 Goed','🤩 Super!'];
+    var fields = {
+      Leerling: leerling,
+      Datum: datum,
+      Mood: mood >= 0 ? moodLabels[mood] : '',
+      MoodScore: mood,
+      Punten: punten,
+      Streak: streak,
+      TotaalPunten: totaalPunten,
+      OpTijd: opTijd ? 'Ja' : 'Nee'
+    };
+    if(checkData.records && checkData.records.length > 0){
+      // Update existing record
+      var recId = checkData.records[0].id;
+      await fetch(AT_PROGRESS_URL+'/'+recId, {
+        method:'PATCH', headers: AT_HEADERS,
+        body: JSON.stringify({fields: fields})
+      });
+    } else {
+      // Create new record
+      await fetch(AT_PROGRESS_URL, {
+        method:'POST', headers: AT_HEADERS,
+        body: JSON.stringify({records:[{fields: fields}]})
+      });
+    }
+  } catch(e){ console.log('Progress sync fout:', e); }
+}
+
+async function herstelProgressVanAirtable(leerling){
+  if(!leerling || leerling==='Onbekend') return;
+  try {
+    // Load all records for this leerling, sorted by date
+    var filter = encodeURIComponent("{Leerling}='"+leerling+"'");
+    var resp = await fetch(AT_PROGRESS_URL+'?filterByFormula='+filter+'&sort[0][field]=Datum&sort[0][direction]=asc&fields[]=Datum&fields[]=Streak&fields[]=TotaalPunten&fields[]=MoodScore&fields[]=OpTijd', {headers: AT_HEADERS});
+    if(!resp.ok) return;
+    var data = await resp.json();
+    if(!data.records || data.records.length === 0) return;
+    // Get most recent record for streak + totaalPunten
+    var last = data.records[data.records.length-1].fields;
+    var streakData = getStreakData();
+    // Only update if Airtable has more data than local
+    if((last.TotaalPunten||0) > (streakData.totaalPunten||0)){
+      streakData.totaalPunten = last.TotaalPunten || 0;
+      streakData.streak = last.Streak || 0;
+      streakData.streakRecord = Math.max(streakData.streakRecord||0, last.Streak||0);
+      // Rebuild dagen map from records
+      data.records.forEach(function(rec){
+        if(rec.fields.OpTijd==='Ja' && rec.fields.Datum){
+          streakData.dagen[rec.fields.Datum] = 'optijd';
+        }
+      });
+      localStorage.setItem('htisa_streak', JSON.stringify(streakData));
+      renderProgress();
+    }
+  } catch(e){ console.log('Herstel progress fout:', e); }
+}
+
 function slaCheckinOp(){
   var fb = document.getElementById('checkin-feedback');
   var punten = 0;
@@ -887,6 +964,11 @@ function slaCheckinOp(){
     if(streak > streakData.streakRecord) streakData.streakRecord = streak;
   }
   localStorage.setItem('htisa_streak', JSON.stringify(streakData));
+
+  // Sync naar Airtable
+  var leerling = localStorage.getItem('htisa_leerling_naam') || 'Onbekend';
+  var datum = getDagKey(new Date());
+  slaProgressOpInAirtable(leerling, datum, selectedMood, punten, streakData.streak||0, streakData.totaalPunten||0, checkinState.items['optijd']||false);
 
   fb.style.color='var(--s-ok)';
   fb.textContent='✅ Check-in opgeslagen! +'+punten+' punten verdiend!';
@@ -2009,6 +2091,9 @@ var AT_TOKEN='patF9mAQo7N9aJeHD.cdba4d69632eb2c9d34de28825bb05303a9ccaf685e86f83
 var AT_BASE='appN0oikU56MoIJpJ';
 var AT_TABLE='tbl3Zbf2z8Ud37mJd';
 var AT_URL='https://api.airtable.com/v0/'+AT_BASE+'/'+AT_TABLE;
+var AT_PROGRESS_TABLE='Progress';
+var AT_PROGRESS_URL='https://api.airtable.com/v0/'+AT_BASE+'/'+AT_PROGRESS_TABLE;
+var AT_HEADERS={'Content-Type':'application/json','Authorization':'Bearer '+AT_TOKEN};
 
 // PINs
 var PINS=JSON.parse(localStorage.getItem('htisa_pins')||'{"werkgever":"1234","begeleider":"5678"}');
@@ -2075,6 +2160,8 @@ function showLeerlingView(naam){
   var n=new Date(); calYear=n.getFullYear(); calMonth=n.getMonth();
   document.getElementById('view-leerling').style.display='block';
   loadLeerlingData(naam);
+  // Herstel progress data van Airtable (na herinstallatie)
+  herstelProgressVanAirtable(naam);
 }
 function changeCalMonth(d){calMonth+=d;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}loadLeerlingData(localStorage.getItem('htisa_leerling_naam'));}
 async function loadLeerlingData(naam){
@@ -2271,6 +2358,68 @@ async function loadBegeleiderData(){
     el.textContent='';
     filterBegeleider();
   }catch(e){el.textContent='❌ Verbinding mislukt — probeer opnieuw';}
+  laadMoodSignalen();
+}
+
+async function laadMoodSignalen(){
+  var el = document.getElementById('mood-loading');
+  var container = document.getElementById('mood-signalen');
+  el.textContent = 'Mood data ophalen...';
+  container.innerHTML = '';
+  try {
+    // Haal de laatste 60 records op (laatste weken)
+    var url = AT_PROGRESS_URL+'?sort[0][field]=Datum&sort[0][direction]=desc&pageSize=100';
+    var resp = await fetch(url, {headers: AT_HEADERS});
+    if(!resp.ok){ el.textContent='⚠️ Progress tabel nog niet aangemaakt in Airtable.'; return; }
+    var data = await resp.json();
+    if(!data.records || data.records.length===0){ el.textContent='Nog geen check-in data beschikbaar.'; return; }
+    el.textContent='';
+
+    // Groepeer per leerling — bewaar laatste 5 check-ins per leerling
+    var byLeerling = {};
+    data.records.forEach(function(rec){
+      var naam = rec.fields.Leerling;
+      if(!naam) return;
+      if(!byLeerling[naam]) byLeerling[naam] = [];
+      if(byLeerling[naam].length < 5) byLeerling[naam].push(rec.fields);
+    });
+
+    // Toon kaartje per leerling
+    var leerlingen = Object.keys(byLeerling);
+    if(leerlingen.length===0){ el.textContent='Nog geen check-in data beschikbaar.'; return; }
+
+    leerlingen.forEach(function(naam){
+      var records = byLeerling[naam];
+      var moodScores = records.map(function(r){ return typeof r.MoodScore === 'number' ? r.MoodScore : -1; }).filter(function(s){ return s>=0; });
+      var aantalSlecht = moodScores.filter(function(s){ return s<=0; }).length;
+      var recentSteak = records[0] ? records[0].Streak || 0 : 0;
+      var totaalPunten = records[0] ? records[0].TotaalPunten || 0 : 0;
+      var moodEmojis = ['😔','😐','😊','🤩'];
+      var moodLabels = moodScores.map(function(s){ return moodEmojis[s]||'?'; }).join(' ');
+      var waarschuwing = aantalSlecht >= 3;
+      var kaartKleur = waarschuwing ? '#fff3cd' : 'white';
+      var borderKleur = waarschuwing ? '#f7941d' : 'var(--htisa-border)';
+
+      var kaart = document.createElement('div');
+      kaart.style.cssText = 'background:'+kaartKleur+';border:1.5px solid '+borderKleur+';border-radius:10px;padding:12px 14px;';
+      kaart.innerHTML =
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">' +
+          '<div>' +
+            '<div style="font-size:13px;font-weight:800;color:var(--htisa-text);margin-bottom:3px;">' +
+              (waarschuwing ? '⚠️ ' : '') + naam +
+            '</div>' +
+            '<div style="font-size:11px;color:var(--htisa-muted);">Laatste check-ins: '+moodLabels+'</div>' +
+            (waarschuwing ? '<div style="font-size:11px;color:#c05900;font-weight:700;margin-top:3px;">⚠️ '+aantalSlecht+'x 😔 recent — misschien even contact opnemen?</div>' : '') +
+          '</div>' +
+          '<div style="text-align:right;flex-shrink:0;">' +
+            '<div style="font-size:11px;color:var(--htisa-muted);">🔥 Streak: <strong>'+recentSteak+'</strong></div>' +
+            '<div style="font-size:11px;color:var(--htisa-muted);">⭐ Punten: <strong>'+totaalPunten+'</strong></div>' +
+          '</div>' +
+        '</div>';
+      container.appendChild(kaart);
+    });
+  } catch(e){ el.textContent='❌ Kon mood data niet ophalen.'; }
+}
 }
 function filterBegeleider(){
   var naam=(document.getElementById('bg-filter-leerling').value||'').toLowerCase();
