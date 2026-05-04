@@ -1231,42 +1231,6 @@ function isWerkdag(datum){
   return r[dagNaam] === 'werk';
 }
 
-function registreerOpTijd(){
-  var vandaag = new Date();
-  if(!isWerkdag(vandaag)){
-    document.getElementById('streak-feedback').style.color='var(--htisa-muted)';
-    document.getElementById('streak-feedback').textContent='ℹ️ Vandaag is geen werkdag volgens jouw rooster.';
-    return;
-  }
-  var key = getDagKey(vandaag);
-  var data = getStreakData();
-  if(data.dagen[key]){
-    document.getElementById('streak-feedback').style.color='var(--htisa-muted)';
-    document.getElementById('streak-feedback').textContent='✅ Al geregistreerd voor vandaag!';
-    return;
-  }
-  data.dagen[key] = 'optijd';
-  data.totaalOpTijd++;
-  // Bereken streak
-  var streak = 0;
-  var check = new Date(vandaag);
-  while(true){
-    if(isWerkdag(check)){
-      if(data.dagen[getDagKey(check)] === 'optijd') streak++;
-      else break;
-    }
-    check.setDate(check.getDate()-1);
-    if(streak > 200) break;
-  }
-  data.streak = streak;
-  if(streak > data.streakRecord) data.streakRecord = streak;
-  localStorage.setItem('htisa_streak', JSON.stringify(data));
-  var fb = document.getElementById('streak-feedback');
-  fb.style.color='var(--s-ok)';
-  fb.textContent='🔥 Top! Streak is nu '+streak+'!';
-  renderProgress();
-}
-
 function renderStreakWeek(){
   var r = getRooster();
   var data = getStreakData();
@@ -1333,23 +1297,7 @@ function renderProgress(){
   document.getElementById('streak-count').textContent = data.streak;
   renderStreakWeek();
 
-  // Streak knop
-  var vandaag = new Date();
-  var todayKey = getDagKey(vandaag);
-  var btn = document.getElementById('streak-btn');
-  if(data.dagen[todayKey]){
-    btn.textContent='✅ Vandaag al geregistreerd!';
-    btn.style.background='#00a99d';
-    btn.disabled=true;
-  } else if(!isWerkdag(vandaag)){
-    btn.textContent='😴 Vandaag geen werkdag';
-    btn.style.background='#9e9e9e';
-    btn.disabled=true;
-  } else {
-    btn.textContent='✅ Ik was vandaag op tijd!';
-    btn.style.background='#f7941d';
-    btn.disabled=false;
-  }
+
 
   // Badges
   var html = badgeDefs.map(function(b){
@@ -1637,9 +1585,6 @@ function saveContactForm(){
 }
 
 // Legacy stubs (voor zekerheid)
-function openForm(){ openContactForm('werk'); }
-function closeForm(){ closeContactForm(); }
-function saveContact(){ saveContactForm(); }
 var werkContact = { get tel(){ return contacts.werk.tel; }, get naam(){ return contacts.werk.naam; } };
 
 var openPanel=null;
@@ -1760,20 +1705,6 @@ function toggle(key,btn,cls){
   showBackBar(panels[key].title);
   document.getElementById('panel-'+key).scrollIntoView({behavior:'smooth',block:'nearest'});
 }
-function openForm(){document.getElementById('add-form').classList.add('open');if(werkContact){document.getElementById('inp-naam').value=werkContact.naam;document.getElementById('inp-tel').value=werkContact.tel;}}
-function closeForm(){document.getElementById('add-form').classList.remove('open');document.getElementById('inp-naam').value='';document.getElementById('inp-tel').value='';}
-function saveContact(){
-  var naam=document.getElementById('inp-naam').value.trim(),tel=document.getElementById('inp-tel').value.trim();
-  if(!naam||!tel)return;
-  werkContact={naam:naam,tel:tel};
-  localStorage.setItem('htisa_werkgever',JSON.stringify(werkContact));
-  document.getElementById('werk-naam-display').textContent=naam;
-  document.getElementById('werk-num-display').textContent=tel;
-  document.getElementById('werk-call-btn').href='tel:'+tel.replace(/\s/g,'');
-  document.getElementById('werkgever-display').style.display='block';
-  document.getElementById('werkgever-add').style.display='none';
-  closeForm();if(openPanel)renderPanel(openPanel);
-}
 function switchTab(n,btn){
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
   document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
@@ -1787,7 +1718,7 @@ function switchTab(n,btn){
     var isLeerlingModus = isLeerlingLink();
     document.getElementById('role-chooser').style.display='block';
     var werkView = document.getElementById('view-werkgever');
-    var leerView = document.getElementById('view-leerling-cal');
+    var leerView = document.getElementById('view-leerling');
     var begView  = document.getElementById('view-begeleider');
     if(werkView) werkView.style.display='none';
     if(leerView) leerView.style.display='none';
@@ -1831,7 +1762,7 @@ function toggleEersteDag(btn) {
   if(frisOpen){frisOpen=false;document.getElementById('panel-fris').classList.remove('open');document.getElementById('btn-fris').classList.remove('active-fris');if(frisTimer){clearInterval(frisTimer);frisTimer=null;}}
   if(veiligOpen){veiligOpen=false;document.getElementById('panel-veilig').classList.remove('open');document.getElementById('btn-veilig').classList.remove('active-veilig');}
   if(woordenOpen){woordenOpen=false;document.getElementById('panel-woorden').classList.remove('open');document.getElementById('btn-woorden').classList.remove('active-info');}
-  if(reflectieOpen){reflectieOpen=false;document.getElementById('panel-reflectie').classList.remove('open');document.getElementById('btn-reflectie').classList.remove('active-fris');}
+  
   var panel = document.getElementById('panel-eerstedag');
   if(eerstedagOpen) {
     panel.classList.add('open');
@@ -1919,7 +1850,7 @@ function toggleWoorden(btn) {
   if(frisOpen){frisOpen=false;document.getElementById('panel-fris').classList.remove('open');document.getElementById('btn-fris').classList.remove('active-fris');if(frisTimer){clearInterval(frisTimer);frisTimer=null;}}
   if(veiligOpen){veiligOpen=false;document.getElementById('panel-veilig').classList.remove('open');document.getElementById('btn-veilig').classList.remove('active-veilig');}
   if(eerstedagOpen){eerstedagOpen=false;document.getElementById('panel-eerstedag').classList.remove('open');document.getElementById('btn-eerstedag').classList.remove('active-info');}
-  if(reflectieOpen){reflectieOpen=false;document.getElementById('panel-reflectie').classList.remove('open');document.getElementById('btn-reflectie').classList.remove('active-fris');}
+  
   var panel = document.getElementById('panel-woorden');
   btn.classList.toggle('active-info', woordenOpen);
   if(woordenOpen) {
@@ -1988,70 +1919,7 @@ function renderWoorden() {
 }
 
 // ── WEEKREFLECTIE ──
-var reflectieOpen = false;
-var AT_REFL_TABLE = 'Reflecties'; // naam van de tabel in Airtable
 
-function toggleReflectie(btn) {
-  reflectieOpen = !reflectieOpen;
-  closeSosPanels();
-  if(frisOpen){frisOpen=false;document.getElementById('panel-fris').classList.remove('open');document.getElementById('btn-fris').classList.remove('active-fris');if(frisTimer){clearInterval(frisTimer);frisTimer=null;}}
-  if(veiligOpen){veiligOpen=false;document.getElementById('panel-veilig').classList.remove('open');document.getElementById('btn-veilig').classList.remove('active-veilig');}
-  if(eerstedagOpen){eerstedagOpen=false;document.getElementById('panel-eerstedag').classList.remove('open');document.getElementById('btn-eerstedag').classList.remove('active-info');}
-  if(woordenOpen){woordenOpen=false;document.getElementById('panel-woorden').classList.remove('open');document.getElementById('btn-woorden').classList.remove('active-info');}
-  var panel = document.getElementById('panel-reflectie');
-  panel.classList.toggle('open', reflectieOpen);
-  btn.classList.toggle('active-fris', reflectieOpen);
-  if(reflectieOpen) {
-    initReflectie();
-    showBackBar('Weekreflectie');
-    panel.scrollIntoView({behavior:'smooth',block:'nearest'});
-  } else hideBackBar();
-}
-function initReflectie() {
-  var n = new Date();
-  var dag = n.getDay(); // 0=zo, 1=ma ... 5=vr, 6=za
-  var vrijdag = new Date(n);
-  vrijdag.setDate(n.getDate() - ((dag + 2) % 7)); // vorige vrijdag
-  var weekLabel = 'Week van ' + vrijdag.toLocaleDateString('nl-BE', {day:'numeric', month:'long', year:'numeric'});
-  document.getElementById('refl-week-label').textContent = weekLabel;
-  // Laad eventuele opgeslagen waarden
-  var saved = JSON.parse(localStorage.getItem('htisa_refl_' + vrijdag.toISOString().split('T')[0]) || '{}');
-  document.getElementById('refl-goed').value = saved.goed || '';
-  document.getElementById('refl-moeilijk').value = saved.moeilijk || '';
-  document.getElementById('refl-volgend').value = saved.volgend || '';
-}
-async function saveReflectie() {
-  var goed = document.getElementById('refl-goed').value.trim();
-  var moeilijk = document.getElementById('refl-moeilijk').value.trim();
-  var volgend = document.getElementById('refl-volgend').value.trim();
-  var fb = document.getElementById('refl-feedback');
-  if(!goed && !moeilijk && !volgend) { fb.style.color='var(--s-ko)'; fb.textContent='⚠️ Vul minstens één veld in'; return; }
-  var leerling = localStorage.getItem('htisa_leerling_naam') || 'Onbekend';
-  var n = new Date();
-  var dag = n.getDay();
-  var vrijdag = new Date(n);
-  vrijdag.setDate(n.getDate() - ((dag + 2) % 7));
-  var datum = vrijdag.toISOString().split('T')[0];
-  // Sla ook lokaal op
-  localStorage.setItem('htisa_refl_' + datum, JSON.stringify({goed:goed, moeilijk:moeilijk, volgend:volgend}));
-  document.getElementById('refl-save-btn').disabled = true;
-  fb.style.color = 'var(--htisa-muted)'; fb.textContent = 'Opslaan...';
-  try {
-    var reflUrl = 'https://api.airtable.com/v0/' + AT_BASE + '/Reflecties';
-    var resp = await fetch(reflUrl, {
-      method: 'POST',
-      headers: {'Authorization':'Bearer '+AT_TOKEN,'Content-Type':'application/json'},
-      body: JSON.stringify({fields:{Leerling:leerling, Datum:datum, WatGingGoed:goed, WatWasMoeilijk:moeilijk, VolgendeWeek:volgend}})
-    });
-    if(resp.ok) { fb.style.color='var(--s-ok)'; fb.textContent='✅ Reflectie opgeslagen!'; }
-    else { fb.style.color='var(--htisa-muted)'; fb.textContent='✅ Lokaal opgeslagen (Airtable tabel "Reflecties" nog niet aangemaakt)'; }
-  } catch(e) {
-    fb.style.color = 'var(--htisa-muted)'; fb.textContent = '✅ Lokaal opgeslagen';
-  }
-  document.getElementById('refl-save-btn').disabled = false;
-}
-
-// ── LEERLINGENLIJST BEHEER ──
 function renderImportLijst() {
   var lijst = document.getElementById('import-leerling-lijst');
   var count = document.getElementById('import-leerling-count');
@@ -2351,7 +2219,7 @@ async function loadLeerlingData(naam){
   document.getElementById('ll-loading').textContent='Gegevens ophalen...';
   try{
     var filter=encodeURIComponent("{Leerling}='"+naam.replace(/'/g,"\\'")+"'");
-    var resp=await fetch(AT_URL+'?filterByFormula='+filter,{headers:{'Authorization':'Bearer '+AT_TOKEN}});
+    var resp=await fetch(AT_URL+'?filterByFormula='+filter,{headers:AT_HEADERS});
     var data=await resp.json();
     renderLeerlingCal(data.records||[]);
     document.getElementById('ll-loading').textContent='';
@@ -2495,15 +2363,15 @@ async function saveAanwezigheid(){
   fb.style.color='var(--htisa-muted)';fb.textContent='Opslaan...';
   try{
     var filter=encodeURIComponent("AND({Leerling}='"+leerling.replace(/'/g,"\\'")+"',{Datum}='"+datum+"')");
-    var check=await fetch(AT_URL+'?filterByFormula='+filter,{headers:{'Authorization':'Bearer '+AT_TOKEN}});
+    var check=await fetch(AT_URL+'?filterByFormula='+filter,{headers:AT_HEADERS});
     var chData=await check.json();
     var existing=chData.records&&chData.records[0];
     var fields={Leerling:leerling,Datum:datum,Status:selectedStatusWg,Opmerking:opmerking,Werkgever:werkgever};
     var resp;
     if(existing){
-      resp=await fetch(AT_URL+'/'+existing.id,{method:'PATCH',headers:{'Authorization':'Bearer '+AT_TOKEN,'Content-Type':'application/json'},body:JSON.stringify({fields:fields})});
+      resp=await fetch(AT_URL+'/'+existing.id,{method:'PATCH',headers:AT_HEADERS,body:JSON.stringify({fields:fields})});
     } else {
-      resp=await fetch(AT_URL,{method:'POST',headers:{'Authorization':'Bearer '+AT_TOKEN,'Content-Type':'application/json'},body:JSON.stringify({fields:fields})});
+      resp=await fetch(AT_URL,{method:'POST',headers:AT_HEADERS,body:JSON.stringify({fields:fields})});
     }
     if(resp.ok){
       // Sla leerling op voor volgende keer
@@ -2532,7 +2400,7 @@ async function loadBegeleiderData(){
     var all=[],offset='';
     do{
       var url=AT_URL+'?sort[0][field]=Datum&sort[0][direction]=desc'+(offset?'&offset='+offset:'');
-      var resp=await fetch(url,{headers:{'Authorization':'Bearer '+AT_TOKEN}});
+      var resp=await fetch(url,{headers:AT_HEADERS});
       var data=await resp.json();
       all=all.concat(data.records||[]);
       offset=data.offset||'';
