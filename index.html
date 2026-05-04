@@ -263,6 +263,12 @@
 </div>
 
 <div class="app">
+  <!-- DEMO BANNER -->
+  <div id="demo-banner" style="display:none;position:sticky;top:0;z-index:999;background:#f7941d;color:white;padding:10px 16px;font-size:13px;font-weight:700;display:none;align-items:center;justify-content:space-between;gap:8px;">
+    <span>👁️ Demo modus — je ziet de app als leerling</span>
+    <button onclick="stopDemoModus()" style="background:white;color:#f7941d;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;">✕ Terug naar begeleider</button>
+  </div>
+
   <div class="app-header">
     <div style="background:white;width:100%;padding:4px 8px 2px;box-sizing:border-box;">
         <img src="icons/logo-htisa.png" alt="HTiSA" style="width:100%;max-height:80px;display:block;object-fit:contain;object-position:left center;"/>
@@ -681,6 +687,7 @@
         <div id="mood-signalen" style="display:flex;flex-direction:column;gap:8px;"></div>
       </div>
 
+      <button class="btn-save" onclick="startDemoModus()" style="width:100%;margin-top:16px;background:#f7941d;">👁️ Bekijk app als leerling (demo)</button>
       <button class="terug-btn" onclick="logoutRole()">← Terug naar keuze</button>
     </div>
 
@@ -2141,6 +2148,72 @@ function checkPin(){
     setTimeout(updatePinDots,100);
   }
 }
+// ── DEMO MODUS ───────────────────────────────────────────────────────────────
+var demoModus = false;
+var demoVorigeRol = null;
+
+function startDemoModus(){
+  demoModus = true;
+  demoVorigeRol = currentRole;
+
+  // Sla echte leerlingnaam tijdelijk op en gebruik demo-naam
+  var echteNaam = localStorage.getItem('htisa_leerling_naam');
+  localStorage.setItem('htisa_demo_echte_naam', echteNaam || '');
+
+  // Vul demo-data in als die nog niet bestaat
+  var demoNaam = 'Demo Leerling';
+  localStorage.setItem('htisa_leerling_naam', demoNaam);
+
+  // Zet demo streak data als die leeg is
+  var streakData = JSON.parse(localStorage.getItem('htisa_demo_streak') || 'null');
+  if(!streakData){
+    var today = new Date();
+    var dagen = {};
+    for(var i=0; i<8; i++){
+      var d = new Date(today); d.setDate(d.getDate()-i);
+      var dow = d.getDay();
+      if(dow!==0 && dow!==6) dagen[getDagKey(d)] = 'optijd';
+    }
+    streakData = {streak:5, streakRecord:8, totaalOpTijd:12, totaalPunten:87, dagen:dagen};
+    localStorage.setItem('htisa_demo_streak', JSON.stringify(streakData));
+  }
+  localStorage.setItem('htisa_streak', JSON.stringify(streakData));
+
+  // Toon demo-banner en wissel naar leerling-scherm
+  document.getElementById('demo-banner').style.display='flex';
+  document.getElementById('view-begeleider').style.display='none';
+
+  // Zorg dat tabs zichtbaar zijn
+  document.querySelector('.tabs').style.display='flex';
+  switchTab('sos', document.querySelector('.tab'));
+
+  // Toon leerling-view direct (sla naam-invoer over)
+  document.getElementById('role-chooser').style.display='none';
+  document.getElementById('leerling-naam-screen').style.display='none';
+  document.getElementById('leerling-naam-display').textContent = demoNaam;
+  document.getElementById('view-leerling').style.display='block';
+}
+
+function stopDemoModus(){
+  demoModus = false;
+
+  // Herstel echte leerlingnaam
+  var echteNaam = localStorage.getItem('htisa_demo_echte_naam') || '';
+  if(echteNaam) localStorage.setItem('htisa_leerling_naam', echteNaam);
+  else localStorage.removeItem('htisa_leerling_naam');
+
+  // Herstel echte streak data
+  localStorage.removeItem('htisa_streak');
+
+  // Verberg demo-banner en leerling-view
+  document.getElementById('demo-banner').style.display='none';
+  document.getElementById('view-leerling').style.display='none';
+
+  // Terug naar begeleider-scherm
+  currentRole = 'begeleider';
+  document.getElementById('view-begeleider').style.display='block';
+}
+
 function logoutRole(){
   currentRole=null; pinBuffer='';
   document.getElementById('role-chooser').style.display='block';
@@ -2419,7 +2492,6 @@ async function laadMoodSignalen(){
       container.appendChild(kaart);
     });
   } catch(e){ el.textContent='❌ Kon mood data niet ophalen.'; }
-}
 }
 function filterBegeleider(){
   var naam=(document.getElementById('bg-filter-leerling').value||'').toLowerCase();
