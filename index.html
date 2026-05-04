@@ -40,10 +40,14 @@
   .duaal-badge{background:#FFE900;border-radius:6px;padding:4px 8px;display:flex;align-items:center;justify-content:center;width:100%;}
   .header-title{font-size:17px;font-weight:900;color:var(--htisa);line-height:1.15;position:relative;z-index:1;margin-top:0;}
   .header-title span{font-size:10px;font-weight:400;color:#5b8fa0;display:block;margin-top:3px;font-style:italic;border-left:2px solid #c2dfe9;padding-left:6px;line-height:1.4;}
-  .tabs-wrap{background:rgba(255,255,255,0.8);border-bottom:2px solid rgba(0,0,0,0.06);padding:0 16px;display:flex;position:sticky;top:0;z-index:99;backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);}
-  .tab{padding:8px 14px;font-size:11px;font-weight:800;color:var(--htisa-muted);cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;margin-bottom:-2px;text-transform:uppercase;letter-spacing:0.08em;font-family:var(--font);transition:color .15s;}
-  .tab.active{color:var(--htisa);border-bottom-color:var(--htisa);}
-  .tab:hover:not(.active){color:var(--htisa-text);}
+  .tabs-wrap{background:var(--htisa-off);border-bottom:2px solid var(--htisa-border);padding:8px 10px;display:flex;gap:4px;position:sticky;top:0;z-index:99;backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);}
+  .tab{flex:1;padding:8px 6px;font-size:10px;font-weight:900;color:var(--htisa-muted);cursor:pointer;border:1.5px solid var(--htisa-border);background:white;border-radius:8px;text-transform:uppercase;letter-spacing:0.06em;font-family:var(--font);transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px;opacity:0.65;}
+  .tab .tab-ico{font-size:18px;line-height:1;}
+  .tab:hover:not(.active){opacity:0.85;}
+  .tab.active{opacity:1;border-width:2px;}
+  .tab.active.tab-sos{background:#FFE900;border-color:#c4a800;border-bottom:3px solid #c4a800;color:#5a4000;}
+  .tab.active.tab-cal{background:#f7941d;border-color:#854f0b;border-bottom:3px solid #854f0b;color:white;}
+  .tab.active.tab-prog{background:#2596be;border-color:#115470;border-bottom:3px solid #115470;color:white;}
   .view{display:none;padding:20px 16px 16px;}
   .view.active{display:block;}
   .contacts-bar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:16px;}
@@ -304,7 +308,7 @@
     <div class="ob-slide" id="ob-2" style="display:none;">
       <div style="text-align:center;margin-bottom:16px;">
         <div style="font-size:56px;margin-bottom:10px;">🆘</div>
-        <div style="font-size:20px;font-weight:900;color:#0d2b38;margin-bottom:6px;">Work hard, work smart</div>
+        <div style="font-size:20px;font-weight:900;color:#0d2b38;margin-bottom:6px;">Wat nu?</div>
         <div style="font-size:13px;color:#5b8fa0;line-height:1.6;">Tik op een knop als er iets mis gaat.<br>Je krijgt stap-voor-stap uitleg.</div>
       </div>
       <div style="background:#fff3e0;border-radius:8px;padding:4px 10px;font-size:9px;font-weight:900;color:#633806;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;display:inline-block;">Ik ben te laat</div>
@@ -457,7 +461,7 @@
         <div style="font-size:13px;color:#5b8fa0;line-height:1.6;">Succes op de werkplek.<br>De app staat altijd voor je klaar.</div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;">
-        <div style="background:#fff3e0;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:24px;">🆘</div><div style="font-size:11px;font-weight:700;color:#633806;margin-top:4px;">Work hard,<br>work smart</div></div>
+        <div style="background:#fff3e0;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:24px;">🆘</div><div style="font-size:11px;font-weight:700;color:#633806;margin-top:4px;">Wat nu?</div></div>
         <div style="background:#eef7fb;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:24px;">📞</div><div style="font-size:11px;font-weight:700;color:#2596be;margin-top:4px;">Bel met<br>één tik</div></div>
         <div style="background:#e8f8f5;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:24px;">📋</div><div style="font-size:11px;font-weight:700;color:#085041;margin-top:4px;">Dagelijkse<br>check-in</div></div>
         <div style="background:#f5f0fc;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:24px;">🏅</div><div style="font-size:11px;font-weight:700;color:#4a148c;margin-top:4px;">Badges<br>& levels</div></div>
@@ -499,9 +503,9 @@
   </div>
 
   <div class="tabs-wrap">
-    <button class="tab active" onclick="switchTab('sos',this)">Work hard, work smart</button>
-    <button class="tab" onclick="switchTab('cal',this)">Aanwezigheden</button>
-    <button class="tab" onclick="switchTab('progress',this)">My progress</button>
+    <button class="tab tab-sos active" onclick="switchTab('sos',this)"><span class="tab-ico">💡</span>Wat nu?</button>
+    <button class="tab tab-cal" onclick="switchTab('cal',this)"><span class="tab-ico">🗓️</span>Aanwezigh.</button>
+    <button class="tab tab-prog" onclick="switchTab('progress',this)"><span class="tab-ico">📈</span>My progress</button>
   </div>
 
   <!-- STICKY BACK BAR — verschijnt als een paneel open is -->
