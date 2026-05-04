@@ -256,6 +256,226 @@
 <body>
 
 <!-- SPLASH SCREEN -->
+<!-- ONBOARDING OVERLAY -->
+<div id="onboarding" style="display:none;position:fixed;inset:0;z-index:10000;background:#f5f9fb;overflow-y:auto;font-family:'Segoe UI',system-ui,sans-serif;">
+
+  <!-- Header met logo -->
+  <div style="background:#2596be;padding:14px 20px 10px;display:flex;align-items:center;justify-content:space-between;">
+    <img src="icons/logo-htisa.png" alt="HTiSA" style="height:36px;object-fit:contain;filter:brightness(0) invert(1);"/>
+    <button onclick="sluitOnboarding()" style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">Overslaan</button>
+  </div>
+
+  <!-- Voortgangsbalk -->
+  <div style="background:#c2dfe9;height:4px;">
+    <div id="ob-progress" style="background:#f7941d;height:4px;width:14%;transition:width 0.3s ease;"></div>
+  </div>
+
+  <!-- Stap container -->
+  <div id="ob-slides" style="padding:20px 18px 100px;">
+
+    <!-- STAP 1: Welkom -->
+    <div class="ob-slide" id="ob-1">
+      <div style="text-align:center;margin-bottom:20px;">
+        <div style="font-size:64px;margin-bottom:12px;">👋</div>
+        <div style="font-size:22px;font-weight:900;color:#0d2b38;margin-bottom:6px;">Welkom bij HTiSA!</div>
+        <div style="font-size:14px;color:#5b8fa0;line-height:1.6;">Deze app helpt je op de werkplek.<br>We tonen je snel hoe het werkt.</div>
+      </div>
+      <div style="background:white;border-radius:12px;border:1.5px solid #c2dfe9;padding:16px;text-align:center;">
+        <img src="icons/logo-htisa.png" alt="HTiSA" style="max-height:60px;max-width:100%;object-fit:contain;"/>
+        <div style="font-size:12px;font-style:italic;color:#00a99d;font-weight:600;margin-top:8px;">Jongeren met dromen, toekomst in techniek</div>
+      </div>
+      <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+        <div style="background:white;border-radius:10px;border:1.5px solid #c2dfe9;padding:12px 14px;display:flex;align-items:center;gap:12px;">
+          <span style="font-size:24px;">🆘</span>
+          <div><div style="font-size:13px;font-weight:800;color:#0d2b38;">Hulp bij problemen</div><div style="font-size:11px;color:#5b8fa0;">Stap-voor-stap oplossingen</div></div>
+        </div>
+        <div style="background:white;border-radius:10px;border:1.5px solid #c2dfe9;padding:12px 14px;display:flex;align-items:center;gap:12px;">
+          <span style="font-size:24px;">📋</span>
+          <div><div style="font-size:13px;font-weight:800;color:#0d2b38;">Dagelijkse check-in</div><div style="font-size:11px;color:#5b8fa0;">Bouw je streak op</div></div>
+        </div>
+        <div style="background:white;border-radius:10px;border:1.5px solid #c2dfe9;padding:12px 14px;display:flex;align-items:center;gap:12px;">
+          <span style="font-size:24px;">🏅</span>
+          <div><div style="font-size:13px;font-weight:800;color:#0d2b38;">Badges en levels</div><div style="font-size:11px;color:#5b8fa0;">Groei doorheen het schooljaar</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAP 2: SOS hulp -->
+    <div class="ob-slide" id="ob-2" style="display:none;">
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-size:56px;margin-bottom:10px;">🆘</div>
+        <div style="font-size:20px;font-weight:900;color:#0d2b38;margin-bottom:6px;">Work hard, work smart</div>
+        <div style="font-size:13px;color:#5b8fa0;line-height:1.6;">Tik op een knop als er iets mis gaat.<br>Je krijgt stap-voor-stap uitleg.</div>
+      </div>
+      <div style="background:#fff3e0;border-radius:8px;padding:4px 10px;font-size:9px;font-weight:900;color:#633806;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;display:inline-block;">Ik ben te laat</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+        <div style="background:white;border:1.5px solid #c2dfe9;border-radius:10px;padding:11px 13px;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:22px;">⏱</span><div><div style="font-size:12px;font-weight:800;color:#0d2b38;">Te laat op het werk</div><div style="font-size:11px;color:#5b8fa0;">Bel meteen → stap 1, 2, 3…</div></div>
+        </div>
+        <div style="background:white;border:1.5px solid #c2dfe9;border-radius:10px;padding:11px 13px;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:22px;">🏫</span><div><div style="font-size:12px;font-weight:800;color:#0d2b38;">Te laat op school</div><div style="font-size:11px;color:#5b8fa0;">Meld je aan → stap 1, 2, 3…</div></div>
+        </div>
+      </div>
+      <div style="background:#e8f8f5;border-radius:8px;padding:4px 10px;font-size:9px;font-weight:900;color:#085041;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;display:inline-block;">Ik ben ziek</div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:white;border:1.5px solid #c2dfe9;border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-size:22px;">🏭</div><div style="font-size:11px;font-weight:700;color:#0d2b38;margin-top:4px;">Op het werk</div>
+        </div>
+        <div style="flex:1;background:white;border:1.5px solid #c2dfe9;border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-size:22px;">🏫</div><div style="font-size:11px;font-weight:700;color:#0d2b38;margin-top:4px;">Op school</div>
+        </div>
+        <div style="flex:1;background:white;border:1.5px solid #c2dfe9;border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-size:22px;">👕</div><div style="font-size:11px;font-weight:700;color:#0d2b38;margin-top:4px;">Kledij vergeten</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAP 3: Contacten -->
+    <div class="ob-slide" id="ob-3" style="display:none;">
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-size:56px;margin-bottom:10px;">📞</div>
+        <div style="font-size:20px;font-weight:900;color:#0d2b38;margin-bottom:6px;">Bel met één tik</div>
+        <div style="font-size:13px;color:#5b8fa0;line-height:1.6;">Voeg de nummers in van je begeleiders.<br>Daarna bel je met één tik.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+        <div style="background:white;border-radius:12px;border:1.5px solid #c2dfe9;padding:12px 14px;">
+          <div style="font-size:9px;font-weight:900;color:#00a99d;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Tewerkstellingsbegeleider</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:13px;color:#0d2b38;font-weight:600;">HTiSA Begeleider</div>
+            <div style="background:#00a99d;color:white;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;">📞 Bel</div>
+          </div>
+        </div>
+        <div style="background:white;border-radius:12px;border:1.5px solid #c2dfe9;padding:12px 14px;">
+          <div style="font-size:9px;font-weight:900;color:#6dcff6;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Leerlingenbegeleider</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:13px;color:#0d2b38;font-weight:600;">Naam invullen</div>
+            <div style="background:#6dcff6;color:#0d4a5e;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;">📞 Bel</div>
+          </div>
+        </div>
+        <div style="background:white;border-radius:12px;border:1.5px solid #c2dfe9;padding:12px 14px;">
+          <div style="font-size:9px;font-weight:900;color:#f7941d;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Werkgever</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:13px;color:#0d2b38;font-weight:600;">Naam invullen</div>
+            <div style="background:#f7941d;color:white;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;">📞 Bel</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:#eef7fb;border-radius:8px;padding:10px 12px;font-size:12px;color:#2596be;font-weight:600;text-align:center;">✏️ Tik op "Wijzigen" om nummers toe te voegen</div>
+    </div>
+
+    <!-- STAP 4: Check-in -->
+    <div class="ob-slide" id="ob-4" style="display:none;">
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-size:56px;margin-bottom:10px;">📋</div>
+        <div style="font-size:20px;font-weight:900;color:#0d2b38;margin-bottom:6px;">Check-in elke werkdag</div>
+        <div style="font-size:13px;color:#5b8fa0;line-height:1.6;">Vul elke dag in hoe het gaat.<br>Zo bouw je punten en een streak op.</div>
+      </div>
+      <div style="background:white;border-radius:12px;border:1.5px solid #c2dfe9;padding:14px;margin-bottom:12px;">
+        <div style="font-size:10px;font-weight:900;color:#f7941d;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">Hoe was je dag?</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px;">
+          <div style="border:2px solid #00a99d;background:#e8f8f5;border-radius:8px;padding:8px;text-align:center;"><div style="font-size:22px;">✅</div><div style="font-size:10px;font-weight:700;color:#085041;margin-top:3px;">Op tijd</div></div>
+          <div style="border:1.5px solid #c2dfe9;border-radius:8px;padding:8px;text-align:center;"><div style="font-size:22px;">🕐</div><div style="font-size:10px;font-weight:700;color:#5b8fa0;margin-top:3px;">Te laat</div></div>
+          <div style="border:1.5px solid #c2dfe9;border-radius:8px;padding:8px;text-align:center;"><div style="font-size:22px;">🤒</div><div style="font-size:10px;font-weight:700;color:#5b8fa0;margin-top:3px;">Ziek</div></div>
+        </div>
+        <div style="font-size:10px;font-weight:900;color:#00a99d;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Op de werkplek</div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#0d2b38;"><div style="width:18px;height:18px;background:#00a99d;border-radius:5px;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;flex-shrink:0;">✓</div>Ik heb vriendelijk gegroet</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#5b8fa0;"><div style="width:18px;height:18px;border:1.5px solid #c2dfe9;border-radius:5px;flex-shrink:0;"></div>Ik heb mijn gsm weggelegd</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#5b8fa0;"><div style="width:18px;height:18px;border:1.5px solid #c2dfe9;border-radius:5px;flex-shrink:0;"></div>Ik heb initiatief genomen</div>
+        </div>
+      </div>
+      <div style="background:#eef7fb;border-radius:8px;padding:10px 12px;font-size:12px;color:#2596be;font-weight:600;text-align:center;">Elk vinkje = 1 punt → meer punten = sneller groeien!</div>
+    </div>
+
+    <!-- STAP 5: Streak & Badges -->
+    <div class="ob-slide" id="ob-5" style="display:none;">
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-size:56px;margin-bottom:10px;">🔥</div>
+        <div style="font-size:20px;font-weight:900;color:#0d2b38;margin-bottom:6px;">Streak & badges</div>
+        <div style="font-size:13px;color:#5b8fa0;line-height:1.6;">Hoe meer werkdagen op rij,<br>hoe groter je vlam!</div>
+      </div>
+      <div style="background:white;border-radius:12px;border:1.5px solid #c2dfe9;padding:14px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div><div style="font-size:13px;font-weight:800;color:#0d2b38;">Op tijd op de werkplek</div><div style="font-size:11px;color:#5b8fa0;">Ziek = pauze • Te laat = gemiste dag</div></div>
+          <div style="text-align:right;"><div style="font-size:32px;font-weight:900;color:#f7941d;line-height:1;">5</div><div style="font-size:10px;color:#5b8fa0;">dagen op rij</div></div>
+        </div>
+        <div style="display:flex;gap:5px;margin-bottom:14px;">
+          <div style="flex:1;background:#e8f5e9;border:1.5px solid #00a99d;border-radius:8px;padding:6px;text-align:center;"><div style="font-size:16px;">✅</div><div style="font-size:9px;font-weight:700;color:#00a99d;">Ma</div></div>
+          <div style="flex:1;background:#e8f5e9;border:1.5px solid #00a99d;border-radius:8px;padding:6px;text-align:center;"><div style="font-size:16px;">✅</div><div style="font-size:9px;font-weight:700;color:#00a99d;">Di</div></div>
+          <div style="flex:1;background:#e8f5e9;border:1.5px solid #00a99d;border-radius:8px;padding:6px;text-align:center;"><div style="font-size:16px;">✅</div><div style="font-size:9px;font-weight:700;color:#00a99d;">Wo</div></div>
+          <div style="flex:1;background:#fff3e0;border:1.5px solid #f7941d;border-radius:8px;padding:6px;text-align:center;"><div style="font-size:16px;font-weight:700;color:#f7941d;">?</div><div style="font-size:9px;font-weight:700;color:#f7941d;">Do</div></div>
+          <div style="flex:1;background:#f5f9fb;border:1.5px solid #c2dfe9;border-radius:8px;padding:6px;text-align:center;"><div style="font-size:16px;">💼</div><div style="font-size:9px;font-weight:700;color:#5b8fa0;">Vr</div></div>
+        </div>
+      </div>
+      <div style="background:white;border-radius:12px;border:1.5px solid #c2dfe9;padding:12px;margin-bottom:12px;">
+        <div style="font-size:10px;font-weight:900;color:#6dcff6;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">Jouw level</div>
+        <div style="display:flex;gap:6px;">
+          <div style="flex:1;background:#e8f8f5;border-radius:8px;padding:8px;text-align:center;border:1.5px solid #00a99d;"><div style="font-size:18px;">🌱</div><div style="font-size:10px;font-weight:700;color:#085041;margin-top:3px;">Starter</div></div>
+          <div style="flex:1;background:#f5f9fb;border-radius:8px;padding:8px;text-align:center;border:1.5px solid #c2dfe9;"><div style="font-size:18px;filter:grayscale(1);opacity:0.4;">⭐</div><div style="font-size:10px;color:#5b8fa0;margin-top:3px;">On the job</div></div>
+          <div style="flex:1;background:#f5f9fb;border-radius:8px;padding:8px;text-align:center;border:1.5px solid #c2dfe9;"><div style="font-size:18px;filter:grayscale(1);opacity:0.4;">💪</div><div style="font-size:10px;color:#5b8fa0;margin-top:3px;">Getting there</div></div>
+          <div style="flex:1;background:#f5f9fb;border-radius:8px;padding:8px;text-align:center;border:1.5px solid #c2dfe9;"><div style="font-size:18px;filter:grayscale(1);opacity:0.4;">🏆</div><div style="font-size:10px;color:#5b8fa0;margin-top:3px;">Work hero</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAP 6: Aanwezigheden -->
+    <div class="ob-slide" id="ob-6" style="display:none;">
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-size:56px;margin-bottom:10px;">🗓️</div>
+        <div style="font-size:20px;font-weight:900;color:#0d2b38;margin-bottom:6px;">Aanwezigheden</div>
+        <div style="font-size:13px;color:#5b8fa0;line-height:1.6;">Bekijk je eigen kalender.<br>Je werkgever vult je aanwezigheid in.</div>
+      </div>
+      <div style="background:white;border-radius:12px;border:1.5px solid #c2dfe9;padding:14px;margin-bottom:12px;">
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:10px;margin-bottom:6px;">
+          <div style="color:#5b8fa0;font-weight:700;padding:3px;">ma</div><div style="color:#5b8fa0;font-weight:700;padding:3px;">di</div><div style="color:#5b8fa0;font-weight:700;padding:3px;">wo</div><div style="color:#5b8fa0;font-weight:700;padding:3px;">do</div><div style="color:#5b8fa0;font-weight:700;padding:3px;">vr</div><div style="color:#c2dfe9;font-weight:700;padding:3px;">za</div><div style="color:#c2dfe9;font-weight:700;padding:3px;">zo</div>
+          <div style="background:#e8f5e9;border-radius:5px;padding:4px;color:#2e7d32;font-weight:700;">1</div>
+          <div style="background:#e8f5e9;border-radius:5px;padding:4px;color:#2e7d32;font-weight:700;">2</div>
+          <div style="background:#ffebee;border-radius:5px;padding:4px;color:#c62828;font-weight:700;">3</div>
+          <div style="background:#e8f5e9;border-radius:5px;padding:4px;color:#2e7d32;font-weight:700;">4</div>
+          <div style="background:#fff3e0;border-radius:5px;padding:4px;color:#e65100;font-weight:700;">5</div>
+          <div style="background:#f5f9fb;border-radius:5px;padding:4px;color:#c2dfe9;">6</div>
+          <div style="background:#f5f9fb;border-radius:5px;padding:4px;color:#c2dfe9;">7</div>
+          <div style="background:#e8f5e9;border-radius:5px;padding:4px;color:#2e7d32;font-weight:700;">8</div>
+          <div style="background:#e8f5e9;border-radius:5px;padding:4px;color:#2e7d32;font-weight:700;">9</div>
+          <div style="background:#e8f5e9;border-radius:5px;padding:4px;color:#2e7d32;font-weight:700;">10</div>
+          <div style="background:#e8f5e9;border-radius:5px;padding:4px;color:#2e7d32;font-weight:700;">11</div>
+          <div style="background:#e8f5e9;border-radius:5px;padding:4px;color:#2e7d32;font-weight:700;">12</div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:8px;">
+          <div style="display:flex;align-items:center;gap:4px;font-size:11px;"><div style="width:12px;height:12px;background:#e8f5e9;border-radius:3px;border:1px solid #00a99d;"></div><span style="color:#5b8fa0;">Aanwezig</span></div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:11px;"><div style="width:12px;height:12px;background:#ffebee;border-radius:3px;border:1px solid #c62828;"></div><span style="color:#5b8fa0;">Afwezig</span></div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:11px;"><div style="width:12px;height:12px;background:#fff3e0;border-radius:3px;border:1px solid #e65100;"></div><span style="color:#5b8fa0;">Te laat</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAP 7: Klaar -->
+    <div class="ob-slide" id="ob-7" style="display:none;">
+      <div style="text-align:center;margin-bottom:20px;">
+        <div style="font-size:64px;margin-bottom:12px;">🚀</div>
+        <div style="font-size:22px;font-weight:900;color:#0d2b38;margin-bottom:8px;">Je bent er klaar voor!</div>
+        <div style="font-size:13px;color:#5b8fa0;line-height:1.6;">Succes op de werkplek.<br>De app staat altijd voor je klaar.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;">
+        <div style="background:#fff3e0;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:24px;">🆘</div><div style="font-size:11px;font-weight:700;color:#633806;margin-top:4px;">Work hard,<br>work smart</div></div>
+        <div style="background:#eef7fb;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:24px;">📞</div><div style="font-size:11px;font-weight:700;color:#2596be;margin-top:4px;">Bel met<br>één tik</div></div>
+        <div style="background:#e8f8f5;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:24px;">📋</div><div style="font-size:11px;font-weight:700;color:#085041;margin-top:4px;">Dagelijkse<br>check-in</div></div>
+        <div style="background:#f5f0fc;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:24px;">🏅</div><div style="font-size:11px;font-weight:700;color:#4a148c;margin-top:4px;">Badges<br>& levels</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Navigatie (vast onderaan) -->
+  <div style="position:fixed;bottom:0;left:0;right:0;background:white;border-top:1.5px solid #c2dfe9;padding:12px 18px 20px;z-index:10001;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <button id="ob-prev-btn" onclick="obVorige()" style="background:#f5f9fb;border:1.5px solid #c2dfe9;color:#5b8fa0;border-radius:8px;padding:11px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:none;">← Terug</button>
+      <div style="display:flex;gap:5px;flex:1;justify-content:center;" id="ob-dots-row"></div>
+      <button id="ob-next-btn" onclick="obVolgende()" style="background:#2596be;border:none;color:white;border-radius:8px;padding:11px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Volgende →</button>
+    </div>
+  </div>
+</div>
+
 <div id="splash">
   <div id="splash-logo">
     <img src="icons/logo-htisa.png" alt="HTiSA logo"/>
@@ -1377,10 +1597,82 @@ var weekQuotes = [
   if(el) el.textContent = '"' + quote + '"';
 })();
 
+// ── ONBOARDING ──────────────────────────────────────────────────────────────
+var obStap = 1;
+var obTotaal = 7;
+
+function obToonStap(n){
+  for(var i=1;i<=obTotaal;i++){
+    var el = document.getElementById('ob-'+i);
+    if(el) el.style.display = i===n ? 'block' : 'none';
+  }
+  // Voortgangsbalk
+  document.getElementById('ob-progress').style.width = Math.round((n/obTotaal)*100)+'%';
+  // Dots
+  var dots = document.getElementById('ob-dots-row');
+  dots.innerHTML = '';
+  for(var j=1;j<=obTotaal;j++){
+    var d = document.createElement('div');
+    d.style.cssText = 'width:'+(j===n?'20px':'8px')+';height:8px;border-radius:4px;background:'+(j===n?'#2596be':j<n?'#00a99d':'#c2dfe9')+';transition:all 0.25s;';
+    dots.appendChild(d);
+  }
+  // Knoppen
+  var prevBtn = document.getElementById('ob-prev-btn');
+  var nextBtn = document.getElementById('ob-next-btn');
+  prevBtn.style.display = n > 1 ? 'block' : 'none';
+  if(n === obTotaal){
+    nextBtn.textContent = '✅ Aan de slag!';
+    nextBtn.style.background = '#00a99d';
+  } else {
+    nextBtn.textContent = 'Volgende →';
+    nextBtn.style.background = '#2596be';
+  }
+  // Scroll naar boven van slide
+  document.getElementById('ob-slides').scrollTop = 0;
+}
+
+function obVolgende(){
+  if(obStap < obTotaal){ obStap++; obToonStap(obStap); }
+  else { sluitOnboarding(); }
+}
+
+function obVorige(){
+  if(obStap > 1){ obStap--; obToonStap(obStap); }
+}
+
+function sluitOnboarding(){
+  localStorage.setItem('htisa_onboarding_done','1');
+  var el = document.getElementById('onboarding');
+  el.style.opacity = '0';
+  el.style.transition = 'opacity 0.4s ease';
+  setTimeout(function(){ el.style.display='none'; }, 400);
+}
+
+function initOnboarding(){
+  if(localStorage.getItem('htisa_onboarding_done')) return;
+  var el = document.getElementById('onboarding');
+  el.style.display = 'block';
+  el.style.opacity = '0';
+  setTimeout(function(){ el.style.opacity='1'; el.style.transition='opacity 0.4s ease'; }, 50);
+  obToonStap(1);
+
+  // Swipe ondersteuning
+  var startX = 0;
+  el.addEventListener('touchstart', function(e){ startX = e.touches[0].clientX; }, {passive:true});
+  el.addEventListener('touchend', function(e){
+    var diff = startX - e.changedTouches[0].clientX;
+    if(Math.abs(diff) > 50){
+      if(diff > 0) obVolgende();
+      else obVorige();
+    }
+  }, {passive:true});
+}
+
 // ── SPLASH SCREEN ──
 window.addEventListener('load', function() {
   setTimeout(function() {
     document.getElementById('splash').classList.add('hidden');
+    initOnboarding();
   }, 2000);
 });
 
