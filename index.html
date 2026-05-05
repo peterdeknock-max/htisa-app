@@ -46,8 +46,8 @@
   .tab:hover:not(.active){opacity:0.85;}
   .tab.active{opacity:1;border-width:2px;}
   .tab.active.tab-sos{background:white;border-color:#2596be;border-bottom:3px solid #2596be;color:#0d2b38;}
-  .tab.active.tab-cal{background:#f7941d;border-color:#854f0b;border-bottom:3px solid #854f0b;color:white;}
-  .tab.active.tab-prog{background:#2596be;border-color:#115470;border-bottom:3px solid #115470;color:white;}
+  .tab.active.tab-cal{background:white;border-color:#f7941d;border-bottom:3px solid #f7941d;color:#0d2b38;}
+  .tab.active.tab-prog{background:white;border-color:#2596be;border-bottom:3px solid #2596be;color:#0d2b38;}
   .view{display:none;padding:20px 16px 16px;}
   .view.active{display:block;}
   .contacts-bar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:16px;}
@@ -505,7 +505,7 @@
   <div class="tabs-wrap">
     <button class="tab tab-sos active" onclick="switchTab('sos',this)"><span class="tab-ico">💡</span>Wat nu?</button>
     <button class="tab tab-cal" onclick="switchTab('cal',this)"><span class="tab-ico">🗓️</span>Aanwezigh.</button>
-    <button class="tab tab-prog" onclick="switchTab('progress',this)"><span class="tab-ico">📈</span>My progress</button>
+    <button class="tab tab-prog" onclick="switchTab('progress',this)"><span class="tab-ico">📈</span>Mijn voortgang</button>
   </div>
 
   <!-- STICKY BACK BAR — verschijnt als een paneel open is -->
@@ -921,7 +921,7 @@
   <div id="view-progress" class="view">
 
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-      <div style="font-size:16px;font-weight:800;color:var(--htisa-text);">My progress</div>
+      <div style="font-size:16px;font-weight:800;color:var(--htisa-text);">Mijn voortgang</div>
       <button onclick="toggleRoosterSetup()" style="font-size:11px;color:var(--htisa-muted);background:none;border:1px solid var(--htisa-border);border-radius:6px;padding:4px 8px;cursor:pointer;">⚙️ Rooster</button>
     </div>
 
