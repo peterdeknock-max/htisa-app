@@ -603,25 +603,52 @@
     </div>
     <div id="panel-ziekschool" class="panel"></div>
 
-    <!-- 3. ANDERE SITUATIES -->
+    <!-- 3. WERK -->
     <div class="section-label groen">Werk</div>
 
-    <!-- Eerste dag checklist - vol breed bovenaan -->
+    <!-- Goede eerste indruk - vol breed bovenaan -->
+    <div class="grid grid-single" style="margin-bottom:6px">
+      <button class="sos-btn" id="btn-fris" onclick="toggleFris(this)">
+        <span class="btn-icon">✨</span>
+        <span class="btn-text"><span class="btn-label">Een goede eerste indruk</span><span class="btn-sub">Tips voor op de werkplek</span></span>
+      </button>
+    </div>
+    <div id="panel-fris" class="fris-panel">
+      <div class="fris-header">
+        <span style="font-size:18px">✨</span>
+        Een goede eerste indruk
+        <span class="badge badge-fris">TIPS</span>
+      </div>
+      <div class="fris-tip-card">
+        <div class="fris-counter" id="fris-num">Tip 1 / 10</div>
+        <span class="fris-emoji" id="fris-emoji">⏰</span>
+        <div class="fris-tip-text" id="fris-text"></div>
+        <span class="fris-tip-sub" id="fris-sub"></span>
+      </div>
+      <div class="fris-nav">
+        <button class="fris-nav-btn outline" onclick="frisPrev()">← Vorige</button>
+        <div class="fris-dots" id="fris-dots"></div>
+        <button class="fris-nav-btn" onclick="frisNext()">Volgende →</button>
+      </div>
+      <div class="fris-auto">Tips wisselen automatisch elke 8 seconden</div>
+    </div>
+
+    <!-- Checklist naar het werk - vol breed -->
     <div class="grid grid-single" style="margin-bottom:6px">
       <button class="sos-btn" id="btn-eerstedag" onclick="toggleEersteDag(this)">
         <span class="btn-icon">🎯</span>
-        <span class="btn-text"><span class="btn-label">First days on the job</span><span class="btn-sub">Ben ik klaar?</span></span>
+        <span class="btn-text"><span class="btn-label">Checklist naar het werk</span><span class="btn-sub">Ben ik klaar?</span></span>
       </button>
     </div>
 
-    <!-- EERSTE DAG PANEL -->
+    <!-- CHECKLIST PANEL -->
     <div id="panel-eerstedag" class="panel">
-      <div class="panel-title"><span style="font-size:18px">🎯</span> First days on the job <span class="badge badge-info">CHECKLIST</span></div>
+      <div class="panel-title"><span style="font-size:18px">🎯</span> Checklist naar het werk <span class="badge badge-info">CHECKLIST</span></div>
       <div id="checklist-items"></div>
       <div style="margin-top:10px;display:flex;gap:8px;">
         <button class="btn-save" onclick="resetChecklist()" style="flex:1;font-size:12px;">↺ Opnieuw</button>
       </div>
-      <div class="callout" style="margin-top:10px;">Vink alles af voor je vertrekt — succes op je eerste dag! 💪</div>
+      <div class="callout" style="margin-top:10px;">Vink alles af voor je vertrekt — succes! 💪</div>
     </div>
 
     <!-- Werkkledij + Conflict naast elkaar -->
@@ -683,58 +710,13 @@
       <div id="bb-feedback" style="font-size:12px;font-weight:600;text-align:center;min-height:18px;"></div>
     </div>
 
-    <!-- 4. TIPS -->
-    <div class="section-label geel">Tips voor de werkplek</div>
-    <div class="grid" style="margin-bottom:6px">
-      <button class="sos-btn" id="btn-fris" onclick="toggleFris(this)">
-        <span class="btn-icon">✨</span>
-        <span class="btn-text"><span class="btn-label">Fris voor de dag</span><span class="btn-sub">Goede indruk tips</span></span>
-      </button>
-      <button class="sos-btn" id="btn-veilig" onclick="toggleVeilig(this)">
-        <span class="btn-icon">🦺</span>
-        <span class="btn-text"><span class="btn-label">Veiligheid</span><span class="btn-sub">Op de werkplek</span></span>
-      </button>
-    </div>
+    <!-- WOORDENLIJST knop + PANEL -->
     <div class="grid grid-single" style="margin-bottom:6px">
       <button class="sos-btn" id="btn-woorden" onclick="toggleWoorden(this)">
         <span class="btn-icon">🌍</span>
         <span class="btn-text"><span class="btn-label">Woordenlijst werkvloer</span><span class="btn-sub">NL · FR · EN · AR · TR</span></span>
       </button>
     </div>
-
-    <!-- FRIS PANEL -->
-    <div id="panel-fris" class="fris-panel">
-      <div class="fris-header">
-        <span style="font-size:18px">✨</span>
-        Fris voor de dag
-        <span class="badge badge-fris">TIPS</span>
-      </div>
-      <div class="fris-tip-card">
-        <div class="fris-counter" id="fris-num">Tip 1 / 10</div>
-        <span class="fris-emoji" id="fris-emoji">⏰</span>
-        <div class="fris-tip-text" id="fris-text"></div>
-        <span class="fris-tip-sub" id="fris-sub"></span>
-      </div>
-      <div class="fris-nav">
-        <button class="fris-nav-btn outline" onclick="frisPrev()">← Vorige</button>
-        <div class="fris-dots" id="fris-dots"></div>
-        <button class="fris-nav-btn" onclick="frisNext()">Volgende →</button>
-      </div>
-      <div class="fris-auto">Tips wisselen automatisch elke 8 seconden</div>
-    </div>
-
-    <!-- VEILIGHEID PANEL -->
-    <div id="panel-veilig" class="veilig-panel">
-      <div class="veilig-header">
-        <span style="font-size:18px">🦺</span>
-        Veiligheid op de werkplek
-        <span class="badge badge-veilig">VEILIG</span>
-      </div>
-      <ul class="veilig-steps" id="veilig-list"></ul>
-      <div class="veilig-callout">🔔 Twijfel je over een veiligheidsregel? Vraag het altijd aan je leidinggevende. Veiligheid gaat voor alles!</div>
-    </div>
-
-    <!-- WOORDENLIJST PANEL -->
     <div id="panel-woorden" class="panel" style="background:var(--htisa-off);">
       <div class="panel-title"><span style="font-size:18px">🌍</span> Woordenlijst werkvloer <span class="badge" style="background:#7b1fa2;color:white;">TALEN</span></div>
       <input class="form-input" id="woorden-zoek" type="text" placeholder="🔍  Zoek een woord..." oninput="filterWoorden()" style="margin-bottom:10px;"/>
@@ -1759,7 +1741,7 @@ function toggleFris(btn){
     renderFrisTip();
     resetFrisTimer();
     showBackBar('Fris voor de dag');
-    document.getElementById('panel-fris').scrollIntoView({behavior:'smooth',block:'nearest'});
+    setTimeout(function(){ btn.scrollIntoView({behavior:'smooth',block:'nearest'}); }, 30);
   } else {
     if(frisTimer){clearInterval(frisTimer);frisTimer=null;}
     hideBackBar();
@@ -1773,7 +1755,7 @@ function toggleVeilig(btn){
   btn.classList.toggle('active-veilig',veiligOpen);
   if(veiligOpen){
     showBackBar('Veiligheid op de werkplek');
-    document.getElementById('panel-veilig').scrollIntoView({behavior:'smooth',block:'nearest'});
+    setTimeout(function(){ btn.scrollIntoView({behavior:'smooth',block:'nearest'}); }, 30);
   } else {
     hideBackBar();
   }
@@ -1959,7 +1941,7 @@ function renderPanel(key){
     var ico = s.ico ? '<div class="step-ico">'+s.ico+'</div>' : '';
     return '<li class="step">'+ico+'<div class="step-num '+d.color+'">'+(i+1)+'</div><div class="step-text"><span class="step-bold">'+s.bold+'</span>'+s.text+ex+'</div></li>';
   }).join('');
-  p.innerHTML='<div class="panel-title"><span style="font-size:18px">'+d.icon+'</span>'+d.title+'<span class="badge badge-'+d.color+'">SOS</span></div>'+al+'<ul class="steps">'+steps+'</ul>'+contactButtons(d)+'<div class="callout">Eerlijkheid en snel communiceren zijn altijd de beste aanpak. Je begeleider bij HTiSA is er om je te helpen!</div>';
+  p.innerHTML='<div class="panel-title"><span style="font-size:18px">'+d.icon+'</span>'+d.title+'<span class="badge badge-'+d.color+'">SOS</span></div>'+al+'<ul class="steps">'+steps+'</ul><div class="callout">Eerlijkheid en snel communiceren zijn altijd de beste aanpak. Je begeleider bij HTiSA is er om je te helpen!</div>';
 }
 function showBackBar(title){
   var bar=document.getElementById('back-bar');
@@ -1999,7 +1981,10 @@ function toggle(key,btn,cls){
   btn.classList.add(cls);
   openPanel=key;
   showBackBar(panels[key].title);
-  document.getElementById('panel-'+key).scrollIntoView({behavior:'smooth',block:'nearest'});
+  // Scroll zodat de knop zichtbaar blijft bovenaan, paneel opent eronder
+  setTimeout(function(){
+    btn.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }, 30);
 }
 function switchTab(n,btn){
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
@@ -2064,7 +2049,7 @@ function toggleEersteDag(btn) {
     panel.classList.add('open');
     btn.classList.add('active-info');
     renderChecklist();
-    showBackBar('First days on the job');
+    showBackBar('Checklist naar het werk');
     setTimeout(function(){panel.scrollIntoView({behavior:'smooth',block:'nearest'});},50);
   } else {
     panel.classList.remove('open');
