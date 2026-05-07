@@ -1729,10 +1729,9 @@ function resetFrisTimer(){
   frisTimer=setInterval(function(){if(frisOpen)frisNext();},8000);
 }
 
-var veiligOpen=false;
+
 function toggleFris(btn){
   frisOpen=!frisOpen;
-  if(frisOpen&&veiligOpen){veiligOpen=false;document.getElementById('panel-veilig').classList.remove('open');document.getElementById('btn-veilig').classList.remove('active-veilig');}
   closeSosPanels();
   document.getElementById('panel-fris').classList.toggle('open',frisOpen);
   btn.classList.toggle('active-fris',frisOpen);
@@ -1740,46 +1739,13 @@ function toggleFris(btn){
     frisIdx=Math.floor(Math.random()*frisTips.length);
     renderFrisTip();
     resetFrisTimer();
-    showBackBar('Fris voor de dag');
+    showBackBar('Een goede eerste indruk');
     setTimeout(function(){ btn.scrollIntoView({behavior:'smooth',block:'nearest'}); }, 30);
   } else {
     if(frisTimer){clearInterval(frisTimer);frisTimer=null;}
     hideBackBar();
   }
 }
-function toggleVeilig(btn){
-  veiligOpen=!veiligOpen;
-  if(veiligOpen&&frisOpen){frisOpen=false;document.getElementById('panel-fris').classList.remove('open');document.getElementById('btn-fris').classList.remove('active-fris');if(frisTimer){clearInterval(frisTimer);frisTimer=null;}}
-  closeSosPanels();
-  document.getElementById('panel-veilig').classList.toggle('open',veiligOpen);
-  btn.classList.toggle('active-veilig',veiligOpen);
-  if(veiligOpen){
-    showBackBar('Veiligheid op de werkplek');
-    setTimeout(function(){ btn.scrollIntoView({behavior:'smooth',block:'nearest'}); }, 30);
-  } else {
-    hideBackBar();
-  }
-}
-
-// ── VEILIGHEID TIPS ──
-var veiligTips=[
-  {bold:'Draag altijd je persoonlijke beschermingsmiddelen (PBM)',text:'Helm, veiligheidsschoenen, handschoenen, veiligheidsbril... Trek ze aan vóór je aan de slag gaat.',hint:'Nooit weglaten, ook al lijkt het even snel.'},
-  {bold:'Ken de nooduitgangen en het evacuatieplan',text:'Weet hoe je het gebouw snel en veilig kunt verlaten. Bekijk de evacuatieplannen bij aankomst.',hint:'Vraag je mentor om uitleg op dag 1.'},
-  {bold:'Meld onveilige situaties onmiddellijk',text:'Zie je een gevaar, lek, of beschadigd materiaal? Meld het meteen aan je leidinggevende.',hint:'Liever één keer te veel melden dan één keer te weinig.'},
-  {bold:'Gebruik machines alleen waarvoor je bent opgeleid',text:'Gebruik nooit een machine of gereedschap dat je niet kent zonder opleiding of begeleiding.',hint:'Vraag altijd eerst een demonstratie.'},
-  {bold:'Hou doorgangen en nooduitgangen vrij',text:'Leg nooit materialen of dozen voor een nooduitgang of in een gang.',hint:'Dit kan levens kosten.'},
-  {bold:'Zorg voor een nette en opgeruimde werkplek',text:'Rommel op de vloer veroorzaakt valpartijen. Ruim direct op na gebruik en hou looppaden vrij.',hint:'Struikelgevaar is de meest voorkomende oorzaak van arbeidsongevallen.'},
-  {bold:'Til op de juiste manier',text:'Rug recht, knieën buigen, last dicht bij het lichaam. Vraag hulp bij zware lasten.',hint:'Rugblessures door verkeerd tillen zijn erg frequent.'},
-  {bold:'Ken de locatie van de EHBO-doos en brandblusser',text:'Weet waar de eerste hulp materialen zijn en hoe je een brandblusser gebruikt.',hint:'Vraag een rondleiding op je eerste werkdag.'},
-  {bold:'Gebruik geen gsm tijdens het werken met machines',text:'Afleiding door een smartphone kan leiden tot ernstige verwondingen. Leg je telefoon altijd weg.',hint:''},
-  {bold:'Bij een arbeidsongeval: meld het altijd',text:'Elke verwonding op het werk, hoe klein ook, moet gemeld worden aan je werkgever én trajectbegeleider.',hint:'Dit is wettelijk verplicht en beschermt jou.'},
-];
-(function(){
-  var list=document.getElementById('veilig-list');
-  list.innerHTML=veiligTips.map(function(t,i){
-    return '<li class="veilig-step"><div class="veilig-num">'+(i+1)+'</div><div class="veilig-text"><span class="veilig-bold">'+t.bold+'</span>'+t.text+(t.hint?'<span class="veilig-hint">'+t.hint+'</span>':'')+'</div></li>';
-  }).join('');
-})();
 
 // ── CONTACTEN — alle 3 aanpasbaar ──
 var contacts = {
@@ -1960,7 +1926,7 @@ function closeAllPanels(){
   // Sluit fris
   if(frisOpen){frisOpen=false;document.getElementById('panel-fris').classList.remove('open');document.getElementById('btn-fris').classList.remove('active-fris');if(frisTimer){clearInterval(frisTimer);frisTimer=null;}}
   // Sluit veilig
-  if(veiligOpen){veiligOpen=false;document.getElementById('panel-veilig').classList.remove('open');document.getElementById('btn-veilig').classList.remove('active-veilig');}
+
   hideBackBar();
   // Scroll terug naar boven
   window.scrollTo({top:0,behavior:'smooth'});
@@ -1972,7 +1938,7 @@ function closeSosPanels(){
 }
 function toggle(key,btn,cls){
   if(frisOpen){frisOpen=false;document.getElementById('panel-fris').classList.remove('open');document.getElementById('btn-fris').classList.remove('active-fris');if(frisTimer){clearInterval(frisTimer);frisTimer=null;}}
-  if(veiligOpen){veiligOpen=false;document.getElementById('panel-veilig').classList.remove('open');document.getElementById('btn-veilig').classList.remove('active-veilig');}
+
   document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('open');});
   document.querySelectorAll('.sos-btn').forEach(function(b){b.classList.remove('active','active-warning','active-info','active-success');});
   if(openPanel===key){openPanel=null;hideBackBar();return;}
@@ -1997,19 +1963,22 @@ function switchTab(n,btn){
   }
   if(n==='cal'){
     var isLeerlingModus = isLeerlingLink();
-    document.getElementById('role-chooser').style.display='block';
-    var werkView = document.getElementById('view-werkgever');
-    var leerView = document.getElementById('view-leerling');
-    var begView  = document.getElementById('view-begeleider');
-    if(werkView) werkView.style.display='none';
-    if(leerView) leerView.style.display='none';
-    if(begView)  begView.style.display='none';
-    document.getElementById('role-knoppen').style.gridTemplateColumns = isLeerlingModus ? '1fr' : '1fr 1fr 1fr';
-    var rolBtns = document.querySelectorAll('#role-knoppen .role-btn');
+    // Reset alle sub-views
+    ['pin-screen','view-werkgever','view-leerling','view-begeleider','leerling-naam-screen'].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el) el.style.display='none';
+    });
     if(isLeerlingModus){
-      rolBtns.forEach(function(b,i){ b.style.display = i===0 ? 'block' : 'none'; });
+      // Leerling: sla rolkeuze over, ga direct naar leerlingview
+      document.getElementById('role-chooser').style.display='none';
+      var naam=localStorage.getItem('htisa_leerling_naam');
+      if(!naam){ document.getElementById('leerling-naam-screen').style.display='block'; }
+      else { showLeerlingView(naam); }
     } else {
-      rolBtns.forEach(function(b){ b.style.display = 'block'; });
+      // Werkgever/begeleider: toon rolkeuze met alle drie knoppen
+      document.getElementById('role-chooser').style.display='block';
+      document.getElementById('role-knoppen').style.gridTemplateColumns='1fr 1fr 1fr';
+      document.querySelectorAll('#role-knoppen .role-btn').forEach(function(b){ b.style.display='block'; });
     }
   }
 }
@@ -2041,7 +2010,7 @@ function toggleEersteDag(btn) {
   document.querySelectorAll('.sos-btn').forEach(function(b){if(b.id!=='btn-eerstedag')b.classList.remove('active','active-warning','active-info','active-success','active-fris','active-veilig');});
   openPanel=null;
   if(frisOpen){frisOpen=false;document.getElementById('panel-fris').classList.remove('open');document.getElementById('btn-fris').classList.remove('active-fris');if(frisTimer){clearInterval(frisTimer);frisTimer=null;}}
-  if(veiligOpen){veiligOpen=false;document.getElementById('panel-veilig').classList.remove('open');document.getElementById('btn-veilig').classList.remove('active-veilig');}
+
   if(woordenOpen){woordenOpen=false;document.getElementById('panel-woorden').classList.remove('open');document.getElementById('btn-woorden').classList.remove('active-info');}
   
   var panel = document.getElementById('panel-eerstedag');
@@ -2129,7 +2098,7 @@ function toggleWoorden(btn) {
   // Sluit andere panels
   closeSosPanels();
   if(frisOpen){frisOpen=false;document.getElementById('panel-fris').classList.remove('open');document.getElementById('btn-fris').classList.remove('active-fris');if(frisTimer){clearInterval(frisTimer);frisTimer=null;}}
-  if(veiligOpen){veiligOpen=false;document.getElementById('panel-veilig').classList.remove('open');document.getElementById('btn-veilig').classList.remove('active-veilig');}
+
   if(eerstedagOpen){eerstedagOpen=false;document.getElementById('panel-eerstedag').classList.remove('open');document.getElementById('btn-eerstedag').classList.remove('active-info');}
   
   var panel = document.getElementById('panel-woorden');
@@ -2308,7 +2277,7 @@ function toggleBedrijfsbezoek(btn) {
   bedrijfsbezoekOpen = !bedrijfsbezoekOpen;
   closeSosPanels();
   if(frisOpen){frisOpen=false;document.getElementById('panel-fris').classList.remove('open');document.getElementById('btn-fris').classList.remove('active-fris');if(frisTimer){clearInterval(frisTimer);frisTimer=null;}}
-  if(veiligOpen){veiligOpen=false;document.getElementById('panel-veilig').classList.remove('open');document.getElementById('btn-veilig').classList.remove('active-veilig');}
+
   if(eerstedagOpen){eerstedagOpen=false;document.getElementById('panel-eerstedag').classList.remove('open');document.getElementById('btn-eerstedag').classList.remove('active-info');}
   if(woordenOpen){woordenOpen=false;document.getElementById('panel-woorden').classList.remove('open');document.getElementById('btn-woorden').classList.remove('active-info');}
   var panel = document.getElementById('panel-bedrijfsbezoek');

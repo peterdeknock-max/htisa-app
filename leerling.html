@@ -18,19 +18,12 @@
   @keyframes pop{from{transform:scale(0.8);opacity:0;}to{transform:scale(1);opacity:1;}}
   h1{font-size:22px;font-weight:800;color:#2596be;margin-bottom:6px;text-align:center;}
   p{font-size:14px;color:#5b8fa0;text-align:center;margin-bottom:20px;line-height:1.6;}
-  .rol-grid{display:grid;grid-template-columns:1fr;gap:10px;width:100%;max-width:320px;margin-bottom:16px;}
-  .btn{display:block;width:100%;background:#2596be;color:white;border:none;border-radius:12px;padding:14px 16px;font-size:15px;font-weight:700;cursor:pointer;text-align:left;text-decoration:none;transition:background .15s;display:flex;align-items:center;gap:12px;}
+  .btn{display:flex;width:100%;max-width:320px;background:#2596be;color:white;border:none;border-radius:12px;padding:14px 16px;font-size:15px;font-weight:700;cursor:pointer;text-align:left;text-decoration:none;transition:background .15s;align-items:center;gap:12px;margin-bottom:16px;}
   .btn:hover{background:#1a7295;}
-  .btn.werkgever{background:#f59e0b;}
-  .btn.werkgever:hover{background:#d97706;}
-  .btn.begeleider{background:#7b1fa2;}
-  .btn.begeleider:hover{background:#6a1891;}
   .btn-ico{font-size:24px;}
   .btn-text{flex:1;}
   .btn-label{display:block;font-size:15px;font-weight:700;}
   .btn-sub{display:block;font-size:11px;opacity:0.85;margin-top:2px;}
-  .divider{width:100%;max-width:320px;display:flex;align-items:center;gap:10px;margin:4px 0 12px;color:#5b8fa0;font-size:12px;}
-  .divider::before,.divider::after{content:'';flex:1;height:1px;background:#c2dfe9;}
   .btn-install{display:none;width:100%;max-width:320px;background:#34a853;color:white;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;margin-bottom:10px;font-family:inherit;}
   .btn-install.show{display:block;}
   .install-tip{background:#eef7fb;border:1.5px solid #c2dfe9;border-radius:10px;padding:14px;width:100%;max-width:320px;margin-top:4px;}
@@ -44,31 +37,15 @@
 
 <img src="icons/icon-512.png" class="logo" alt="HTiSA logo"/>
 <h1>HTiSA – Duaal Leren</h1>
-<p>Kies jouw rol om de app te openen:</p>
+<p>Tik op de knop om de app te openen.</p>
 
-<div class="rol-grid">
-  <a href="index.html" class="btn" onclick="setRol('leerling')">
-    <span class="btn-ico">👨‍🎓</span>
-    <span class="btn-text">
-      <span class="btn-label">Leerling</span>
-      <span class="btn-sub">SOS-hulp en eigen aanwezigheidskalender</span>
-    </span>
-  </a>
-  <a href="index.html" class="btn werkgever" onclick="setRol('werkgever')">
-    <span class="btn-ico">🏭</span>
-    <span class="btn-text">
-      <span class="btn-label">Werkgever</span>
-      <span class="btn-sub">Aanwezigheid registreren · PIN vereist</span>
-    </span>
-  </a>
-  <a href="index.html" class="btn begeleider" onclick="setRol('begeleider')">
-    <span class="btn-ico">👨‍🏫</span>
-    <span class="btn-text">
-      <span class="btn-label">Begeleider</span>
-      <span class="btn-sub">Alle leerlingen opvolgen · PIN vereist</span>
-    </span>
-  </a>
-</div>
+<a href="index.html" class="btn" onclick="setRol('leerling')">
+  <span class="btn-ico">👨‍🎓</span>
+  <span class="btn-text">
+    <span class="btn-label">Open de app</span>
+    <span class="btn-sub">SOS-hulp en jouw aanwezigheidskalender</span>
+  </span>
+</a>
 
 <div id="status"></div>
 
