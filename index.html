@@ -643,7 +643,6 @@
 
     <!-- CHECKLIST PANEL -->
     <div id="panel-eerstedag" class="panel">
-      <div class="panel-title"><span style="font-size:18px">🎯</span> Checklist naar het werk <span class="badge badge-info">CHECKLIST</span></div>
       <div id="checklist-items"></div>
       <div style="margin-top:10px;display:flex;gap:8px;">
         <button class="btn-save" onclick="resetChecklist()" style="flex:1;font-size:12px;">↺ Opnieuw</button>
@@ -891,6 +890,16 @@
         </div>
         <div id="mood-loading" style="text-align:center;color:var(--htisa-muted);font-size:12px;padding:10px 0;"></div>
         <div id="mood-signalen" style="display:flex;flex-direction:column;gap:8px;"></div>
+      </div>
+
+      <!-- VOORTGANG LEERLINGEN -->
+      <div style="margin-top:18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="font-size:14px;font-weight:800;color:var(--htisa-text);">📈 Voortgang leerlingen</div>
+          <button class="cal-nav-btn" onclick="laadVoortgangLeerlingen()" title="Ververs" style="font-size:14px;">↻</button>
+        </div>
+        <div id="voortgang-loading" style="text-align:center;color:var(--htisa-muted);font-size:12px;padding:10px 0;"></div>
+        <div id="voortgang-leerlingen" style="display:flex;flex-direction:column;gap:8px;"></div>
       </div>
 
       <button class="btn-save" onclick="startDemoModus()" style="width:100%;margin-top:16px;background:#f7941d;">👁️ Bekijk app als leerling (demo)</button>
@@ -1323,11 +1332,26 @@ function initCheckin(){
     checkinState = {mood: -1, items: {}};
     selectedMood = -1;
     selectedDagtype = '';
+    // Reset dagtype knoppen visueel — geen enkele is geselecteerd
+    document.querySelectorAll('.dagtype-opt').forEach(function(el){
+      el.style.border = '1.5px solid var(--htisa-border)';
+      el.style.background = 'var(--htisa-off)';
+    });
     document.getElementById('checkin-save-btn').disabled = false;
     document.getElementById('checkin-save-btn').style.background = '#2596be';
     document.getElementById('checkin-save-btn').textContent = 'Check-in opslaan';
     document.getElementById('checkin-feedback').textContent = '';
     document.getElementById('checkin-items-container').style.display = 'none';
+    // Verberg ook mood en banner
+    var moodSectie = document.getElementById('checkin-mood-sectie');
+    var banner = document.getElementById('checkin-info-banner');
+    if(moodSectie) moodSectie.style.display = 'none';
+    if(banner) banner.style.display = 'none';
+    // Reset mood knoppen
+    document.querySelectorAll('.mood-opt').forEach(function(el){
+      el.style.background = 'var(--htisa-off)';
+      el.style.borderColor = 'var(--htisa-border)';
+    });
   }
 
   if(saved.mood >= 0){
@@ -2019,7 +2043,7 @@ function toggleEersteDag(btn) {
     btn.classList.add('active-info');
     renderChecklist();
     showBackBar('Checklist naar het werk');
-    setTimeout(function(){panel.scrollIntoView({behavior:'smooth',block:'nearest'});},50);
+    setTimeout(function(){ btn.scrollIntoView({behavior:'smooth',block:'nearest'}); }, 30);
   } else {
     panel.classList.remove('open');
     btn.classList.remove('active-info');
@@ -2660,6 +2684,7 @@ async function loadBegeleiderData(){
     filterBegeleider();
   }catch(e){el.textContent='❌ Verbinding mislukt — probeer opnieuw';}
   laadMoodSignalen();
+  laadVoortgangLeerlingen();
 }
 
 async function laadMoodSignalen(){
@@ -2721,6 +2746,103 @@ async function laadMoodSignalen(){
     });
   } catch(e){ el.textContent='❌ Kon mood data niet ophalen.'; }
 }
+async function laadVoortgangLeerlingen(){
+  var el = document.getElementById('voortgang-loading');
+  var container = document.getElementById('voortgang-leerlingen');
+  el.textContent = 'Voortgang ophalen...';
+  container.innerHTML = '';
+  try {
+    var url = AT_PROGRESS_URL+'?sort[0][field]=Datum&sort[0][direction]=desc&pageSize=200';
+    var resp = await fetch(url, {headers: AT_HEADERS});
+    if(!resp.ok){ el.textContent='⚠️ Nog geen voortgangsdata beschikbaar.'; return; }
+    var data = await resp.json();
+    if(!data.records || data.records.length===0){ el.textContent='Nog geen check-in data beschikbaar.'; return; }
+    el.textContent='';
+
+    // Groepeer alle records per leerling
+    var byLeerling = {};
+    data.records.forEach(function(rec){
+      var naam = rec.fields.Leerling;
+      if(!naam) return;
+      if(!byLeerling[naam]) byLeerling[naam] = [];
+      byLeerling[naam].push(rec.fields);
+    });
+
+    var levels = [
+      {naam:'Starter',       ico:'🌱', min:0},
+      {naam:'On the job',    ico:'⭐', min:10},
+      {naam:'Getting there', ico:'💪', min:30},
+      {naam:'Pro worker',    ico:'🔥', min:60},
+      {naam:'Work hero',     ico:'🏆', min:100},
+      {naam:'Legend',        ico:'👑', min:140},
+    ];
+    function getLevel(punten){
+      var lvl = levels[0];
+      levels.forEach(function(l){ if(punten >= l.min) lvl = l; });
+      return lvl;
+    }
+
+    var moodEmojis = ['😔','😐','😊','🤩'];
+    var moodKleuren = ['#fce4ec','#fff9c4','#e8f5e9','#e3f0fc'];
+
+    // Sorteer leerlingen alphabetisch
+    Object.keys(byLeerling).sort().forEach(function(naam){
+      var records = byLeerling[naam]; // al gesorteerd desc (meest recent eerst)
+      var laatste = records[0] || {};
+      var totaalPunten = laatste.TotaalPunten || 0;
+      var streak = laatste.Streak || 0;
+      var lvl = getLevel(totaalPunten);
+
+      // Totaal check-ins / op tijd
+      var totaalCheckins = records.length;
+      var aantalOpTijd = records.filter(function(r){ return r.OpTijd === 'Ja'; }).length;
+      var pctOpTijd = totaalCheckins > 0 ? Math.round(aantalOpTijd / totaalCheckins * 100) : 0;
+
+      // Laatste 7 moods als mini-balkjes
+      var recenteMoods = records.slice(0,7).reverse();
+      var moodBar = recenteMoods.map(function(r){
+        var s = typeof r.MoodScore === 'number' ? r.MoodScore : -1;
+        if(s < 0) return '';
+        return '<span title="'+moodEmojis[s]+' ('+r.Datum+')" style="display:inline-block;width:18px;height:18px;border-radius:4px;background:'+moodKleuren[s]+';font-size:11px;line-height:18px;text-align:center;">'+moodEmojis[s]+'</span>';
+      }).join('');
+
+      // Waarschuwing: 3+ 😔 in laatste 5
+      var recenteScores = records.slice(0,5).map(function(r){ return typeof r.MoodScore === 'number' ? r.MoodScore : -1; });
+      var aantalSlecht = recenteScores.filter(function(s){ return s === 0; }).length;
+      var waarschuwing = aantalSlecht >= 3;
+
+      // Laatste check-in datum
+      var laatsteDatum = laatste.Datum || '—';
+
+      var kaart = document.createElement('div');
+      kaart.style.cssText = 'background:'+(waarschuwing?'#fff3cd':'white')+';border:1.5px solid '+(waarschuwing?'#f7941d':'var(--htisa-border)')+';border-radius:12px;padding:12px 14px;cursor:pointer;';
+
+      kaart.innerHTML =
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
+          '<div style="font-size:22px;width:36px;text-align:center;">'+lvl.ico+'</div>' +
+          '<div style="flex:1;">' +
+            '<div style="font-size:13px;font-weight:800;color:var(--htisa-text);">'+(waarschuwing?'⚠️ ':'')+naam+'</div>' +
+            '<div style="font-size:11px;color:var(--htisa-muted);">'+lvl.naam+' · '+totaalPunten+' punten · 🔥 streak '+streak+'</div>' +
+          '</div>' +
+          '<div style="text-align:right;flex-shrink:0;">' +
+            '<div style="font-size:18px;font-weight:800;color:'+(pctOpTijd>=80?'#00a99d':pctOpTijd>=60?'#f7941d':'#e24b4a')+';">'+pctOpTijd+'%</div>' +
+            '<div style="font-size:10px;color:var(--htisa-muted);">op tijd</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">' +
+          '<div style="display:flex;gap:3px;align-items:center;">' +
+            '<span style="font-size:10px;color:var(--htisa-muted);margin-right:4px;">Mood:</span>'+moodBar +
+          '</div>' +
+          '<div style="font-size:10px;color:var(--htisa-muted);">Laatste: '+laatsteDatum+'</div>' +
+        '</div>' +
+        (waarschuwing ? '<div style="font-size:11px;color:#c05900;font-weight:700;margin-top:6px;background:#ffe8b0;border-radius:6px;padding:5px 8px;">⚠️ '+aantalSlecht+'× 😔 recent — misschien even contact opnemen?</div>' : '');
+
+      container.appendChild(kaart);
+    });
+
+  } catch(e){ el.textContent='❌ Kon voortgang niet ophalen.'; }
+}
+
 function filterBegeleider(){
   var naam=(document.getElementById('bg-filter-leerling').value||'').toLowerCase();
   var status=document.getElementById('bg-filter-status').value||'';
