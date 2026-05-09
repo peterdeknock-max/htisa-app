@@ -1043,24 +1043,178 @@
 
 <script>
 // ── DAGELIJKSE CHECK-IN ──
-var checkinItemsWerk = [
-  {id:'gegroet',   tekst:'Ik heb vriendelijk gegroet'},
-  {id:'gsm',       tekst:'Ik heb mijn gsm weggelegd'},
-  {id:'initiatief',tekst:'Ik heb initiatief genomen'},
+// ── TOCI SCHAAL ──
+var tociSchaal = [
+  {waarde:0, label:'Meestal niet', kleur:'#e24b4a', bg:'#fef3f3'},
+  {waarde:1, label:'Af en toe',    kleur:'#f7941d', bg:'#fff3e0'},
+  {waarde:2, label:'Meestal wel',  kleur:'#2596be', bg:'#eef7fb'},
+  {waarde:3, label:'Bijna altijd', kleur:'#00a99d', bg:'#e8f8f5'},
 ];
-var checkinItemsLeren = [
-  {id:'geleerd',   tekst:'Ik heb iets nieuws geleerd'},
-  {id:'gevraagd',  tekst:'Ik heb een vraag gesteld aan mijn mentor'},
-  {id:'zelfstandig',tekst:'Ik heb een taak zelfstandig afgerond'},
-];
-var checkinItemsHouding = [
-  {id:'netjes',    tekst:'Ik heb mijn werkplek netjes achtergelaten'},
-  {id:'volledig',  tekst:'Ik heb de volledige dag doorgewerkt'},
-];
+
+// ── TOCI VRAGEN PER PERIODE ──
+// Periode bepalen op basis van datum (Vlaamse schoolkalender)
+function getTociPeriode(){
+  var nu = new Date();
+  var m = nu.getMonth()+1; // 1-12
+  // P1: september t.e.m. herfstvakantie (eind oktober)
+  if(m===9 || m===10) return 'P1';
+  // P2: na herfst t.e.m. kerstvakantie (november-december)
+  if(m===11 || m===12) return 'P2';
+  // P3: januari t.e.m. krokusvakantie (jan-februari)
+  if(m===1 || m===2) return 'P3';
+  // P4: na krokus t.e.m. paasvakantie (maart-april)
+  if(m===3 || m===4) return 'P4';
+  // P5: na pasen t.e.m. einde schooljaar (mei-juni)
+  return 'P5';
+}
+
+var tociVragen = {
+  P1: {
+    label: 'Periode 1 — Opstarten',
+    categorieen: [
+      {
+        id:'afspraken', label:'Afspraken naleven', kleur:'#00a99d',
+        items:[
+          {id:'p1_uurregeling',  tekst:'Ik houd me aan de uurregeling'},
+          {id:'p1_gsm',          tekst:'Ik houd me aan de gsm-regels'},
+          {id:'p1_regels',       tekst:'Ik houd me aan de regels van de werkplek'},
+        ]
+      },
+      {
+        id:'communiceren', label:'Communiceren & Respect', kleur:'#2596be',
+        items:[
+          {id:'p1_gegroet',      tekst:'Ik groet vriendelijk'},
+          {id:'p1_taal',         tekst:'Ik pas mijn taalgebruik aan aan de situatie'},
+          {id:'p1_zorgzaam',     tekst:'Ik ben zorgzaam voor anderen'},
+        ]
+      },
+      {
+        id:'houding', label:'Werkhouding', kleur:'#6a3b9c',
+        items:[
+          {id:'p1_volledig',     tekst:'Ik werk de volledige dag door'},
+          {id:'p1_netjes',       tekst:'Ik draag zorg voor materiaal en omgeving'},
+        ]
+      },
+    ]
+  },
+  P2: {
+    label: 'Periode 2 — Groeien',
+    categorieen: [
+      {
+        id:'initiatief', label:'Initiatief & Doorzetten', kleur:'#00a99d',
+        items:[
+          {id:'p2_initiatief',   tekst:'Ik neem initiatief'},
+          {id:'p2_werkzoeken',   tekst:'Ik zoek werk als ik klaar ben met een opdracht'},
+          {id:'p2_doorzetten',   tekst:'Ik voer ook opdrachten uit die ik niet graag doe'},
+        ]
+      },
+      {
+        id:'samenwerken', label:'Samenwerken & Communiceren', kleur:'#2596be',
+        items:[
+          {id:'p2_samenwerken',  tekst:'Ik kan met iedereen samenwerken'},
+          {id:'p2_overlegd',     tekst:'Ik overleg met anderen'},
+          {id:'p2_vragen',       tekst:'Ik durf vragen stellen'},
+        ]
+      },
+      {
+        id:'feedback', label:'Omgaan met feedback', kleur:'#6a3b9c',
+        items:[
+          {id:'p2_compliment',   tekst:'Ik aanvaard complimenten en werkpunten'},
+          {id:'p2_fout',         tekst:'Ik zeg het wanneer ik een fout maak'},
+        ]
+      },
+    ]
+  },
+  P3: {
+    label: 'Periode 3 — Verdiepen',
+    categorieen: [
+      {
+        id:'organiseren', label:'Organiseren & Kwaliteit', kleur:'#00a99d',
+        items:[
+          {id:'p3_uitleg',       tekst:'Ik lees of luister de uitleg voor ik begin'},
+          {id:'p3_stappen',      tekst:'Ik denk na over de stappen die ik moet nemen'},
+          {id:'p3_nauwkeurig',   tekst:'Ik kijk na of mijn werk nauwkeurig gedaan is'},
+        ]
+      },
+      {
+        id:'zelfstandig', label:'Zelfstandigheid', kleur:'#2596be',
+        items:[
+          {id:'p3_toezicht',     tekst:'Ik werk door ook zonder toezicht'},
+          {id:'p3_oplossing',    tekst:'Ik zoek zelf een oplossing bij problemen'},
+          {id:'p3_concentratie', tekst:'Ik concentreer me op de opdracht tot die klaar is'},
+        ]
+      },
+      {
+        id:'reflectie', label:'Zelfreflectie', kleur:'#6a3b9c',
+        items:[
+          {id:'p3_fouten',       tekst:'Ik leer uit mijn fouten en werk aan mijn werkpunten'},
+          {id:'p3_mening',       tekst:'Ik geef mijn mening op een beleefde manier'},
+        ]
+      },
+    ]
+  },
+  P4: {
+    label: 'Periode 4 — Consolideren',
+    categorieen: [
+      {
+        id:'flexibiliteit', label:'Flexibiliteit & Verantwoordelijkheid', kleur:'#00a99d',
+        items:[
+          {id:'p4_flexibel',     tekst:'Ik ben bereid andere opdrachten uit te voeren'},
+          {id:'p4_tijdsdruk',    tekst:'Ik kan werken onder tijdsdruk'},
+          {id:'p4_afwijken',     tekst:'Ik kan afwijken van de planning indien nodig'},
+        ]
+      },
+      {
+        id:'kwaliteit', label:'Kwaliteit & Groei', kleur:'#2596be',
+        items:[
+          {id:'p4_inspanning',   tekst:'Ik doe een extra inspanning voor moeilijke taken'},
+          {id:'p4_open',         tekst:'Ik sta open voor de mening van anderen'},
+          {id:'p4_werkpunten',   tekst:'Ik werk actief aan mijn werkpunten'},
+        ]
+      },
+      {
+        id:'totaalbeeld', label:'Totaalbeeld', kleur:'#6a3b9c',
+        items:[
+          {id:'p4_zorgzelf',     tekst:'Ik draag zorg voor mezelf (rust, voeding, stiptheid)'},
+          {id:'p4_trots',        tekst:'Ik ben tevreden over hoe ik vandaag functioneerde'},
+        ]
+      },
+    ]
+  },
+  P5: {
+    label: 'Periode 5 — Eindevaluatie',
+    categorieen: [
+      {
+        id:'arbeidsrijpheid', label:'Arbeidsrijpheid', kleur:'#00a99d',
+        items:[
+          {id:'p5_afspraken',    tekst:'Ik leef alle afspraken na zonder herinnering'},
+          {id:'p5_zelfstandig',  tekst:'Ik werk volledig zelfstandig en vraag hulp wanneer nodig'},
+          {id:'p5_kwaliteit',    tekst:'Ik lever consequent kwaliteitsvol werk af'},
+        ]
+      },
+      {
+        id:'professioneel', label:'Professioneel gedrag', kleur:'#2596be',
+        items:[
+          {id:'p5_communicatie', tekst:'Ik communiceer professioneel in alle situaties'},
+          {id:'p5_collega',      tekst:'Ik ben een fijne collega om mee samen te werken'},
+          {id:'p5_stress',       tekst:'Ik ga constructief om met stress en tegenslagen'},
+        ]
+      },
+      {
+        id:'toekomst', label:'Toekomstgerichtheid', kleur:'#6a3b9c',
+        items:[
+          {id:'p5_groei',        tekst:'Ik zie duidelijk mijn groei dit schooljaar'},
+          {id:'p5_klaar',        tekst:'Ik voel me klaar voor de arbeidsmarkt'},
+        ]
+      },
+    ]
+  }
+};
+
 var checkinItemsTeLaat = [
-  {id:'gebeld',      tekst:'Ik heb gebeld voor de start van de werkdag'},
-  {id:'verontschuldigd', tekst:'Ik heb mij verontschuldigd aan mijn werkgever'},
-  {id:'reden',       tekst:'Ik heb uitgelegd waarom ik te laat was'},
+  {id:'gebeld',           tekst:'Ik heb gebeld voor de start van de werkdag'},
+  {id:'verontschuldigd',  tekst:'Ik heb mij verontschuldigd aan mijn werkgever'},
+  {id:'reden',            tekst:'Ik heb uitgelegd waarom ik te laat was'},
 ];
 var checkinItemsZiek = [
   {id:'school_verwittigd', tekst:'Ik heb de school verwittigd'},
@@ -1096,12 +1250,19 @@ function selectDagtype(type){
   banner.style.display = 'none';
   moodSectie.style.display = 'block';
   if(type === 'optijd'){
-    document.getElementById('checkin-items-label-werk').textContent = 'Op de werkplek';
-    document.getElementById('checkin-items-label-leren').textContent = 'Leren en groeien';
-    document.getElementById('checkin-items-label-houding').textContent = 'Werkhouding';
-    renderCheckinItems(checkinItemsWerk, 'checkin-items-werk');
-    renderCheckinItems(checkinItemsLeren, 'checkin-items-leren');
-    renderCheckinItems(checkinItemsHouding, 'checkin-items-houding');
+    var periode = getTociPeriode();
+    var config = tociVragen[periode];
+    document.getElementById('checkin-items-label-werk').textContent = '';
+    document.getElementById('checkin-items-label-leren').textContent = '';
+    document.getElementById('checkin-items-label-houding').textContent = '';
+    // Toon periode badge
+    var banner = document.getElementById('checkin-info-banner');
+    banner.style.display = 'block';
+    banner.style.background = '#eef7fb';
+    banner.style.border = '1px solid var(--htisa-border)';
+    banner.style.color = 'var(--htisa-sec)';
+    banner.textContent = '📋 '+config.label+' — beantwoord elke vraag op de TOCI-schaal';
+    renderTociItems();
   } else if(type === 'telaat'){
     banner.style.display = 'block';
     banner.style.background = '#fff3e0';
@@ -1111,7 +1272,7 @@ function selectDagtype(type){
     document.getElementById('checkin-items-label-werk').textContent = 'Wat heb je gedaan?';
     document.getElementById('checkin-items-label-leren').textContent = '';
     document.getElementById('checkin-items-label-houding').textContent = '';
-    renderCheckinItems(checkinItemsTeLaat, 'checkin-items-werk');
+    renderCheckinItemsSimple(checkinItemsTeLaat,'checkin-items-werk',null,null,null);
     document.getElementById('checkin-items-leren').innerHTML = '';
     document.getElementById('checkin-items-houding').innerHTML = '';
   } else if(type === 'ziek'){
@@ -1123,7 +1284,7 @@ function selectDagtype(type){
     document.getElementById('checkin-items-label-werk').textContent = 'Heb je dit al gedaan?';
     document.getElementById('checkin-items-label-leren').textContent = '';
     document.getElementById('checkin-items-label-houding').textContent = '';
-    renderCheckinItems(checkinItemsZiek, 'checkin-items-werk');
+    renderCheckinItemsSimple(checkinItemsZiek,'checkin-items-werk',null,null,null);
     document.getElementById('checkin-items-leren').innerHTML = '';
     document.getElementById('checkin-items-houding').innerHTML = '';
     moodSectie.style.display = 'none';
@@ -1136,9 +1297,60 @@ function getCheckinKey(){
   return 'htisa_checkin_' + getDagKey(new Date());
 }
 
-function renderCheckinItems(items, containerId){
+function renderTociItems(){
+  var periode = getTociPeriode();
+  var config = tociVragen[periode];
   var saved = JSON.parse(localStorage.getItem(getCheckinKey()) || '{}');
   var alOpgeslagen = saved.opgeslagen;
+
+  // Toon periode-label in de sectie-header
+  var labelWerk = document.getElementById('checkin-items-label-werk');
+  var labelLeren = document.getElementById('checkin-items-label-leren');
+  var labelHouding = document.getElementById('checkin-items-label-houding');
+  var containerWerk = document.getElementById('checkin-items-werk');
+  var containerLeren = document.getElementById('checkin-items-leren');
+  var containerHouding = document.getElementById('checkin-items-houding');
+
+  // Verdeel de 3 categorieën over de 3 containers
+  var cats = config.categorieen;
+  var containers = [
+    {label: labelWerk,   el: containerWerk},
+    {label: labelLeren,  el: containerLeren},
+    {label: labelHouding,el: containerHouding},
+  ];
+
+  cats.forEach(function(cat, i){
+    if(!containers[i]) return;
+    containers[i].label.textContent = cat.label;
+    containers[i].label.style.color = cat.kleur;
+    containers[i].el.innerHTML = cat.items.map(function(item){
+      var huidig = checkinState.items[item.id] !== undefined ? checkinState.items[item.id] : -1;
+      return '<div style="margin-bottom:8px;background:white;border-radius:10px;padding:10px 12px;border:1px solid var(--htisa-border);">'+
+        '<div style="font-size:12px;font-weight:600;color:var(--htisa-text);margin-bottom:8px;">'+item.tekst+'</div>'+
+        '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;">'+
+        tociSchaal.map(function(s){
+          var actief = huidig === s.waarde;
+          return '<div onclick="'+(alOpgeslagen?'':'setTociScore(\''+item.id+'\','+s.waarde+')')+'" '+
+            'style="text-align:center;padding:5px 2px;border-radius:7px;border:1.5px solid '+(actief?s.kleur:'var(--htisa-border)')+';'+
+            'background:'+(actief?s.bg:'var(--htisa-off)')+';cursor:'+(alOpgeslagen?'default':'pointer')+';transition:all .1s;">'+
+            '<div style="font-size:9px;font-weight:'+(actief?'800':'500')+';color:'+(actief?s.kleur:'var(--htisa-muted)')+';">'+s.label+'</div>'+
+          '</div>';
+        }).join('')+
+        '</div>'+
+      '</div>';
+    }).join('');
+  });
+  updateCheckinPunten();
+}
+
+function renderCheckinItemsSimple(items, containerId, labelId, labelTekst, labelKleur){
+  var saved = JSON.parse(localStorage.getItem(getCheckinKey()) || '{}');
+  var alOpgeslagen = saved.opgeslagen;
+  if(labelId){
+    var lbl = document.getElementById(labelId);
+    lbl.textContent = labelTekst || '';
+    if(labelKleur) lbl.style.color = labelKleur;
+  }
   var html = items.map(function(item){
     var checked = checkinState.items[item.id] || false;
     return '<div onclick="'+(alOpgeslagen?'':'toggleCheckinItem(\''+item.id+'\')')+'" style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:1px solid '+(checked?'#00a99d':'var(--htisa-border)')+';background:'+(checked?'#e8f5e9':'white')+';margin-bottom:5px;cursor:'+(alOpgeslagen?'default':'pointer')+';">'+
@@ -1154,9 +1366,18 @@ function toggleCheckinItem(id){
   var saved = JSON.parse(localStorage.getItem(getCheckinKey()) || '{}');
   if(saved.opgeslagen) return;
   checkinState.items[id] = !checkinState.items[id];
-  renderCheckinItems(checkinItemsWerk, 'checkin-items-werk');
-  renderCheckinItems(checkinItemsLeren, 'checkin-items-leren');
-  renderCheckinItems(checkinItemsHouding, 'checkin-items-houding');
+  if(selectedDagtype === 'telaat'){
+    renderCheckinItemsSimple(checkinItemsTeLaat,'checkin-items-werk','checkin-items-label-werk','Wat heb je gedaan?','#f7941d');
+  } else if(selectedDagtype === 'ziek'){
+    renderCheckinItemsSimple(checkinItemsZiek,'checkin-items-werk','checkin-items-label-werk','Heb je dit al gedaan?','#e24b4a');
+  }
+}
+
+function setTociScore(id, waarde){
+  var saved = JSON.parse(localStorage.getItem(getCheckinKey()) || '{}');
+  if(saved.opgeslagen) return;
+  checkinState.items[id] = waarde;
+  renderTociItems();
 }
 
 function selectMood(m){
@@ -1173,8 +1394,16 @@ function selectMood(m){
 
 function updateCheckinPunten(){
   var punten = 0;
-  Object.values(checkinState.items).forEach(function(v){ if(v) punten++; });
-  if(selectedMood >= 0) punten++;
+  if(selectedDagtype === 'optijd'){
+    // TOCI schaal: tel het aantal ingevulde antwoorden (>= 0)
+    var scores = Object.values(checkinState.items).filter(function(v){ return typeof v === 'number' && v >= 0; });
+    // Punten = som van alle scores (max 3 per vraag)
+    scores.forEach(function(s){ punten += s; });
+    if(selectedMood >= 0) punten++;
+  } else {
+    // Te laat / ziek: gewone ja/nee checkboxes
+    Object.values(checkinState.items).forEach(function(v){ if(v) punten++; });
+  }
   document.getElementById('checkin-punten').textContent = '+' + punten;
 }
 
@@ -1248,9 +1477,15 @@ function slaCheckinOp(){
   var fb = document.getElementById('checkin-feedback');
   if(!selectedDagtype){ fb.style.color='var(--s-ko)'; fb.textContent='⚠️ Kies eerst hoe je dag was (op tijd / te laat / ziek)'; return; }
   var punten = 0;
-  Object.values(checkinState.items).forEach(function(v){ if(v) punten++; });
-  if(selectedMood >= 0 && selectedDagtype !== 'ziek') punten++;
-  if(punten === 0 && selectedDagtype === 'optijd'){ fb.style.color='var(--s-ko)'; fb.textContent='⚠️ Vink minstens één ding aan'; return; }
+  if(selectedDagtype === 'optijd'){
+    var scores = Object.values(checkinState.items).filter(function(v){ return typeof v === 'number' && v >= 0; });
+    scores.forEach(function(s){ punten += s; });
+    if(selectedMood >= 0) punten++;
+    if(scores.length === 0){ fb.style.color='var(--s-ko)'; fb.textContent='⚠️ Beantwoord minstens één TOCI-vraag'; return; }
+  } else {
+    Object.values(checkinState.items).forEach(function(v){ if(v) punten++; });
+    if(selectedMood >= 0 && selectedDagtype !== 'ziek') punten++;
+  }
 
   var key = getCheckinKey();
   var data = {dagtype: selectedDagtype, mood: selectedMood, items: checkinState.items, punten: punten, opgeslagen: true};
@@ -1313,9 +1548,12 @@ function initCheckin(){
   var vandaag = new Date();
   var dagNamen = ['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];
   var maandNamen = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
-  document.getElementById('checkin-datum').textContent =
+  var periodeLabels = {P1:'Periode 1 — Opstarten',P2:'Periode 2 — Groeien',P3:'Periode 3 — Verdiepen',P4:'Periode 4 — Consolideren',P5:'Periode 5 — Eindevaluatie'};
+  var periode = getTociPeriode();
+  document.getElementById('checkin-datum').innerHTML =
     dagNamen[vandaag.getDay()] + ' ' + vandaag.getDate() + ' ' + maandNamen[vandaag.getMonth()] +
-    (isWerkdag(vandaag) ? ' — werkdag' : ' — geen werkdag vandaag');
+    (isWerkdag(vandaag) ? ' — werkdag' : ' — geen werkdag vandaag') +
+    ' &nbsp;<span style="background:#eef7fb;color:#2596be;font-size:9px;font-weight:800;padding:2px 6px;border-radius:10px;border:1px solid var(--htisa-border);">📋 '+periodeLabels[periode]+'</span>';
 
   if(saved.opgeslagen){
     checkinState = {mood: saved.mood, items: saved.items};
