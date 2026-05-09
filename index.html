@@ -911,17 +911,25 @@
   <!-- MY PROGRESS VIEW -->
   <div id="view-progress" class="view">
 
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-      <div style="font-size:16px;font-weight:800;color:var(--htisa-text);">Mijn voortgang</div>
-      <button onclick="toggleRoosterSetup()" style="font-size:11px;color:var(--htisa-muted);background:none;border:1px solid var(--htisa-border);border-radius:6px;padding:4px 8px;cursor:pointer;">⚙️ Rooster</button>
+    <!-- ROOSTER -->
+    <div class="section-label geel" style="margin-bottom:10px;">📅 Mijn werkrooster</div>
+    <div style="margin-bottom:12px;">
+      <button onclick="toggleRoosterSetup()" style="width:100%;display:flex;align-items:center;gap:12px;background:#FFE900;border:2px solid #e6c800;border-radius:12px;padding:13px 16px;cursor:pointer;font-family:var(--font);">
+        <span style="font-size:24px;">📅</span>
+        <span style="flex:1;text-align:left;">
+          <span style="display:block;font-size:14px;font-weight:800;color:#5a4000;">Stel mijn rooster in</span>
+          <span style="display:block;font-size:11px;color:#7a5c00;margin-top:2px;">Werk · School · Vrij — per dag instellen</span>
+        </span>
+        <span id="rooster-toggle-ico" style="font-size:16px;color:#7a5c00;">▼</span>
+      </button>
     </div>
 
     <!-- ROOSTER SETUP -->
-    <div id="progress-setup" style="display:none;background:white;border-radius:10px;padding:16px;border:0.5px solid var(--htisa-border);margin-bottom:12px;">
+    <div id="progress-setup" style="display:none;background:white;border-radius:10px;padding:16px;border:2px solid #FFE900;margin-bottom:12px;">
       <div style="font-size:14px;font-weight:800;color:var(--htisa-text);margin-bottom:4px;">📅 Mijn werkrooster</div>
       <div style="font-size:11px;color:var(--htisa-muted);margin-bottom:14px;">Kies voor elke dag of je werkt, naar school gaat of vrij bent.</div>
       <div id="rooster-dagen"></div>
-      <button class="btn-save" onclick="slaRoosterOp()" style="width:100%;margin-top:12px;">Opslaan</button>
+      <button class="btn-save" onclick="slaRoosterOp()" style="width:100%;margin-top:12px;background:#FFE900;color:#5a4000;border:none;">💾 Rooster opslaan</button>
     </div>
 
     <!-- LEVEL -->
@@ -1678,8 +1686,10 @@ function slaRoosterOp(){
 
 function toggleRoosterSetup(){
   var el = document.getElementById('progress-setup');
+  var ico = document.getElementById('rooster-toggle-ico');
   var zichtbaar = el.style.display !== 'none';
   el.style.display = zichtbaar ? 'none' : 'block';
+  if(ico) ico.textContent = zichtbaar ? '▼' : '▲';
   if(!zichtbaar) renderRooster();
 }
 
