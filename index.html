@@ -2891,10 +2891,6 @@ function wgGetLeerlingNaam() {
 function wgSlaLeerlingOp(naam) {
   localStorage.setItem('htisa_wg_last_leerling', naam);
 }
-  wgNieuwModus = false;
-  renderWgLeerlingen();
-  document.getElementById('wg-leerling-select').value = naam;
-}
 
 function showWerkgeverView(){
   document.getElementById('view-werkgever').style.display='block';
