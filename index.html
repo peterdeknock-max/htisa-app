@@ -760,11 +760,14 @@
     <!-- LEERLING: naam instellen -->
     <div id="leerling-naam-screen" style="display:none;">
       <div class="panel open">
-        <div style="font-size:15px;font-weight:800;color:var(--htisa-text);margin-bottom:10px;">👨‍🎓 Jouw naam</div>
-        <div style="font-size:13px;color:var(--htisa-muted);margin-bottom:10px;">Voer je naam in zodat je jouw aanwezigheden kunt zien.</div>
-        <input class="form-input" id="leerling-naam-input" type="text" placeholder="bv. Ahmed El Mansouri" style="margin-bottom:8px;"/>
+        <div style="font-size:15px;font-weight:800;color:var(--htisa-text);margin-bottom:10px;">👨‍🎓 Wie ben jij?</div>
+        <div style="font-size:13px;color:var(--htisa-muted);margin-bottom:10px;">Kies je naam uit de lijst om jouw aanwezigheden te zien.</div>
+        <select class="form-input" id="leerling-naam-input" style="margin-bottom:8px;">
+          <option value="">— Kies jouw naam —</option>
+        </select>
+        <div id="leerling-naam-loading" style="font-size:11px;color:var(--htisa-muted);margin-bottom:8px;"></div>
         <button class="btn-save" onclick="saveLeerlingNaam()" style="width:100%;margin-bottom:8px;">Bevestigen</button>
-        <button class="btn-cancel" onclick="logoutRole()" style="width:100%;">← Terug naar keuze</button>
+        <button class="btn-cancel" onclick="logoutRole()" style="width:100%;">← Terug</button>
       </div>
     </div>
 
@@ -802,16 +805,11 @@
       <div class="panel open" style="margin-bottom:10px;">
 
         <label class="form-label">Naam leerling</label>
-        <!-- Dropdown als er leerlingen opgeslagen zijn, anders tekstveld -->
         <div id="wg-leerling-wrap" style="margin-bottom:10px;">
-          <div style="display:flex;gap:6px;">
-            <select class="form-input" id="wg-leerling-select" style="margin-bottom:0;flex:1;display:none;" onchange="wgSelectLeerling(this.value)">
-              <option value="">— Kies een leerling —</option>
-            </select>
-            <input class="form-input" id="wg-leerling" type="text" placeholder="bv. Ahmed El Mansouri" style="margin-bottom:0;flex:1;"/>
-            <button onclick="wgToggleLeerlingInput()" id="wg-leerling-toggle" style="background:var(--htisa);border:none;color:white;border-radius:6px;padding:0 10px;font-size:16px;cursor:pointer;flex-shrink:0;" title="Nieuwe leerling toevoegen">+</button>
-          </div>
-          <div id="wg-leerling-lijst" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;"></div>
+          <select class="form-input" id="wg-leerling-select" style="margin-bottom:0;" onchange="wgSelectLeerling(this.value)">
+            <option value="">— Kies een leerling —</option>
+          </select>
+          <div id="wg-leerling-loading" style="font-size:11px;color:var(--htisa-muted);margin-top:4px;"></div>
         </div>
 
         <label class="form-label">Datum</label>
@@ -851,7 +849,7 @@
           📥 Importeer lijst (Excel / CSV)
           <input type="file" id="import-leerling-file" accept=".xlsx,.xls,.csv" style="display:none;" onchange="importeerLeerlingen(this)"/>
         </label>
-        <div style="font-size:11px;color:var(--htisa-muted);margin-bottom:10px;text-align:center;">Exporteer in Smartschool of Informat als CSV of Excel. Zorg dat de eerste kolom de namen bevat.</div>
+        <div style="font-size:11px;color:var(--htisa-muted);margin-bottom:10px;text-align:center;">Exporteer in Smartschool of Informat als CSV of Excel. Zorg dat de eerste kolom de namen bevat.<br><span style="color:#f7941d;font-weight:600;">⚠️ Maak eerst een tabel "Leerlingen" aan in Airtable met kolom "Naam".</span></div>
 
         <!-- Leerlingen chips -->
         <div id="import-leerling-lijst" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
@@ -2244,7 +2242,10 @@ function switchTab(n,btn){
       // Leerling: sla rolkeuze over, ga direct naar leerlingview
       document.getElementById('role-chooser').style.display='none';
       var naam=localStorage.getItem('htisa_leerling_naam');
-      if(!naam){ document.getElementById('leerling-naam-screen').style.display='block'; }
+      if(!naam){
+        document.getElementById('leerling-naam-screen').style.display='block';
+        vulLeerlingDropdown('leerling-naam-input','leerling-naam-loading');
+      }
       else { showLeerlingView(naam); }
     } else {
       // Werkgever/begeleider: toon rolkeuze met alle drie knoppen
@@ -2442,40 +2443,92 @@ function renderWoorden() {
 
 // ── WEEKREFLECTIE ──
 
-function renderImportLijst() {
-  var lijst = document.getElementById('import-leerling-lijst');
-  var count = document.getElementById('import-leerling-count');
-  if(!lijst) return;
-  count.textContent = wgLeerlingen.length + ' leerlingen';
-  if(wgLeerlingen.length === 0) {
-    lijst.innerHTML = '<span style="font-size:11px;color:var(--htisa-muted);">Nog geen leerlingen toegevoegd.</span>';
-    return;
-  }
-  lijst.innerHTML = wgLeerlingen.map(function(naam) {
-    return '<span style="background:var(--htisa-pale);border:1px solid var(--htisa-border);border-radius:12px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--htisa-text);display:inline-flex;align-items:center;gap:5px;">' +
-      naam +
-      '<span onclick="wgVerwijderLeerling(\''+naam.replace(/'/g,"\\'")+'\');renderImportLijst();" style="color:var(--s-ko);cursor:pointer;font-weight:700;font-size:13px;line-height:1;">×</span>' +
-    '</span>';
-  }).join('');
-}
-
-function voegLeerlingToe() {
+async function voegLeerlingToe() {
   var input = document.getElementById('import-manueel');
   var naam = input.value.trim();
   var fb = document.getElementById('import-feedback');
   if(!naam) return;
-  if(wgLeerlingen.includes(naam)) {
+  fb.style.color = 'var(--htisa-muted)'; fb.textContent = 'Toevoegen...';
+  // Check of naam al bestaat
+  await laadCentraleLeerlingen();
+  if(centraleLeerlingen.some(function(l){ return l.naam.toLowerCase() === naam.toLowerCase(); })){
     fb.style.color = 'var(--s-ko)';
     fb.textContent = '⚠️ ' + naam + ' staat al in de lijst';
     return;
   }
-  wgLeerlingen.push(naam);
-  localStorage.setItem('htisa_wg_leerlingen', JSON.stringify(wgLeerlingen));
-  input.value = '';
-  fb.style.color = 'var(--s-ok)';
-  fb.textContent = '✅ ' + naam + ' toegevoegd';
-  renderImportLijst();
-  renderWgLeerlingen();
+  try {
+    var resp = await fetch(AT_LEERLINGEN_URL, {
+      method:'POST', headers: AT_HEADERS,
+      body: JSON.stringify({fields:{Naam: naam}})
+    });
+    if(resp.ok){
+      input.value = '';
+      fb.style.color = 'var(--s-ok)';
+      fb.textContent = '✅ ' + naam + ' toegevoegd';
+      await renderImportLijst();
+    } else {
+      fb.style.color = 'var(--s-ko)';
+      fb.textContent = '❌ Kon niet opslaan in Airtable';
+    }
+  } catch(e){ fb.style.color='var(--s-ko)'; fb.textContent='❌ Verbinding mislukt'; }
+}
+
+async function verwijderLeerlingUitAirtable(id, naam) {
+  var fb = document.getElementById('import-feedback');
+  fb.style.color = 'var(--htisa-muted)'; fb.textContent = naam + ' verwijderen...';
+  try {
+    var resp = await fetch(AT_LEERLINGEN_URL+'/'+id, {method:'DELETE', headers: AT_HEADERS});
+    if(resp.ok){
+      fb.style.color = 'var(--s-ok)'; fb.textContent = '✅ ' + naam + ' verwijderd';
+      await renderImportLijst();
+    } else {
+      fb.style.color = 'var(--s-ko)'; fb.textContent = '❌ Kon niet verwijderen';
+    }
+  } catch(e){ fb.style.color='var(--s-ko)'; fb.textContent='❌ Verbinding mislukt'; }
+}
+
+async function renderImportLijst() {
+  var container = document.getElementById('import-leerling-lijst');
+  var count = document.getElementById('import-leerling-count');
+  container.innerHTML = '<span style="font-size:11px;color:var(--htisa-muted);">Laden...</span>';
+  await laadCentraleLeerlingen();
+  count.textContent = centraleLeerlingen.length + ' leerlingen';
+  if(centraleLeerlingen.length === 0){
+    container.innerHTML = '<span style="font-size:11px;color:var(--htisa-muted);">Nog geen leerlingen toegevoegd.</span>';
+    return;
+  }
+  container.innerHTML = '';
+  centraleLeerlingen.forEach(function(l){
+    var chip = document.createElement('span');
+    chip.style.cssText = 'background:var(--htisa-pale);border:1px solid var(--htisa-border);border-radius:12px;padding:4px 10px;font-size:12px;display:inline-flex;align-items:center;gap:6px;';
+    chip.innerHTML = '👨‍🎓 '+l.naam+' <span style="color:var(--s-ko);font-weight:800;cursor:pointer;font-size:14px;" onclick="verwijderLeerlingUitAirtable(\''+l.id+'\',\''+l.naam.replace(/'/g,"\\'")+'\')" title="Verwijder">×</span>';
+    container.appendChild(chip);
+  });
+}
+
+async function verwerkNamen(namen) {
+  var fb = document.getElementById('import-feedback');
+  fb.style.color = 'var(--htisa-muted)'; fb.textContent = 'Importeren naar Airtable...';
+  await laadCentraleLeerlingen();
+  var bestaande = centraleLeerlingen.map(function(l){ return l.naam.toLowerCase(); });
+  var nieuw = namen.filter(function(n){ return n && !bestaande.includes(n.toLowerCase()); });
+  if(nieuw.length === 0){
+    fb.style.color = 'var(--htisa-muted)'; fb.textContent = '⚠️ Alle namen stonden al in de lijst';
+    return;
+  }
+  // Batch toevoegen (max 10 per keer)
+  var batches = [];
+  for(var i=0;i<nieuw.length;i+=10) batches.push(nieuw.slice(i,i+10));
+  try {
+    for(var b=0;b<batches.length;b++){
+      await fetch(AT_LEERLINGEN_URL, {
+        method:'POST', headers: AT_HEADERS,
+        body: JSON.stringify({records: batches[b].map(function(n){ return {fields:{Naam:n}}; })})
+      });
+    }
+    fb.style.color = 'var(--s-ok)'; fb.textContent = '✅ ' + nieuw.length + ' nieuwe leerlingen geïmporteerd!';
+    await renderImportLijst();
+  } catch(e){ fb.style.color='var(--s-ko)'; fb.textContent='❌ Verbinding mislukt'; }
 }
 
 function importeerLeerlingen(input) {
@@ -2600,7 +2653,41 @@ var AT_TABLE='tbl3Zbf2z8Ud37mJd';
 var AT_URL='https://api.airtable.com/v0/'+AT_BASE+'/'+AT_TABLE;
 var AT_PROGRESS_TABLE='Progress';
 var AT_PROGRESS_URL='https://api.airtable.com/v0/'+AT_BASE+'/'+AT_PROGRESS_TABLE;
+var AT_LEERLINGEN_TABLE='Leerlingen';
+var AT_LEERLINGEN_URL='https://api.airtable.com/v0/'+AT_BASE+'/'+AT_LEERLINGEN_TABLE;
 var AT_HEADERS={'Content-Type':'application/json','Authorization':'Bearer '+AT_TOKEN};
+
+// Centrale leerlingenlijst — altijd ophalen van Airtable
+var centraleLeerlingen = [];
+
+async function laadCentraleLeerlingen(){
+  try {
+    var resp = await fetch(AT_LEERLINGEN_URL+'?sort[0][field]=Naam&sort[0][direction]=asc&fields[]=Naam', {headers: AT_HEADERS});
+    if(!resp.ok) return [];
+    var data = await resp.json();
+    centraleLeerlingen = (data.records||[]).map(function(r){ return {id: r.id, naam: r.fields.Naam || ''}; }).filter(function(r){ return r.naam; });
+    return centraleLeerlingen;
+  } catch(e){ return []; }
+}
+
+function vulLeerlingDropdown(selectId, loadingId){
+  var sel = document.getElementById(selectId);
+  var ldr = loadingId ? document.getElementById(loadingId) : null;
+  if(!sel) return;
+  if(ldr) ldr.textContent = 'Leerlingen ophalen...';
+  sel.innerHTML = '<option value="">— Kies een leerling —</option>';
+  laadCentraleLeerlingen().then(function(lijst){
+    if(ldr) ldr.textContent = lijst.length === 0 ? '⚠️ Nog geen leerlingen toegevoegd door begeleider.' : '';
+    lijst.forEach(function(l){
+      var opt = document.createElement('option');
+      opt.value = l.naam; opt.textContent = l.naam;
+      sel.appendChild(opt);
+    });
+    // Herselecteer eventuele vorige waarde
+    var last = localStorage.getItem('htisa_wg_last_leerling');
+    if(last) sel.value = last;
+  });
+}
 
 // PINs
 var PINS=JSON.parse(localStorage.getItem('htisa_pins')||'{"werkgever":"1234","begeleider":"5678"}');
@@ -2618,7 +2705,10 @@ function selectRole(role){
   document.getElementById('role-chooser').style.display='none';
   if(role==='leerling'){
     var naam=localStorage.getItem('htisa_leerling_naam');
-    if(!naam){document.getElementById('leerling-naam-screen').style.display='block';}
+    if(!naam){
+      document.getElementById('leerling-naam-screen').style.display='block';
+      vulLeerlingDropdown('leerling-naam-input','leerling-naam-loading');
+    }
     else{showLeerlingView(naam);}
   } else {
     currentRole=role; pinBuffer='';
@@ -2722,9 +2812,10 @@ function logoutRole(){
 
 // LEERLING
 function saveLeerlingNaam(){
-  var naam=document.getElementById('leerling-naam-input').value.trim();
-  if(!naam)return;
-  localStorage.setItem('htisa_leerling_naam',naam);
+  var sel = document.getElementById('leerling-naam-input');
+  var naam = sel.tagName === 'SELECT' ? sel.value : sel.value.trim();
+  if(!naam){ return; }
+  localStorage.setItem('htisa_leerling_naam', naam);
   document.getElementById('leerling-naam-screen').style.display='none';
   showLeerlingView(naam);
 }
@@ -2776,85 +2867,24 @@ function renderLeerlingCal(records){
 }
 
 // WERKGEVER
-var wgLeerlingen = JSON.parse(localStorage.getItem('htisa_wg_leerlingen') || '[]');
+var wgLeerlingen = []; // niet meer gebruikt voor opslaan, alleen nog voor backwards compat
 var wgNieuwModus = false;
 
 function renderWgLeerlingen() {
-  var select = document.getElementById('wg-leerling-select');
-  var input  = document.getElementById('wg-leerling');
-  var toggle = document.getElementById('wg-leerling-toggle');
-  var lijst  = document.getElementById('wg-leerling-lijst');
-
-  // Bouw dropdown
-  select.innerHTML = '<option value="">— Kies een leerling —</option>';
-  wgLeerlingen.forEach(function(naam) {
-    var opt = document.createElement('option');
-    opt.value = naam; opt.textContent = naam;
-    select.appendChild(opt);
-  });
-
-  if(wgLeerlingen.length > 0 && !wgNieuwModus) {
-    // Toon dropdown, verberg tekstveld
-    select.style.display = 'block';
-    input.style.display  = 'none';
-    toggle.textContent   = '+';
-    toggle.title         = 'Nieuwe leerling toevoegen';
-    // Herselecteer vorige leerling
-    var last = localStorage.getItem('htisa_wg_last_leerling');
-    if(last) select.value = last;
-  } else {
-    // Toon tekstveld
-    select.style.display = 'none';
-    input.style.display  = 'block';
-    input.value = '';
-    toggle.textContent = wgLeerlingen.length > 0 ? '←' : '';
-    toggle.title = 'Terug naar lijst';
-    toggle.style.display = wgLeerlingen.length > 0 ? 'block' : 'none';
-  }
-
-  // Toon leerlingen als verwijderbare chips
-  lijst.innerHTML = '';
-  if(wgLeerlingen.length > 0 && !wgNieuwModus) {
-    lijst.innerHTML = '<span style="font-size:10px;color:var(--htisa-muted);width:100%;display:block;margin-bottom:3px;">Opgeslagen leerlingen:</span>';
-    wgLeerlingen.forEach(function(naam) {
-      var chip = document.createElement('span');
-      chip.style.cssText = 'background:var(--htisa-pale);border:1px solid var(--htisa-border);border-radius:12px;padding:2px 8px;font-size:11px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;';
-      chip.innerHTML = naam + ' <span style="color:var(--s-ko);font-weight:700;cursor:pointer;" onclick="wgVerwijderLeerling(\''+naam.replace(/'/g,"\\'")+'\')" title="Verwijder">×</span>';
-      lijst.appendChild(chip);
-    });
-  }
+  vulLeerlingDropdown('wg-leerling-select', 'wg-leerling-loading');
 }
 
 function wgSelectLeerling(naam) {
   if(naam) localStorage.setItem('htisa_wg_last_leerling', naam);
 }
 
-function wgToggleLeerlingInput() {
-  wgNieuwModus = !wgNieuwModus;
-  renderWgLeerlingen();
-  if(wgNieuwModus) document.getElementById('wg-leerling').focus();
-}
-
-function wgVerwijderLeerling(naam) {
-  wgLeerlingen = wgLeerlingen.filter(function(n){ return n !== naam; });
-  localStorage.setItem('htisa_wg_leerlingen', JSON.stringify(wgLeerlingen));
-  if(localStorage.getItem('htisa_wg_last_leerling') === naam) localStorage.removeItem('htisa_wg_last_leerling');
-  renderWgLeerlingen();
-}
-
 function wgGetLeerlingNaam() {
-  if(wgLeerlingen.length > 0 && !wgNieuwModus) {
-    return document.getElementById('wg-leerling-select').value;
-  }
-  return document.getElementById('wg-leerling').value.trim();
+  return document.getElementById('wg-leerling-select').value;
 }
 
 function wgSlaLeerlingOp(naam) {
-  if(naam && !wgLeerlingen.includes(naam)) {
-    wgLeerlingen.push(naam);
-    localStorage.setItem('htisa_wg_leerlingen', JSON.stringify(wgLeerlingen));
-  }
   localStorage.setItem('htisa_wg_last_leerling', naam);
+}
   wgNieuwModus = false;
   renderWgLeerlingen();
   document.getElementById('wg-leerling-select').value = naam;
