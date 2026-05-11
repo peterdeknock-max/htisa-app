@@ -1060,18 +1060,37 @@ var tociSchaal = [
 // ── TOCI VRAGEN PER PERIODE ──
 // Periode bepalen op basis van datum (Vlaamse schoolkalender)
 function getTociPeriode(){
+  // Periode gebaseerd op aantal weken sinds start stage van deze leerling
+  // Startdatum = eerste check-in ooit, opgeslagen als 'htisa_stage_start'
+  var start = localStorage.getItem('htisa_stage_start');
+  if(!start){
+    // Nog geen startdatum — sla vandaag op als startdatum
+    start = new Date().toISOString().slice(0,10);
+    localStorage.setItem('htisa_stage_start', start);
+  }
+  var startDate = new Date(start);
   var nu = new Date();
-  var m = nu.getMonth()+1; // 1-12
-  // P1: september t.e.m. herfstvakantie (eind oktober)
-  if(m===9 || m===10) return 'P1';
-  // P2: na herfst t.e.m. kerstvakantie (november-december)
-  if(m===11 || m===12) return 'P2';
-  // P3: januari t.e.m. krokusvakantie (jan-februari)
-  if(m===1 || m===2) return 'P3';
-  // P4: na krokus t.e.m. paasvakantie (maart-april)
-  if(m===3 || m===4) return 'P4';
-  // P5: na pasen t.e.m. einde schooljaar (mei-juni)
+  // Bereken aantal kalenderweken verschil (afgerond naar beneden)
+  var msPerWeek = 7 * 24 * 60 * 60 * 1000;
+  var aantalWeken = Math.floor((nu - startDate) / msPerWeek);
+
+  // P1: week 0-5 (eerste 6 weken = opstarten)
+  if(aantalWeken < 6)  return 'P1';
+  // P2: week 6-14 (groeien)
+  if(aantalWeken < 15) return 'P2';
+  // P3: week 15-22 (verdiepen)
+  if(aantalWeken < 23) return 'P3';
+  // P4: week 23-30 (consolideren)
+  if(aantalWeken < 31) return 'P4';
+  // P5: week 31+ (eindevaluatie)
   return 'P5';
+}
+
+function getAantalWekenStage(){
+  var start = localStorage.getItem('htisa_stage_start');
+  if(!start) return 0;
+  var msPerWeek = 7 * 24 * 60 * 60 * 1000;
+  return Math.floor((new Date() - new Date(start)) / msPerWeek);
 }
 
 var tociVragen = {
@@ -1482,6 +1501,11 @@ async function herstelProgressVanAirtable(leerling){
 function slaCheckinOp(){
   var fb = document.getElementById('checkin-feedback');
   if(!selectedDagtype){ fb.style.color='var(--s-ko)'; fb.textContent='⚠️ Kies eerst hoe je dag was (op tijd / te laat / ziek)'; return; }
+
+  // Sla startdatum stage op bij allereerste check-in
+  if(!localStorage.getItem('htisa_stage_start')){
+    localStorage.setItem('htisa_stage_start', new Date().toISOString().slice(0,10));
+  }
   var punten = 0;
   if(selectedDagtype === 'optijd'){
     var scores = Object.values(checkinState.items).filter(function(v){ return typeof v === 'number' && v >= 0; });
@@ -1556,10 +1580,12 @@ function initCheckin(){
   var maandNamen = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
   var periodeLabels = {P1:'Periode 1 — Opstarten',P2:'Periode 2 — Groeien',P3:'Periode 3 — Verdiepen',P4:'Periode 4 — Consolideren',P5:'Periode 5 — Eindevaluatie'};
   var periode = getTociPeriode();
+  var weken = getAantalWekenStage();
+  var wekenTekst = weken === 0 ? 'week 1' : 'week ' + (weken + 1);
   document.getElementById('checkin-datum').innerHTML =
     dagNamen[vandaag.getDay()] + ' ' + vandaag.getDate() + ' ' + maandNamen[vandaag.getMonth()] +
     (isWerkdag(vandaag) ? ' — werkdag' : ' — geen werkdag vandaag') +
-    ' &nbsp;<span style="background:#eef7fb;color:#2596be;font-size:9px;font-weight:800;padding:2px 6px;border-radius:10px;border:1px solid var(--htisa-border);">📋 '+periodeLabels[periode]+'</span>';
+    ' &nbsp;<span style="background:#eef7fb;color:#2596be;font-size:9px;font-weight:800;padding:2px 6px;border-radius:10px;border:1px solid var(--htisa-border);">📋 '+periodeLabels[periode]+' · '+wekenTekst+'</span>';
 
   if(saved.opgeslagen){
     checkinState = {mood: saved.mood, items: saved.items};
