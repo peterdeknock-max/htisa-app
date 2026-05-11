@@ -2490,20 +2490,25 @@ async function verwijderLeerlingUitAirtable(id, naam) {
 async function renderImportLijst() {
   var container = document.getElementById('import-leerling-lijst');
   var count = document.getElementById('import-leerling-count');
+  if(!container) return;
   container.innerHTML = '<span style="font-size:11px;color:var(--htisa-muted);">Laden...</span>';
-  await laadCentraleLeerlingen();
-  count.textContent = centraleLeerlingen.length + ' leerlingen';
-  if(centraleLeerlingen.length === 0){
-    container.innerHTML = '<span style="font-size:11px;color:var(--htisa-muted);">Nog geen leerlingen toegevoegd.</span>';
-    return;
+  try {
+    await laadCentraleLeerlingen();
+    if(count) count.textContent = centraleLeerlingen.length + ' leerlingen';
+    if(centraleLeerlingen.length === 0){
+      container.innerHTML = '<span style="font-size:11px;color:var(--htisa-muted);">Nog geen leerlingen toegevoegd.</span>';
+      return;
+    }
+    container.innerHTML = '';
+    centraleLeerlingen.forEach(function(l){
+      var chip = document.createElement('span');
+      chip.style.cssText = 'background:var(--htisa-pale);border:1px solid var(--htisa-border);border-radius:12px;padding:4px 10px;font-size:12px;display:inline-flex;align-items:center;gap:6px;';
+      chip.innerHTML = '👨‍🎓 '+l.naam+' <span style="color:var(--s-ko);font-weight:800;cursor:pointer;font-size:14px;" onclick="verwijderLeerlingUitAirtable(\''+l.id+'\',\''+l.naam.replace(/'/g,"\\'")+'\')" title="Verwijder">×</span>';
+      container.appendChild(chip);
+    });
+  } catch(e) {
+    container.innerHTML = '<span style="font-size:11px;color:var(--s-ko);">⚠️ Kon leerlingen niet laden. Controleer je Airtable verbinding.</span>';
   }
-  container.innerHTML = '';
-  centraleLeerlingen.forEach(function(l){
-    var chip = document.createElement('span');
-    chip.style.cssText = 'background:var(--htisa-pale);border:1px solid var(--htisa-border);border-radius:12px;padding:4px 10px;font-size:12px;display:inline-flex;align-items:center;gap:6px;';
-    chip.innerHTML = '👨‍🎓 '+l.naam+' <span style="color:var(--s-ko);font-weight:800;cursor:pointer;font-size:14px;" onclick="verwijderLeerlingUitAirtable(\''+l.id+'\',\''+l.naam.replace(/'/g,"\\'")+'\')" title="Verwijder">×</span>';
-    container.appendChild(chip);
-  });
 }
 
 async function verwerkNamen(namen) {
@@ -2683,9 +2688,10 @@ function vulLeerlingDropdown(selectId, loadingId){
       opt.value = l.naam; opt.textContent = l.naam;
       sel.appendChild(opt);
     });
-    // Herselecteer eventuele vorige waarde
     var last = localStorage.getItem('htisa_wg_last_leerling');
     if(last) sel.value = last;
+  }).catch(function(){
+    if(ldr) ldr.textContent = '⚠️ Kon leerlingen niet laden.';
   });
 }
 
@@ -2941,7 +2947,8 @@ async function saveAanwezigheid(){
 // BEGELEIDER
 function showBegeleiderView(){
   document.getElementById('view-begeleider').style.display='block';
-  renderImportLijst();
+  // Niet-blokkerend laden
+  setTimeout(function(){ renderImportLijst(); }, 100);
   loadBegeleiderData();
 }
 async function loadBegeleiderData(){
