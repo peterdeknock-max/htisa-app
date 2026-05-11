@@ -960,7 +960,7 @@
       <div style="font-size:10px;font-weight:800;color:#f7941d;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Hoe was je dag?</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;" id="dagtype-row">
         <div class="dagtype-opt" onclick="selectDagtype('optijd')" data-dagtype="optijd" style="border:1.5px solid var(--htisa-border);border-radius:8px;padding:10px 6px;text-align:center;cursor:pointer;background:var(--htisa-off);">
-          <div style="font-size:20px;">✅</div><div style="font-size:10px;color:var(--htisa-muted);margin-top:3px;font-weight:700;">Op tijd</div>
+          <div style="font-size:20px;">👍</div><div style="font-size:10px;color:var(--htisa-muted);margin-top:3px;font-weight:700;">Op tijd</div>
         </div>
         <div class="dagtype-opt" onclick="selectDagtype('telaat')" data-dagtype="telaat" style="border:1.5px solid var(--htisa-border);border-radius:8px;padding:10px 6px;text-align:center;cursor:pointer;background:var(--htisa-off);">
           <div style="font-size:20px;">🕐</div><div style="font-size:10px;color:var(--htisa-muted);margin-top:3px;font-weight:700;">Te laat</div>
@@ -1538,7 +1538,7 @@ function slaCheckinOp(){
   slaProgressOpInAirtable(leerling, datum, selectedMood, punten, streakData.streak||0, streakData.totaalPunten||0, selectedDagtype==='optijd');
 
   var berichten = {
-    optijd: '✅ Check-in opgeslagen! +'+punten+' punten — streak groeit!',
+    optijd: '👍 Check-in opgeslagen! +'+punten+' punten — streak groeit!',
     telaat: '✅ Check-in opgeslagen. Streak pauzeert vandaag.',
     ziek:   '✅ Check-in opgeslagen. Beterschap! Streak wordt bewaard.'
   };
