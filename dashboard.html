@@ -370,19 +370,27 @@ async function fetchAll(url){
 async function laadAlles(){
   document.getElementById('sidebar-leerlingen').innerHTML='<div class="loading">Leerlingen ophalen...</div>';
   try {
+    // Haal leerlingen op zonder Schooljaar filter eerst (veiligst)
     var [lRecs, pRecs, aRecs] = await Promise.all([
-      fetchAll(AT_LEERLINGEN_URL+'?sort[0][field]=Naam&sort[0][direction]=asc&fields[]=Naam&fields[]=Schooljaar'),
+      fetchAll(AT_LEERLINGEN_URL+'?sort[0][field]=Naam&sort[0][direction]=asc'),
       fetchAll(AT_PROGRESS_URL+'?sort[0][field]=Datum&sort[0][direction]=desc'),
       fetchAll(AT_AANW_URL+'?sort[0][field]=Datum&sort[0][direction]=desc')
     ]);
-    alleLeerlingen = lRecs.map(function(r){return {id:r.id, naam:r.fields.Naam||'', schooljaar:r.fields.Schooljaar||'Geen schooljaar'};}).filter(function(l){return l.naam;});
+    alleLeerlingen = lRecs.map(function(r){
+      return {
+        id: r.id,
+        naam: r.fields.Naam||'',
+        schooljaar: r.fields.Schooljaar || r.fields.schooljaar || 'Geen schooljaar'
+      };
+    }).filter(function(l){return l.naam;});
     allProgress = pRecs.map(function(r){return r.fields;});
     alleAanw = aRecs.map(function(r){return r.fields;});
     renderSidebar();
     updateStats();
     if(alleLeerlingen.length>0) selecteerLeerling(alleLeerlingen[0].naam);
   } catch(e){
-    document.getElementById('sidebar-leerlingen').innerHTML='<div class="loading" style="color:#e24b4a;">❌ Verbinding mislukt</div>';
+    console.error('laadAlles fout:', e);
+    document.getElementById('sidebar-leerlingen').innerHTML='<div class="loading" style="color:#e24b4a;">❌ Verbinding mislukt — ververs de pagina</div>';
   }
 }
 
