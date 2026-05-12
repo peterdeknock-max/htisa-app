@@ -440,7 +440,8 @@ function renderSidebar(filter){
         '</div>'+
         '<div style="display:flex;align-items:center;gap:6px;">'+
           '<div class="'+badgeClass+'"></div>'+
-          '<button onclick="event.stopPropagation();verwijderLeerling(\''+l.id+'\',\''+l.naam.replace(/'/g,"\\'")+'\',\''+l.schooljaar.replace(/'/g,"\\'")+'\');" '+
+          '<button data-id="'+l.id+'" data-naam="'+l.naam.replace(/"/g,'&quot;')+'" data-jaar="'+(l.schooljaar||'').replace(/"/g,'&quot;')+'" '+
+            'onclick="event.stopPropagation();verwijderLeerlingBtn(this);" '+
             'title="Verwijder leerling" '+
             'style="background:none;border:none;color:rgba(255,255,255,0.2);font-size:14px;cursor:pointer;padding:2px 4px;border-radius:4px;line-height:1;transition:all .15s;" '+
             'onmouseover="this.style.color=\'#e24b4a\';this.style.background=\'rgba(226,75,74,0.15)\'" '+
@@ -454,18 +455,38 @@ function renderSidebar(filter){
 }
 
 var openJaren = {};
+function verwijderLeerlingBtn(btn){
+  var id   = btn.getAttribute('data-id');
+  var naam = btn.getAttribute('data-naam');
+  var jaar = btn.getAttribute('data-jaar');
+  verwijderLeerling(id, naam, jaar);
+}
+
 async function verwijderLeerling(id, naam, schooljaar){
   if(!confirm('Wil je '+naam+' ('+schooljaar+') verwijderen uit de lijst?\n\nDe aanwezigheids- en voortgangsdata blijft bewaard in Airtable.')) return;
   try {
-    var resp = await fetch(AT_LEERLINGEN_URL+'/'+id, {method:'DELETE', headers:HEADERS});
+    var resp = await fetch(AT_LEERLINGEN_URL+'/'+id, {
+      method:'DELETE',
+      headers: {'Authorization': 'Bearer '+AT_TOKEN},
+      cache: 'no-store'
+    });
     if(resp.ok){
-      if(activeLeerling === naam) activeLeerling = null;
+      if(activeLeerling === naam){
+        activeLeerling = null;
+        document.getElementById('topbar-naam').textContent = 'Overzicht';
+        document.getElementById('topbar-periode').textContent = 'Alle leerlingen';
+        document.getElementById('kaart-detail').innerHTML = '<div class="empty"><div class="empty-ico">👈</div><div class="empty-txt">Kies een leerling</div></div>';
+        document.getElementById('aanw-content').innerHTML = '<div class="empty"><div class="empty-sub">Selecteer een leerling</div></div>';
+        document.getElementById('mood-content').innerHTML = '<div class="empty"><div class="empty-sub">Selecteer een leerling</div></div>';
+        document.getElementById('heatmap-content').innerHTML = '';
+      }
       await laadAlles();
     } else {
-      alert('❌ Kon '+naam+' niet verwijderen. Probeer opnieuw.');
+      var err = await resp.text();
+      alert('❌ Kon '+naam+' niet verwijderen.\n\nFout: '+resp.status+' — '+err);
     }
   } catch(e){
-    alert('❌ Verbinding mislukt.');
+    alert('❌ Verbinding mislukt: '+e.message);
   }
 }
 
