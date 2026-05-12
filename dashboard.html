@@ -119,6 +119,16 @@
   .mood-bar-fill{height:100%;border-radius:4px;transition:width .6s ease;}
   .mood-count{font-size:11px;font-weight:700;color:var(--text);width:24px;text-align:right;}
 
+  /* SCHOOLJAAR MAPPEN */
+  .sj-map{padding:0;}
+  .sj-header{display:flex;align-items:center;gap:8px;padding:8px 16px;cursor:pointer;user-select:none;transition:background .15s;}
+  .sj-header:hover{background:rgba(255,255,255,0.05);}
+  .sj-icon{font-size:13px;transition:transform .2s;}
+  .sj-icon.open{transform:rotate(90deg);}
+  .sj-naam{font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.1em;flex:1;}
+  .sj-count{font-size:10px;color:rgba(255,255,255,0.3);background:rgba(255,255,255,0.08);border-radius:10px;padding:2px 7px;}
+  .sj-leerlingen{overflow:hidden;transition:max-height .25s ease;}
+
   /* EMPTY STATE */
   .empty{text-align:center;padding:48px 20px;color:var(--muted);}
   .empty-ico{font-size:40px;margin-bottom:12px;}
@@ -173,13 +183,58 @@
     <div style="background:#fff;border-radius:16px;padding:32px;width:100%;max-width:520px;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
         <div>
-          <div style="font-size:18px;font-weight:800;color:var(--text);">⬆ Leerlingen importeren</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:3px;">Exporteer uit Informat en importeer hier</div>
+          <div style="font-size:18px;font-weight:800;color:var(--text);">⬆ Leerlingen beheren</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:3px;">Manueel toevoegen of importeren uit Informat</div>
         </div>
         <button onclick="toggleImport()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);">✕</button>
       </div>
 
-      <!-- STAP 1 -->
+      <!-- TABS -->
+      <div style="display:flex;gap:4px;background:#f0f4f8;border-radius:10px;padding:4px;margin-bottom:20px;">
+        <button id="tab-manueel-btn" onclick="switchImportTab('manueel')" style="flex:1;padding:8px;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.1);">✏️ Manueel</button>
+        <button id="tab-import-btn" onclick="switchImportTab('import')" style="flex:1;padding:8px;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);background:transparent;color:var(--muted);">📂 Importeer CSV/Excel</button>
+      </div>
+
+      <!-- TAB MANUEEL -->
+      <div id="tab-manueel">
+        <div style="margin-bottom:16px;">
+          <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Schooljaar</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <select id="schooljaar-select" style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);outline:none;background:#fff;">
+              <option value="">— Kies een schooljaar —</option>
+            </select>
+            <button onclick="toonNieuwJaarInput()" style="background:var(--bg);color:var(--text);border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;">+ Nieuw jaar</button>
+          </div>
+          <div id="nieuw-jaar-wrap" style="display:none;margin-bottom:8px;">
+            <div style="display:flex;gap:8px;">
+              <input id="nieuw-jaar-input" type="text" placeholder="bv. 2025-2026" style="flex:1;padding:10px 12px;border:1.5px solid var(--htisa);border-radius:8px;font-size:13px;font-family:var(--font);outline:none;">
+              <button onclick="bevestigNieuwJaar()" style="background:var(--htisa);color:#fff;border:none;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);">✓</button>
+              <button onclick="document.getElementById('nieuw-jaar-wrap').style.display='none'" style="background:var(--bg);color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;cursor:pointer;font-family:var(--font);">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Snel 1 leerling toevoegen -->
+        <div style="margin-bottom:16px;">
+          <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Voeg één leerling toe</div>
+          <div style="display:flex;gap:8px;">
+            <input id="manueel-naam" type="text" placeholder="Voornaam Achternaam" style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);outline:none;" onkeydown="if(event.key==='Enter')voegEenToe()">
+            <button onclick="voegEenToe()" style="background:var(--htisa);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;">+ Toevoegen</button>
+          </div>
+          <div id="manueel-feedback" style="font-size:12px;font-weight:600;min-height:18px;margin-top:6px;"></div>
+        </div>
+
+        <!-- Meerdere leerlingen tegelijk -->
+        <div>
+          <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Of meerdere tegelijk — één naam per lijn</div>
+          <textarea id="manueel-lijst" placeholder="Jan Janssen&#10;Fatima El Amrani&#10;Axel Pieters&#10;..." style="width:100%;height:120px;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-family:var(--font);outline:none;resize:vertical;line-height:1.7;"></textarea>
+          <button onclick="voegMeerderenToe()" style="width:100%;margin-top:8px;background:var(--groen);color:#fff;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);">✅ Voeg allen toe</button>
+          <div id="manueel-bulk-feedback" style="font-size:12px;font-weight:600;min-height:18px;margin-top:6px;"></div>
+        </div>
+      </div>
+
+      <!-- TAB IMPORT -->
+      <div id="tab-import" style="display:none;">
       <div style="background:#f0f4f8;border-radius:10px;padding:16px;margin-bottom:16px;">
         <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;">Stap 1 — Export uit Informat</div>
         <div style="font-size:12px;color:var(--text);line-height:1.7;">
@@ -216,8 +271,9 @@
 
       <div style="display:flex;gap:10px;">
         <button id="import-bevestig-btn" onclick="bevestigImport()" style="display:none;flex:1;background:var(--groen);color:#fff;border:none;border-radius:8px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);">✅ Importeer leerlingen</button>
-        <button onclick="toggleImport()" style="flex:1;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);">Annuleer</button>
+        <button onclick="toggleImport()" style="flex:1;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);">Sluiten</button>
       </div>
+      </div><!-- /tab-import -->
     </div>
   </div>
 
@@ -315,11 +371,11 @@ async function laadAlles(){
   document.getElementById('sidebar-leerlingen').innerHTML='<div class="loading">Leerlingen ophalen...</div>';
   try {
     var [lRecs, pRecs, aRecs] = await Promise.all([
-      fetchAll(AT_LEERLINGEN_URL+'?sort[0][field]=Naam&sort[0][direction]=asc&fields[]=Naam'),
+      fetchAll(AT_LEERLINGEN_URL+'?sort[0][field]=Naam&sort[0][direction]=asc&fields[]=Naam&fields[]=Schooljaar'),
       fetchAll(AT_PROGRESS_URL+'?sort[0][field]=Datum&sort[0][direction]=desc'),
       fetchAll(AT_AANW_URL+'?sort[0][field]=Datum&sort[0][direction]=desc')
     ]);
-    alleLeerlingen = lRecs.map(function(r){return {id:r.id, naam:r.fields.Naam||''};}).filter(function(l){return l.naam;});
+    alleLeerlingen = lRecs.map(function(r){return {id:r.id, naam:r.fields.Naam||'', schooljaar:r.fields.Schooljaar||'Geen schooljaar'};}).filter(function(l){return l.naam;});
     allProgress = pRecs.map(function(r){return r.fields;});
     alleAanw = aRecs.map(function(r){return r.fields;});
     renderSidebar();
@@ -333,27 +389,62 @@ async function laadAlles(){
 function renderSidebar(filter){
   var lijst = filter ? alleLeerlingen.filter(function(l){return l.naam.toLowerCase().includes(filter.toLowerCase());}) : alleLeerlingen;
   if(lijst.length===0){
-    document.getElementById('sidebar-leerlingen').innerHTML='<div class="loading">Geen leerlingen gevonden</div>';
+    document.getElementById('sidebar-leerlingen').innerHTML='<div class="loading" style="font-size:11px;">Geen leerlingen gevonden</div>';
     return;
   }
   var vandaag = vandaagStr();
-  document.getElementById('sidebar-leerlingen').innerHTML = lijst.map(function(l){
-    var progressRecs = allProgress.filter(function(p){return p.Leerling===l.naam;});
-    var streak = progressRecs.length>0 ? (progressRecs[0].Streak||0) : 0;
-    var recent = progressRecs.slice(0,5).map(function(p){return typeof p.MoodScore==='number'?p.MoodScore:-1;});
-    var aantalSlecht = recent.filter(function(s){return s===0;}).length;
-    var checkinVandaag = progressRecs.some(function(p){return p.Datum===vandaag;});
-    var badgeClass = aantalSlecht>=3 ? 'badge-warn' : checkinVandaag ? 'badge-ok' : 'badge-grey';
-    var kleur = avatarKleur(l.naam);
-    return '<div class="leerling-item'+(activeLeerling===l.naam?' active':'')+'" onclick="selecteerLeerling(\''+l.naam.replace(/'/g,"\\'")+'\')">'+
-      '<div class="leerling-avatar" style="background:'+kleur+'">'+initialen(l.naam)+'</div>'+
-      '<div class="leerling-info">'+
-        '<div class="leerling-naam">'+l.naam+'</div>'+
-        '<div class="leerling-meta">🔥 '+streak+' streak'+(checkinVandaag?' · ✅ vandaag':'')+'</div>'+
-      '</div>'+
-      '<div class="leerling-badge"><div class="'+badgeClass+'"></div></div>'+
+
+  // Groepeer per schooljaar
+  var perJaar = {};
+  lijst.forEach(function(l){
+    var jaar = l.schooljaar || 'Geen schooljaar';
+    if(!perJaar[jaar]) perJaar[jaar] = [];
+    perJaar[jaar].push(l);
+  });
+
+  // Sorteer schooljaren (meest recent eerst)
+  var jaren = Object.keys(perJaar).sort(function(a,b){ return b.localeCompare(a); });
+
+  var html = '';
+  jaren.forEach(function(jaar){
+    var leerlingen = perJaar[jaar];
+    var isOpen = openJaren[jaar] !== false; // standaard open
+    html += '<div class="sj-map">';
+    html += '<div class="sj-header" onclick="toggleJaar(\''+jaar.replace(/'/g,"\\'")+'\')">'+
+      '<span class="sj-icon'+(isOpen?' open':'')+'">▶</span>'+
+      '<span class="sj-naam">📁 '+jaar+'</span>'+
+      '<span class="sj-count">'+leerlingen.length+'</span>'+
     '</div>';
-  }).join('');
+    html += '<div class="sj-leerlingen" id="sj-'+jaar.replace(/\s/g,'-')+'" style="max-height:'+(isOpen?'9999px':'0')+';">';
+    leerlingen.forEach(function(l){
+      var progressRecs = allProgress.filter(function(p){return p.Leerling===l.naam;});
+      var streak = progressRecs.length>0 ? (progressRecs[0].Streak||0) : 0;
+      var recent = progressRecs.slice(0,5).map(function(p){return typeof p.MoodScore==='number'?p.MoodScore:-1;});
+      var aantalSlecht = recent.filter(function(s){return s===0;}).length;
+      var checkinVandaag = progressRecs.some(function(p){return p.Datum===vandaag;});
+      var badgeClass = aantalSlecht>=3 ? 'badge-warn' : checkinVandaag ? 'badge-ok' : 'badge-grey';
+      var kleur = avatarKleur(l.naam);
+      html += '<div class="leerling-item'+(activeLeerling===l.naam?' active':'')+'" onclick="selecteerLeerling(\''+l.naam.replace(/'/g,"\\'")+'\')">'+
+        '<div class="leerling-avatar" style="background:'+kleur+'">'+initialen(l.naam)+'</div>'+
+        '<div class="leerling-info">'+
+          '<div class="leerling-naam">'+l.naam+'</div>'+
+          '<div class="leerling-meta">🔥 '+streak+' streak'+(checkinVandaag?' · ✅ vandaag':'')+'</div>'+
+        '</div>'+
+        '<div class="leerling-badge"><div class="'+badgeClass+'"></div></div>'+
+      '</div>';
+    });
+    html += '</div></div>';
+  });
+  document.getElementById('sidebar-leerlingen').innerHTML = html;
+}
+
+var openJaren = {};
+function toggleJaar(jaar){
+  openJaren[jaar] = openJaren[jaar] === false ? true : false;
+  var el = document.getElementById('sj-'+jaar.replace(/\s/g,'-'));
+  var ico = el ? el.previousElementSibling.querySelector('.sj-icon') : null;
+  if(el){ el.style.maxHeight = openJaren[jaar] === false ? '0' : '9999px'; }
+  if(ico){ ico.classList.toggle('open', openJaren[jaar] !== false); }
 }
 
 function filterLeerlingen(){
@@ -574,6 +665,129 @@ function exporteerCSV(){
   a.click();
 }
 
+// ── SCHOOLJAAR BEHEER ──
+var alleSchoolJaren = [];
+
+function vulSchoolJaarDropdown(){
+  // Haal unieke schooljaren op uit bestaande leerlingen
+  var jaren = [...new Set(alleLeerlingen.map(function(l){ return l.schooljaar; }).filter(function(j){ return j && j !== 'Geen schooljaar'; }))].sort(function(a,b){ return b.localeCompare(a); });
+  alleSchoolJaren = jaren;
+  var sel = document.getElementById('schooljaar-select');
+  if(!sel) return;
+  var huidig = sel.value;
+  sel.innerHTML = '<option value="">— Kies een schooljaar —</option>';
+  jaren.forEach(function(j){
+    var opt = document.createElement('option');
+    opt.value = j; opt.textContent = j;
+    sel.appendChild(opt);
+  });
+  // Selecteer automatisch het meest recente jaar
+  if(!huidig && jaren.length > 0) sel.value = jaren[0];
+  else if(huidig) sel.value = huidig;
+}
+
+function toonNieuwJaarInput(){
+  var wrap = document.getElementById('nieuw-jaar-wrap');
+  wrap.style.display = 'flex';
+  // Stel een suggestie in
+  var nu = new Date();
+  var suggestie = nu.getMonth() >= 8
+    ? nu.getFullYear()+'-'+(nu.getFullYear()+1)
+    : (nu.getFullYear()-1)+'-'+nu.getFullYear();
+  document.getElementById('nieuw-jaar-input').value = suggestie;
+  document.getElementById('nieuw-jaar-input').focus();
+  document.getElementById('nieuw-jaar-input').select();
+}
+
+function bevestigNieuwJaar(){
+  var naam = document.getElementById('nieuw-jaar-input').value.trim();
+  if(!naam){ return; }
+  var sel = document.getElementById('schooljaar-select');
+  // Voeg toe als optie als nog niet bestaat
+  var bestaat = Array.from(sel.options).some(function(o){ return o.value === naam; });
+  if(!bestaat){
+    var opt = document.createElement('option');
+    opt.value = naam; opt.textContent = naam;
+    sel.insertBefore(opt, sel.options[1]); // na "kies een schooljaar"
+  }
+  sel.value = naam;
+  document.getElementById('nieuw-jaar-wrap').style.display = 'none';
+}
+
+function getGekozenSchoolJaar(){
+  var sel = document.getElementById('schooljaar-select');
+  return sel ? sel.value : '';
+}
+
+// ── MANUEEL TOEVOEGEN ──
+  document.getElementById('tab-manueel').style.display = tab==='manueel' ? 'block' : 'none';
+  document.getElementById('tab-import').style.display  = tab==='import'  ? 'block' : 'none';
+  document.getElementById('tab-manueel-btn').style.cssText = tab==='manueel'
+    ? 'flex:1;padding:8px;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.1);'
+    : 'flex:1;padding:8px;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);background:transparent;color:var(--muted);';
+  document.getElementById('tab-import-btn').style.cssText = tab==='import'
+    ? 'flex:1;padding:8px;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.1);'
+    : 'flex:1;padding:8px;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);background:transparent;color:var(--muted);';
+}
+
+async function voegEenToe(){
+  var input = document.getElementById('manueel-naam');
+  var naam = input.value.trim();
+  var jaar = getGekozenSchoolJaar();
+  var fb = document.getElementById('manueel-feedback');
+  if(!naam){ fb.style.color='var(--rood)'; fb.textContent='⚠️ Vul een naam in'; return; }
+  if(!jaar){ fb.style.color='var(--rood)'; fb.textContent='⚠️ Kies eerst een schooljaar'; return; }
+
+  var bestaande = alleLeerlingen.map(function(l){ return l.naam.toLowerCase(); });
+  if(bestaande.includes(naam.toLowerCase())){
+    fb.style.color='var(--oranje)'; fb.textContent='⚠️ '+naam+' staat al in de lijst'; return;
+  }
+
+  fb.style.color='var(--muted)'; fb.textContent='Toevoegen...';
+  try {
+    var resp = await fetch(AT_LEERLINGEN_URL, {
+      method:'POST', headers: HEADERS,
+      body: JSON.stringify({fields:{Naam:naam, Schooljaar:jaar}})
+    });
+    if(resp.ok){
+      fb.style.color='var(--groen)'; fb.textContent='✅ '+naam+' toegevoegd aan '+jaar+'!';
+      input.value='';
+      await laadAlles();
+      setTimeout(function(){ selecteerLeerling(naam); }, 500);
+    } else {
+      fb.style.color='var(--rood)'; fb.textContent='❌ Kon niet opslaan';
+    }
+  } catch(e){ fb.style.color='var(--rood)'; fb.textContent='❌ Verbinding mislukt'; }
+}
+
+async function voegMeerderenToe(){
+  var tekst = document.getElementById('manueel-lijst').value;
+  var jaar = getGekozenSchoolJaar();
+  var fb = document.getElementById('manueel-bulk-feedback');
+  var namen = tekst.split('\n').map(function(n){ return n.trim(); }).filter(function(n){ return n.length > 1; });
+  if(namen.length === 0){ fb.style.color='var(--rood)'; fb.textContent='⚠️ Geen namen gevonden'; return; }
+  if(!jaar){ fb.style.color='var(--rood)'; fb.textContent='⚠️ Kies eerst een schooljaar'; return; }
+
+  var bestaande = alleLeerlingen.map(function(l){ return l.naam.toLowerCase(); });
+  var nieuw = namen.filter(function(n){ return !bestaande.includes(n.toLowerCase()); });
+  if(nieuw.length === 0){ fb.style.color='var(--oranje)'; fb.textContent='⚠️ Alle namen staan al in de lijst'; return; }
+
+  fb.style.color='var(--muted)'; fb.textContent=nieuw.length+' leerlingen toevoegen aan '+jaar+'...';
+  try {
+    for(var i=0; i<nieuw.length; i+=10){
+      var batch = nieuw.slice(i,i+10);
+      await fetch(AT_LEERLINGEN_URL, {
+        method:'POST', headers: HEADERS,
+        body: JSON.stringify({records: batch.map(function(n){ return {fields:{Naam:n, Schooljaar:jaar}}; })})
+      });
+    }
+    fb.style.color='var(--groen)';
+    fb.textContent='✅ '+nieuw.length+' leerlingen toegevoegd aan '+jaar+(namen.length-nieuw.length>0?' ('+((namen.length-nieuw.length))+' al aanwezig)':'')+'!';
+    document.getElementById('manueel-lijst').value='';
+    laadAlles();
+  } catch(e){ fb.style.color='var(--rood)'; fb.textContent='❌ Verbinding mislukt'; }
+}
+
 // ── IMPORT ──
 var importNamen = [];
 
@@ -582,15 +796,21 @@ function toggleImport(){
   var open = modal.style.display === 'flex';
   modal.style.display = open ? 'none' : 'flex';
   if(!open){
-    // Reset
     importNamen = [];
     document.getElementById('import-preview').style.display = 'none';
     document.getElementById('import-bevestig-btn').style.display = 'none';
     document.getElementById('import-feedback').textContent = '';
     document.getElementById('import-file').value = '';
+    document.getElementById('manueel-naam').value = '';
+    document.getElementById('manueel-feedback').textContent = '';
+    document.getElementById('manueel-lijst').value = '';
+    document.getElementById('manueel-bulk-feedback').textContent = '';
+    switchImportTab('manueel');
     var dz = document.getElementById('import-dropzone');
     dz.style.borderColor = 'var(--border)';
     dz.style.background = 'transparent';
+    // Vul schooljaar dropdown
+    vulSchoolJaarDropdown();
   }
 }
 
@@ -687,25 +907,25 @@ function verwerkTekst(tekst, sep){
 
 async function bevestigImport(){
   if(importNamen.length === 0) return;
+  var jaar = getGekozenSchoolJaar();
   var btn = document.getElementById('import-bevestig-btn');
   var fb = document.getElementById('import-feedback');
+  if(!jaar){ fb.style.color='var(--rood)'; fb.textContent='⚠️ Kies eerst een schooljaar bovenaan'; return; }
   btn.disabled = true; btn.textContent = 'Bezig...';
-  fb.style.color = 'var(--muted)'; fb.textContent = importNamen.length + ' leerlingen toevoegen aan Airtable...';
+  fb.style.color = 'var(--muted)'; fb.textContent = importNamen.length + ' leerlingen toevoegen aan '+jaar+'...';
 
   try {
-    // Batch per 10 (Airtable limiet)
     for(var i = 0; i < importNamen.length; i += 10){
       var batch = importNamen.slice(i, i+10);
       await fetch(AT_LEERLINGEN_URL, {
         method:'POST', headers: HEADERS,
-        body: JSON.stringify({records: batch.map(function(n){ return {fields:{Naam:n}}; })})
+        body: JSON.stringify({records: batch.map(function(n){ return {fields:{Naam:n, Schooljaar:jaar}}; })})
       });
     }
     fb.style.color = 'var(--groen)';
-    fb.textContent = '✅ ' + importNamen.length + ' leerlingen succesvol geïmporteerd!';
+    fb.textContent = '✅ ' + importNamen.length + ' leerlingen succesvol geïmporteerd in '+jaar+'!';
     btn.style.display = 'none';
     importNamen = [];
-    // Ververs de lijst
     setTimeout(function(){ laadAlles(); toggleImport(); }, 1500);
   } catch(e){
     fb.style.color = 'var(--rood)';
