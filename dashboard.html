@@ -359,7 +359,7 @@ async function fetchAll(url){
   var all=[]; var offset='';
   do {
     var u = url+(url.includes('?')?'&':'?')+'pageSize=100'+(offset?'&offset='+offset:'');
-    var r = await fetch(u,{headers:HEADERS});
+    var r = await fetch(u, {headers: HEADERS, cache: 'no-store'});
     var d = await r.json();
     all = all.concat(d.records||[]);
     offset = d.offset||'';
@@ -728,6 +728,7 @@ function getGekozenSchoolJaar(){
 }
 
 // ── MANUEEL TOEVOEGEN ──
+function switchImportTab(tab){
   document.getElementById('tab-manueel').style.display = tab==='manueel' ? 'block' : 'none';
   document.getElementById('tab-import').style.display  = tab==='import'  ? 'block' : 'none';
   document.getElementById('tab-manueel-btn').style.cssText = tab==='manueel'
