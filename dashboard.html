@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTiSA – Begeleidersdashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --htisa:#2596be;
+    --htisa-dark:#1a7295;
+    --oranje:#f7941d;
+    --groen:#00a99d;
+    --rood:#e24b4a;
+    --geel:#f59e0b;
+    --paars:#7b1fa2;
+    --bg:#f0f4f8;
+    --sidebar:#0d2b38;
+    --sidebar-hover:#1a3f50;
+    --card:#ffffff;
+    --border:#e2eaf0;
+    --text:#0d2b38;
+    --muted:#5b8fa0;
+    --font:'DM Sans',sans-serif;
+    --mono:'DM Mono',monospace;
+  }
+
+  body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
+
+  /* SIDEBAR */
+  .sidebar{width:260px;min-width:260px;background:var(--sidebar);display:flex;flex-direction:column;min-height:100vh;position:sticky;top:0;height:100vh;overflow-y:auto;}
+  .sidebar-header{padding:24px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.08);}
+  .sidebar-logo{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+  .sidebar-logo img{width:36px;height:36px;object-fit:contain;border-radius:8px;}
+  .sidebar-title{font-size:14px;font-weight:800;color:#fff;letter-spacing:0.01em;}
+  .sidebar-sub{font-size:11px;color:rgba(255,255,255,0.45);margin-top:1px;}
+  .sidebar-section{padding:12px 12px 4px;font-size:9px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.12em;}
+  .sidebar-search{padding:8px 12px 12px;}
+  .sidebar-search input{width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 10px;font-size:12px;color:#fff;font-family:var(--font);outline:none;}
+  .sidebar-search input::placeholder{color:rgba(255,255,255,0.3);}
+  .sidebar-search input:focus{background:rgba(255,255,255,0.12);border-color:var(--htisa);}
+  .leerling-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;transition:background .15s;border-left:3px solid transparent;}
+  .leerling-item:hover{background:var(--sidebar-hover);}
+  .leerling-item.active{background:var(--sidebar-hover);border-left-color:var(--htisa);}
+  .leerling-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
+  .leerling-info{flex:1;min-width:0;}
+  .leerling-naam{font-size:12px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .leerling-meta{font-size:10px;color:rgba(255,255,255,0.4);margin-top:1px;}
+  .leerling-badge{flex-shrink:0;}
+  .badge-warn{width:8px;height:8px;border-radius:50%;background:var(--oranje);}
+  .badge-ok{width:8px;height:8px;border-radius:50%;background:var(--groen);}
+  .badge-grey{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2);}
+
+  /* MAIN */
+  .main{flex:1;display:flex;flex-direction:column;min-width:0;}
+  .topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+  .topbar-left{display:flex;align-items:center;gap:12px;}
+  .topbar-title{font-size:18px;font-weight:800;color:var(--text);}
+  .topbar-period{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:var(--muted);}
+  .topbar-right{display:flex;align-items:center;gap:10px;}
+  .btn-refresh{background:var(--htisa);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:background .15s;}
+  .btn-refresh:hover{background:var(--htisa-dark);}
+  .btn-export{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);}
+
+  .content{padding:28px 32px;flex:1;}
+
+  /* STAT CARDS */
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+  .stat-card{background:var(--card);border-radius:12px;padding:18px 20px;border:1px solid var(--border);}
+  .stat-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
+  .stat-val{font-size:28px;font-weight:800;color:var(--text);line-height:1;}
+  .stat-sub{font-size:11px;color:var(--muted);margin-top:4px;}
+  .stat-card.warn .stat-val{color:var(--oranje);}
+  .stat-card.good .stat-val{color:var(--groen);}
+
+  /* GRID */
+  .dash-grid{display:grid;grid-template-columns:1fr 360px;gap:20px;}
+  .card{background:var(--card);border-radius:12px;border:1px solid var(--border);padding:20px;}
+  .card-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+  .card-title span{font-size:16px;}
+
+  /* LEERLING DETAIL */
+  .detail-header{display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+  .detail-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;flex-shrink:0;}
+  .detail-naam{font-size:20px;font-weight:800;color:var(--text);}
+  .detail-meta{font-size:12px;color:var(--muted);margin-top:3px;}
+  .detail-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+  .detail-stat{background:var(--bg);border-radius:10px;padding:14px;}
+  .detail-stat-val{font-size:22px;font-weight:800;color:var(--text);}
+  .detail-stat-lbl{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px;}
+
+  /* TABEL */
+  .aanw-table{width:100%;border-collapse:collapse;}
+  .aanw-table th{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;padding:6px 10px;text-align:left;border-bottom:2px solid var(--border);}
+  .aanw-table td{font-size:12px;padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+  .aanw-table tr:last-child td{border-bottom:none;}
+  .aanw-table tr:hover td{background:#f7fafc;}
+  .status-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:600;}
+  .status-aanwezig{background:#e8f5e9;color:#2e7d32;}
+  .status-afwezig{background:#fce4ec;color:#c62828;}
+  .status-telaat{background:#fff3e0;color:#e65100;}
+
+  /* KALENDER HEATMAP */
+  .heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+  .heatmap-dag{aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;cursor:default;position:relative;}
+  .heatmap-dag:hover .tooltip{display:block;}
+  .tooltip{display:none;position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:#0d2b38;color:#fff;font-size:10px;padding:4px 8px;border-radius:6px;white-space:nowrap;z-index:10;}
+  .heatmap-lbl{font-size:9px;font-weight:700;color:var(--muted);text-align:center;padding-bottom:4px;}
+
+  /* GRAFIEK */
+  canvas{display:block;}
+
+  /* MOOD BAR */
+  .mood-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .mood-lbl{font-size:11px;color:var(--muted);width:70px;flex-shrink:0;}
+  .mood-bar-wrap{flex:1;height:8px;background:var(--bg);border-radius:4px;overflow:hidden;}
+  .mood-bar-fill{height:100%;border-radius:4px;transition:width .6s ease;}
+  .mood-count{font-size:11px;font-weight:700;color:var(--text);width:24px;text-align:right;}
+
+  /* EMPTY STATE */
+  .empty{text-align:center;padding:48px 20px;color:var(--muted);}
+  .empty-ico{font-size:40px;margin-bottom:12px;}
+  .empty-txt{font-size:14px;font-weight:600;}
+  .empty-sub{font-size:12px;margin-top:4px;}
+
+  /* LOADING */
+  .loading{text-align:center;padding:32px;color:var(--muted);font-size:13px;}
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar{width:5px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.15);border-radius:10px;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <img src="icons/logo-htisa.png" alt="HTiSA">
+      <div>
+        <div class="sidebar-title">HTiSA Dashboard</div>
+        <div class="sidebar-sub">Begeleidersdashboard</div>
+      </div>
+    </div>
+  </div>
+  <div class="sidebar-search">
+    <input type="text" id="zoek-input" placeholder="🔍  Zoek leerling..." oninput="filterLeerlingen()">
+  </div>
+  <div class="sidebar-section">Leerlingen</div>
+  <div id="sidebar-leerlingen"><div class="loading">Laden...</div></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title" id="topbar-naam">Overzicht</div>
+      <div class="topbar-period" id="topbar-periode">Alle leerlingen</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn-export" onclick="exporteerCSV()">⬇ Export CSV</button>
+      <button class="btn-refresh" onclick="toggleImport()" style="background:#00a99d;">⬆ Importeer leerlingen</button>
+      <button class="btn-refresh" onclick="laadAlles()">↻ Ververs</button>
+    </div>
+  </div>
+
+  <!-- IMPORT MODAL -->
+  <div id="import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;display:none;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:16px;padding:32px;width:100%;max-width:520px;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div>
+          <div style="font-size:18px;font-weight:800;color:var(--text);">⬆ Leerlingen importeren</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:3px;">Exporteer uit Informat en importeer hier</div>
+        </div>
+        <button onclick="toggleImport()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);">✕</button>
+      </div>
+
+      <!-- STAP 1 -->
+      <div style="background:#f0f4f8;border-radius:10px;padding:16px;margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;">Stap 1 — Export uit Informat</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.7;">
+          1. Open Informat → <strong>Leerlingen</strong><br>
+          2. Filter op <strong>Duaal Leren</strong> of jouw klas<br>
+          3. Klik op <strong>Exporteer naar Excel of CSV</strong><br>
+          4. Zorg dat de <strong>eerste kolom de naam</strong> van de leerling bevat
+        </div>
+      </div>
+
+      <!-- STAP 2 -->
+      <div style="background:#f0f4f8;border-radius:10px;padding:16px;margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;">Stap 2 — Kies je bestand</div>
+        <div id="import-dropzone" onclick="document.getElementById('import-file').click()"
+          style="border:2px dashed var(--border);border-radius:10px;padding:24px;text-align:center;cursor:pointer;transition:all .15s;"
+          ondragover="event.preventDefault();this.style.borderColor='var(--htisa)';this.style.background='#eef7fb';"
+          ondragleave="this.style.borderColor='var(--border)';this.style.background='transparent';"
+          ondrop="handleDrop(event)">
+          <div style="font-size:28px;margin-bottom:8px;">📂</div>
+          <div style="font-size:13px;font-weight:700;color:var(--text);">Klik of sleep je CSV/Excel bestand hier</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;">.csv, .xlsx of .xls — max 5MB</div>
+        </div>
+        <input type="file" id="import-file" accept=".csv,.xlsx,.xls" style="display:none;" onchange="verwerkBestand(this.files[0])">
+      </div>
+
+      <!-- PREVIEW -->
+      <div id="import-preview" style="display:none;margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Stap 3 — Controleer en importeer</div>
+        <div id="import-preview-inhoud" style="background:#f0f4f8;border-radius:10px;padding:12px;max-height:160px;overflow-y:auto;font-size:12px;line-height:1.8;"></div>
+        <div id="import-tel" style="font-size:12px;color:var(--muted);margin-top:6px;"></div>
+      </div>
+
+      <div id="import-feedback" style="font-size:12px;font-weight:600;min-height:18px;margin-bottom:12px;"></div>
+
+      <div style="display:flex;gap:10px;">
+        <button id="import-bevestig-btn" onclick="bevestigImport()" style="display:none;flex:1;background:var(--groen);color:#fff;border:none;border-radius:8px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);">✅ Importeer leerlingen</button>
+        <button onclick="toggleImport()" style="flex:1;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);">Annuleer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- STAT CARDS -->
+    <div class="stat-grid" id="stat-grid">
+      <div class="stat-card"><div class="stat-label">Leerlingen</div><div class="stat-val" id="stat-totaal">—</div><div class="stat-sub">in de lijst</div></div>
+      <div class="stat-card good"><div class="stat-label">Gem. aanwezigheid</div><div class="stat-val" id="stat-aanw">—</div><div class="stat-sub">op tijd %</div></div>
+      <div class="stat-card"><div class="stat-label">Check-ins vandaag</div><div class="stat-val" id="stat-today">—</div><div class="stat-sub">van <span id="stat-today-van">?</span> leerlingen</div></div>
+      <div class="stat-card warn"><div class="stat-label">Waarschuwingen</div><div class="stat-val" id="stat-warn">—</div><div class="stat-sub">leerlingen met aandacht nodig</div></div>
+    </div>
+
+    <!-- DETAIL OF OVERZICHT -->
+    <div id="dash-content">
+      <div class="dash-grid">
+        <!-- LINKER KOLOM -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div class="card" id="kaart-detail">
+            <div class="empty"><div class="empty-ico">👈</div><div class="empty-txt">Kies een leerling</div><div class="empty-sub">Selecteer een leerling in de zijbalk om details te zien</div></div>
+          </div>
+          <div class="card" id="kaart-aanwezigheden">
+            <div class="card-title"><span>🗓️</span> Aanwezigheidsoverzicht</div>
+            <div id="aanw-content"><div class="empty"><div class="empty-sub">Selecteer een leerling</div></div></div>
+          </div>
+        </div>
+        <!-- RECHTER KOLOM -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div class="card">
+            <div class="card-title"><span>📈</span> Punten evolutie</div>
+            <canvas id="grafiek" height="160"></canvas>
+          </div>
+          <div class="card">
+            <div class="card-title"><span>😊</span> Mood verdeling</div>
+            <div id="mood-content"><div class="empty"><div class="empty-sub">Selecteer een leerling</div></div></div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span>🔥</span> Moodkalender</div>
+            <div style="display:flex;gap:6px;margin-bottom:8px;">
+              <div style="flex:1;text-align:center;font-size:9px;font-weight:700;color:var(--muted);">MA</div>
+              <div style="flex:1;text-align:center;font-size:9px;font-weight:700;color:var(--muted);">DI</div>
+              <div style="flex:1;text-align:center;font-size:9px;font-weight:700;color:var(--muted);">WO</div>
+              <div style="flex:1;text-align:center;font-size:9px;font-weight:700;color:var(--muted);">DO</div>
+              <div style="flex:1;text-align:center;font-size:9px;font-weight:700;color:var(--muted);">VR</div>
+              <div style="flex:1;text-align:center;font-size:9px;font-weight:700;color:var(--muted);">ZA</div>
+              <div style="flex:1;text-align:center;font-size:9px;font-weight:700;color:var(--muted);">ZO</div>
+            </div>
+            <div class="heatmap" id="heatmap-content"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var AT_TOKEN = 'patF9mAQo7N9aJeHD.cdba4d69632eb2c9d34de28825bb05303a9ccaf685e86f8336654c8d61000f60';
+var AT_BASE  = 'appN0oikU56MoIJpJ';
+var AT_AANW_URL     = 'https://api.airtable.com/v0/'+AT_BASE+'/tbl3Zbf2z8Ud37mJd';
+var AT_PROGRESS_URL = 'https://api.airtable.com/v0/'+AT_BASE+'/Progress';
+var AT_LEERLINGEN_URL = 'https://api.airtable.com/v0/'+AT_BASE+'/Leerlingen';
+var HEADERS = {'Content-Type':'application/json','Authorization':'Bearer '+AT_TOKEN};
+
+var alleLeerlingen = [];
+var allProgress = [];
+var alleAanw = [];
+var activeLeerling = null;
+
+var moodEmoji  = ['😔','😐','😊','🤩'];
+var moodKleur  = ['#e57373','#ffb74d','#81c784','#4fc3f7'];
+var moodKleurL = ['#fce4ec','#fff9c4','#e8f5e9','#e3f0fc'];
+var avatarKleuren = ['#2596be','#00a99d','#f7941d','#7b1fa2','#e24b4a','#34a853'];
+
+function avatarKleur(naam){
+  var sum=0; for(var i=0;i<naam.length;i++) sum+=naam.charCodeAt(i);
+  return avatarKleuren[sum%avatarKleuren.length];
+}
+function initialen(naam){
+  return naam.split(' ').slice(0,2).map(function(w){return w[0]||'';}).join('').toUpperCase();
+}
+function vandaagStr(){ return new Date().toISOString().slice(0,10); }
+
+async function fetchAll(url){
+  var all=[]; var offset='';
+  do {
+    var u = url+(url.includes('?')?'&':'?')+'pageSize=100'+(offset?'&offset='+offset:'');
+    var r = await fetch(u,{headers:HEADERS});
+    var d = await r.json();
+    all = all.concat(d.records||[]);
+    offset = d.offset||'';
+  } while(offset);
+  return all;
+}
+
+async function laadAlles(){
+  document.getElementById('sidebar-leerlingen').innerHTML='<div class="loading">Leerlingen ophalen...</div>';
+  try {
+    var [lRecs, pRecs, aRecs] = await Promise.all([
+      fetchAll(AT_LEERLINGEN_URL+'?sort[0][field]=Naam&sort[0][direction]=asc&fields[]=Naam'),
+      fetchAll(AT_PROGRESS_URL+'?sort[0][field]=Datum&sort[0][direction]=desc'),
+      fetchAll(AT_AANW_URL+'?sort[0][field]=Datum&sort[0][direction]=desc')
+    ]);
+    alleLeerlingen = lRecs.map(function(r){return {id:r.id, naam:r.fields.Naam||''};}).filter(function(l){return l.naam;});
+    allProgress = pRecs.map(function(r){return r.fields;});
+    alleAanw = aRecs.map(function(r){return r.fields;});
+    renderSidebar();
+    updateStats();
+    if(alleLeerlingen.length>0) selecteerLeerling(alleLeerlingen[0].naam);
+  } catch(e){
+    document.getElementById('sidebar-leerlingen').innerHTML='<div class="loading" style="color:#e24b4a;">❌ Verbinding mislukt</div>';
+  }
+}
+
+function renderSidebar(filter){
+  var lijst = filter ? alleLeerlingen.filter(function(l){return l.naam.toLowerCase().includes(filter.toLowerCase());}) : alleLeerlingen;
+  if(lijst.length===0){
+    document.getElementById('sidebar-leerlingen').innerHTML='<div class="loading">Geen leerlingen gevonden</div>';
+    return;
+  }
+  var vandaag = vandaagStr();
+  document.getElementById('sidebar-leerlingen').innerHTML = lijst.map(function(l){
+    var progressRecs = allProgress.filter(function(p){return p.Leerling===l.naam;});
+    var streak = progressRecs.length>0 ? (progressRecs[0].Streak||0) : 0;
+    var recent = progressRecs.slice(0,5).map(function(p){return typeof p.MoodScore==='number'?p.MoodScore:-1;});
+    var aantalSlecht = recent.filter(function(s){return s===0;}).length;
+    var checkinVandaag = progressRecs.some(function(p){return p.Datum===vandaag;});
+    var badgeClass = aantalSlecht>=3 ? 'badge-warn' : checkinVandaag ? 'badge-ok' : 'badge-grey';
+    var kleur = avatarKleur(l.naam);
+    return '<div class="leerling-item'+(activeLeerling===l.naam?' active':'')+'" onclick="selecteerLeerling(\''+l.naam.replace(/'/g,"\\'")+'\')">'+
+      '<div class="leerling-avatar" style="background:'+kleur+'">'+initialen(l.naam)+'</div>'+
+      '<div class="leerling-info">'+
+        '<div class="leerling-naam">'+l.naam+'</div>'+
+        '<div class="leerling-meta">🔥 '+streak+' streak'+(checkinVandaag?' · ✅ vandaag':'')+'</div>'+
+      '</div>'+
+      '<div class="leerling-badge"><div class="'+badgeClass+'"></div></div>'+
+    '</div>';
+  }).join('');
+}
+
+function filterLeerlingen(){
+  var q = document.getElementById('zoek-input').value;
+  renderSidebar(q);
+}
+
+function updateStats(){
+  var vandaag = vandaagStr();
+  document.getElementById('stat-totaal').textContent = alleLeerlingen.length;
+  document.getElementById('stat-today-van').textContent = alleLeerlingen.length;
+
+  // Gem aanwezigheid %
+  var totCheckins=0, totOpTijd=0;
+  allProgress.forEach(function(p){ totCheckins++; if(p.OpTijd==='Ja') totOpTijd++; });
+  var pct = totCheckins>0 ? Math.round(totOpTijd/totCheckins*100) : 0;
+  document.getElementById('stat-aanw').textContent = pct+'%';
+
+  // Check-ins vandaag
+  var vandaagSet = new Set();
+  allProgress.filter(function(p){return p.Datum===vandaag;}).forEach(function(p){vandaagSet.add(p.Leerling);});
+  document.getElementById('stat-today').textContent = vandaagSet.size;
+
+  // Waarschuwingen
+  var warns = 0;
+  alleLeerlingen.forEach(function(l){
+    var recent = allProgress.filter(function(p){return p.Leerling===l.naam;}).slice(0,5);
+    if(recent.filter(function(p){return p.MoodScore===0;}).length>=3) warns++;
+  });
+  document.getElementById('stat-warn').textContent = warns;
+}
+
+function selecteerLeerling(naam){
+  activeLeerling = naam;
+  document.getElementById('topbar-naam').textContent = naam;
+
+  var progressRecs = allProgress.filter(function(p){return p.Leerling===naam;}).sort(function(a,b){return a.Datum<b.Datum?-1:1;});
+  var aanwRecs = alleAanw.filter(function(a){return a.Leerling===naam;}).sort(function(a,b){return b.Datum<a.Datum?1:-1;});
+
+  // Periode bepalen
+  var periodeLabels = {P1:'Periode 1',P2:'Periode 2',P3:'Periode 3',P4:'Periode 4',P5:'Periode 5'};
+  var eersteCheckin = progressRecs.length>0 ? progressRecs[0].Datum : null;
+  var periode = 'P1';
+  if(eersteCheckin){
+    var weken = Math.floor((new Date()-new Date(eersteCheckin))/(7*24*60*60*1000));
+    if(weken<6) periode='P1'; else if(weken<15) periode='P2'; else if(weken<23) periode='P3'; else if(weken<31) periode='P4'; else periode='P5';
+  }
+  document.getElementById('topbar-periode').textContent = (periodeLabels[periode]||'P1') + ' — ' + progressRecs.length + ' check-ins';
+
+  // Stats
+  var laatste = progressRecs[progressRecs.length-1]||{};
+  var totaal = laatste.TotaalPunten||0;
+  var streak = laatste.Streak||0;
+  var aantalOpTijd = progressRecs.filter(function(p){return p.OpTijd==='Ja';}).length;
+  var pct = progressRecs.length>0 ? Math.round(aantalOpTijd/progressRecs.length*100) : 0;
+
+  var lvls = [{n:'Starter',i:'🌱',m:0},{n:'On the job',i:'⭐',m:10},{n:'Getting there',i:'💪',m:30},{n:'Pro worker',i:'🔥',m:60},{n:'Work hero',i:'🏆',m:100},{n:'Legend',i:'👑',m:140}];
+  var lvl = lvls[0]; lvls.forEach(function(l){if(totaal>=l.m)lvl=l;});
+  var kleur = avatarKleur(naam);
+
+  // Detail kaart
+  document.getElementById('kaart-detail').innerHTML =
+    '<div class="detail-header">'+
+      '<div class="detail-avatar" style="background:'+kleur+'">'+initialen(naam)+'</div>'+
+      '<div>'+
+        '<div class="detail-naam">'+naam+'</div>'+
+        '<div class="detail-meta">'+lvl.i+' '+lvl.n+' · '+periodeLabels[periode]+'</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="detail-stats">'+
+      '<div class="detail-stat"><div class="detail-stat-val">'+totaal+'</div><div class="detail-stat-lbl">Punten</div></div>'+
+      '<div class="detail-stat"><div class="detail-stat-val" style="color:'+(pct>=80?'var(--groen)':pct>=60?'var(--oranje)':'var(--rood)')+'">'+pct+'%</div><div class="detail-stat-lbl">Op tijd</div></div>'+
+      '<div class="detail-stat"><div class="detail-stat-val">🔥'+streak+'</div><div class="detail-stat-lbl">Streak</div></div>'+
+    '</div>';
+
+  // Aanwezigheidsoverzicht
+  if(aanwRecs.length===0){
+    document.getElementById('aanw-content').innerHTML='<div class="empty"><div class="empty-sub">Nog geen aanwezigheidsregistraties</div></div>';
+  } else {
+    document.getElementById('aanw-content').innerHTML =
+      '<table class="aanw-table"><thead><tr><th>Datum</th><th>Status</th><th>Geregistreerd door</th></tr></thead><tbody>'+
+      aanwRecs.slice(0,15).map(function(a){
+        var s = (a.Status||'').toLowerCase();
+        var cls = s==='aanwezig'?'status-aanwezig':s==='te laat'||s==='telaat'?'status-telaat':'status-afwezig';
+        var ico = s==='aanwezig'?'✅':s==='te laat'||s==='telaat'?'🕐':'❌';
+        return '<tr><td><span style="font-family:var(--mono);font-size:11px;">'+a.Datum+'</span></td>'+
+          '<td><span class="status-pill '+cls+'">'+ico+' '+(a.Status||'—')+'</span></td>'+
+          '<td style="color:var(--muted);font-size:11px;">'+(a.Werkgever||'—')+'</td></tr>';
+      }).join('')+
+      '</tbody></table>';
+  }
+
+  // Grafiek
+  tekenGrafiek(progressRecs);
+
+  // Mood verdeling
+  var moodTelling = [0,0,0,0];
+  progressRecs.forEach(function(p){ if(typeof p.MoodScore==='number'&&p.MoodScore>=0) moodTelling[p.MoodScore]++; });
+  var totMood = moodTelling.reduce(function(a,b){return a+b;},0);
+  if(totMood===0){
+    document.getElementById('mood-content').innerHTML='<div class="empty"><div class="empty-sub">Nog geen mood data</div></div>';
+  } else {
+    document.getElementById('mood-content').innerHTML = [3,2,1,0].map(function(i){
+      var pct = totMood>0?Math.round(moodTelling[i]/totMood*100):0;
+      return '<div class="mood-row">'+
+        '<div class="mood-lbl">'+moodEmoji[i]+' '+['Slecht','Matig','Goed','Top'][i]+'</div>'+
+        '<div class="mood-bar-wrap"><div class="mood-bar-fill" style="width:'+pct+'%;background:'+moodKleur[i]+';"></div></div>'+
+        '<div class="mood-count">'+moodTelling[i]+'</div>'+
+      '</div>';
+    }).join('');
+  }
+
+  // Heatmap laatste 5 weken
+  tekenHeatmap(progressRecs);
+
+  // Sidebar update
+  renderSidebar(document.getElementById('zoek-input').value);
+}
+
+function tekenGrafiek(progressRecs){
+  var canvas = document.getElementById('grafiek');
+  var W = canvas.parentElement.offsetWidth - 40;
+  canvas.width = W; canvas.height = 160;
+  var ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,W,160);
+
+  if(progressRecs.length<2){
+    ctx.fillStyle='#aaa'; ctx.font='12px DM Sans'; ctx.textAlign='center';
+    ctx.fillText('Nog onvoldoende data', W/2, 80);
+    return;
+  }
+
+  var punten = progressRecs.map(function(p){return p.TotaalPunten||0;});
+  var labels = progressRecs.map(function(p){return (p.Datum||'').slice(5);});
+  var maxP = Math.max.apply(null,punten)||10;
+  var pad = {t:10,r:8,b:28,l:40};
+  var gW=W-pad.l-pad.r, gH=160-pad.t-pad.b;
+  var xOf=function(i){return pad.l+(i/(punten.length-1))*gW;};
+  var yOf=function(v){return pad.t+gH-(v/maxP)*gH;};
+
+  // Grid
+  ctx.strokeStyle='#e2eaf0'; ctx.lineWidth=1;
+  [0,0.5,1].forEach(function(f){
+    var y=pad.t+gH*(1-f);
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+gW,y); ctx.stroke();
+    ctx.fillStyle='#aaa'; ctx.font='9px DM Mono'; ctx.textAlign='right';
+    ctx.fillText(Math.round(maxP*f),pad.l-5,y+3);
+  });
+
+  // X labels elke 5
+  ctx.fillStyle='#aaa'; ctx.font='9px DM Mono'; ctx.textAlign='center';
+  labels.forEach(function(l,i){ if(i%5===0||i===labels.length-1) ctx.fillText(l,xOf(i),160-pad.b+12); });
+
+  // Gradient fill
+  var grad=ctx.createLinearGradient(0,pad.t,0,pad.t+gH);
+  grad.addColorStop(0,'rgba(37,150,190,0.2)'); grad.addColorStop(1,'rgba(37,150,190,0.01)');
+  ctx.beginPath(); ctx.moveTo(xOf(0),yOf(punten[0]));
+  punten.forEach(function(v,i){if(i>0)ctx.lineTo(xOf(i),yOf(v));});
+  ctx.lineTo(xOf(punten.length-1),pad.t+gH); ctx.lineTo(xOf(0),pad.t+gH);
+  ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
+
+  // Lijn
+  ctx.beginPath(); ctx.strokeStyle='#2596be'; ctx.lineWidth=2.5; ctx.lineJoin='round';
+  punten.forEach(function(v,i){i===0?ctx.moveTo(xOf(i),yOf(v)):ctx.lineTo(xOf(i),yOf(v));});
+  ctx.stroke();
+
+  // Punten
+  punten.forEach(function(v,i){
+    ctx.beginPath(); ctx.arc(xOf(i),yOf(v),3.5,0,Math.PI*2);
+    ctx.fillStyle='#2596be'; ctx.fill();
+    ctx.strokeStyle='white'; ctx.lineWidth=1.5; ctx.stroke();
+  });
+}
+
+function tekenHeatmap(progressRecs){
+  var container = document.getElementById('heatmap-content');
+  var nu = new Date();
+  var dagenMap = {};
+  for(var i=34;i>=0;i--){
+    var d=new Date(nu); d.setDate(nu.getDate()-i);
+    var k=d.toISOString().slice(0,10);
+    dagenMap[k]=null;
+  }
+  progressRecs.forEach(function(p){ if(dagenMap.hasOwnProperty(p.Datum)) dagenMap[p.Datum]=p; });
+  var dagen=Object.keys(dagenMap).sort();
+
+  // Lege cellen voor uitlijning
+  var eerste=new Date(dagen[0]);
+  var offset=(eerste.getDay()+6)%7;
+  var html='';
+  for(var j=0;j<offset;j++) html+='<div></div>';
+  dagen.forEach(function(dag){
+    var rec=dagenMap[dag];
+    var mood=rec&&typeof rec.MoodScore==='number'?rec.MoodScore:-1;
+    var bg=mood>=0?moodKleurL[mood]:'#f0f4f8';
+    var border=mood>=0?moodKleur[mood]:'#e2eaf0';
+    var emoji=mood>=0?moodEmoji[mood]:'';
+    var dagNr=dag.slice(8);
+    html+='<div class="heatmap-dag" style="background:'+bg+';border:1px solid '+border+';" title="'+dag+(rec?' · '+['Slecht','Matig','Goed','Top'][mood]+(rec.OpTijd==='Ja'?' · ✅ op tijd':' · ❌'):'  · geen check-in')+'">'+
+      '<div style="font-size:8px;color:#666;position:absolute;top:2px;left:3px;">'+dagNr+'</div>'+
+      '<div style="font-size:11px;margin-top:4px;">'+emoji+'</div>'+
+    '</div>';
+  });
+  container.innerHTML=html;
+}
+
+function exporteerCSV(){
+  if(!activeLeerling){ alert('Kies eerst een leerling'); return; }
+  var recs = alleAanw.filter(function(a){return a.Leerling===activeLeerling;});
+  var csv = 'Datum,Leerling,Status,Werkgever\n';
+  recs.forEach(function(r){
+    csv += [r.Datum||'',r.Leerling||'',r.Status||'',r.Werkgever||''].map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(',')+'\n';
+  });
+  var blob = new Blob([csv],{type:'text/csv'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = activeLeerling.replace(/\s+/g,'_')+'_aanwezigheden.csv';
+  a.click();
+}
+
+// ── IMPORT ──
+var importNamen = [];
+
+function toggleImport(){
+  var modal = document.getElementById('import-modal');
+  var open = modal.style.display === 'flex';
+  modal.style.display = open ? 'none' : 'flex';
+  if(!open){
+    // Reset
+    importNamen = [];
+    document.getElementById('import-preview').style.display = 'none';
+    document.getElementById('import-bevestig-btn').style.display = 'none';
+    document.getElementById('import-feedback').textContent = '';
+    document.getElementById('import-file').value = '';
+    var dz = document.getElementById('import-dropzone');
+    dz.style.borderColor = 'var(--border)';
+    dz.style.background = 'transparent';
+  }
+}
+
+function handleDrop(event){
+  event.preventDefault();
+  var dz = document.getElementById('import-dropzone');
+  dz.style.borderColor = 'var(--border)';
+  dz.style.background = 'transparent';
+  var file = event.dataTransfer.files[0];
+  if(file) verwerkBestand(file);
+}
+
+function verwerkBestand(file){
+  if(!file) return;
+  var fb = document.getElementById('import-feedback');
+  fb.textContent = ''; fb.style.color = 'var(--muted)';
+  var ext = file.name.split('.').pop().toLowerCase();
+
+  if(ext === 'csv'){
+    var reader = new FileReader();
+    reader.onload = function(e){
+      verwerkTekst(e.target.result, ',');
+    };
+    reader.readAsText(file, 'UTF-8');
+  } else if(ext === 'xlsx' || ext === 'xls'){
+    // Gebruik SheetJS als beschikbaar, anders melding
+    if(typeof XLSX === 'undefined'){
+      fb.style.color = 'var(--rood)';
+      fb.textContent = '⚠️ Excel import niet beschikbaar. Exporteer je bestand als CSV uit Informat.';
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var wb = XLSX.read(e.target.result, {type:'binary'});
+      var ws = wb.Sheets[wb.SheetNames[0]];
+      var data = XLSX.utils.sheet_to_csv(ws);
+      verwerkTekst(data, ',');
+    };
+    reader.readAsBinaryString(file);
+  } else {
+    fb.style.color = 'var(--rood)';
+    fb.textContent = '⚠️ Enkel CSV, XLSX of XLS bestanden zijn toegestaan.';
+  }
+}
+
+function verwerkTekst(tekst, sep){
+  var fb = document.getElementById('import-feedback');
+  var regels = tekst.split(/\r?\n/).map(function(r){ return r.trim(); }).filter(function(r){ return r; });
+  if(regels.length === 0){ fb.style.color='var(--rood)'; fb.textContent='⚠️ Leeg bestand.'; return; }
+
+  // Detecteer of eerste rij een header is (bevat 'naam' of 'leerling')
+  var startRij = 0;
+  var eersteRij = regels[0].toLowerCase();
+  if(eersteRij.includes('naam') || eersteRij.includes('leerling') || eersteRij.includes('name')){
+    startRij = 1;
+  }
+
+  // Haal eerste kolom op als naam — ondersteunt komma en puntkomma als separator
+  var namen = [];
+  for(var i = startRij; i < regels.length; i++){
+    var kolommen = regels[i].split(/[;,\t]/);
+    var naam = kolommen[0].replace(/^["']|["']$/g,'').trim();
+    if(naam && naam.length > 1) namen.push(naam);
+  }
+
+  if(namen.length === 0){ fb.style.color='var(--rood)'; fb.textContent='⚠️ Geen namen gevonden. Zorg dat de eerste kolom de naam bevat.'; return; }
+
+  // Filter al bestaande namen
+  var bestaande = alleLeerlingen.map(function(l){ return l.naam.toLowerCase(); });
+  var nieuw = namen.filter(function(n){ return !bestaande.includes(n.toLowerCase()); });
+  var al = namen.filter(function(n){ return bestaande.includes(n.toLowerCase()); });
+
+  importNamen = nieuw;
+
+  // Toon preview
+  var preview = document.getElementById('import-preview');
+  var inhoud = document.getElementById('import-preview-inhoud');
+  var tel = document.getElementById('import-tel');
+  preview.style.display = 'block';
+
+  var html = nieuw.map(function(n){
+    return '<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--groen);font-weight:700;">+</span> '+n+'</div>';
+  }).join('');
+  if(al.length > 0){
+    html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:var(--muted);">Al in de lijst (worden overgeslagen):</div>';
+    html += al.map(function(n){ return '<div style="color:var(--muted);">↩ '+n+'</div>'; }).join('');
+  }
+  inhoud.innerHTML = html || '<div style="color:var(--muted);">Alle namen staan al in de lijst.</div>';
+  tel.textContent = nieuw.length + ' nieuwe leerlingen te importeren' + (al.length > 0 ? ', ' + al.length + ' al aanwezig' : '') + '.';
+
+  var btn = document.getElementById('import-bevestig-btn');
+  btn.style.display = nieuw.length > 0 ? 'block' : 'none';
+}
+
+async function bevestigImport(){
+  if(importNamen.length === 0) return;
+  var btn = document.getElementById('import-bevestig-btn');
+  var fb = document.getElementById('import-feedback');
+  btn.disabled = true; btn.textContent = 'Bezig...';
+  fb.style.color = 'var(--muted)'; fb.textContent = importNamen.length + ' leerlingen toevoegen aan Airtable...';
+
+  try {
+    // Batch per 10 (Airtable limiet)
+    for(var i = 0; i < importNamen.length; i += 10){
+      var batch = importNamen.slice(i, i+10);
+      await fetch(AT_LEERLINGEN_URL, {
+        method:'POST', headers: HEADERS,
+        body: JSON.stringify({records: batch.map(function(n){ return {fields:{Naam:n}}; })})
+      });
+    }
+    fb.style.color = 'var(--groen)';
+    fb.textContent = '✅ ' + importNamen.length + ' leerlingen succesvol geïmporteerd!';
+    btn.style.display = 'none';
+    importNamen = [];
+    // Ververs de lijst
+    setTimeout(function(){ laadAlles(); toggleImport(); }, 1500);
+  } catch(e){
+    fb.style.color = 'var(--rood)';
+    fb.textContent = '❌ Import mislukt. Controleer je verbinding.';
+    btn.disabled = false; btn.textContent = '✅ Importeer leerlingen';
+  }
+}
+
+// Start
+laadAlles();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+</body>
+</html>
