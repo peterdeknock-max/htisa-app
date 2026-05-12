@@ -734,10 +734,22 @@
     <div id="leerling-naam-screen" style="display:none;">
       <div class="panel open">
         <div style="font-size:15px;font-weight:800;color:var(--htisa-text);margin-bottom:10px;">👨‍🎓 Wie ben jij?</div>
-        <div style="font-size:13px;color:var(--htisa-muted);margin-bottom:10px;">Kies je naam uit de lijst om jouw aanwezigheden te zien.</div>
-        <select class="form-input" id="leerling-naam-input" style="margin-bottom:8px;">
-          <option value="">— Kies jouw naam —</option>
+        <div style="font-size:13px;color:var(--htisa-muted);margin-bottom:14px;">Kies eerst je schooljaar, daarna je naam.</div>
+
+        <!-- Stap 1: schooljaar -->
+        <div style="font-size:11px;font-weight:700;color:var(--htisa-muted);margin-bottom:6px;">📅 Schooljaar</div>
+        <select class="form-input" id="leerling-schooljaar-input" style="margin-bottom:12px;" onchange="laadNamenVoorJaar(this.value)">
+          <option value="">— Kies je schooljaar —</option>
         </select>
+
+        <!-- Stap 2: naam (verborgen tot schooljaar gekozen) -->
+        <div id="leerling-naam-wrap" style="display:none;">
+          <div style="font-size:11px;font-weight:700;color:var(--htisa-muted);margin-bottom:6px;">👤 Jouw naam</div>
+          <select class="form-input" id="leerling-naam-input" style="margin-bottom:8px;">
+            <option value="">— Kies jouw naam —</option>
+          </select>
+        </div>
+
         <div id="leerling-naam-loading" style="font-size:11px;color:var(--htisa-muted);margin-bottom:8px;"></div>
         <button class="btn-save" onclick="saveLeerlingNaam()" style="width:100%;margin-bottom:8px;">Bevestigen</button>
         <button class="btn-cancel" onclick="logoutRole()" style="width:100%;">← Terug</button>
@@ -2666,32 +2678,73 @@ var centraleLeerlingen = [];
 
 async function laadCentraleLeerlingen(){
   try {
-    var resp = await fetch(AT_LEERLINGEN_URL+'?sort[0][field]=Naam&sort[0][direction]=asc&fields[]=Naam', {headers: AT_HEADERS});
+    var resp = await fetch(AT_LEERLINGEN_URL+'?sort[0][field]=Naam&sort[0][direction]=asc', {headers: AT_HEADERS, cache:'no-store'});
     if(!resp.ok) return [];
     var data = await resp.json();
-    centraleLeerlingen = (data.records||[]).map(function(r){ return {id: r.id, naam: r.fields.Naam || ''}; }).filter(function(r){ return r.naam; });
+    centraleLeerlingen = (data.records||[]).map(function(r){
+      return {id: r.id, naam: r.fields.Naam||'', schooljaar: r.fields.Schooljaar||r.fields.schooljaar||''};
+    }).filter(function(r){ return r.naam; });
     return centraleLeerlingen;
   } catch(e){ return []; }
 }
 
 function vulLeerlingDropdown(selectId, loadingId){
-  var sel = document.getElementById(selectId);
+  // Vult de schooljaar dropdown (leerling kiest eerst schooljaar)
+  var sjSel = document.getElementById('leerling-schooljaar-input');
   var ldr = loadingId ? document.getElementById(loadingId) : null;
-  if(!sel) return;
-  if(ldr) ldr.textContent = 'Leerlingen ophalen...';
-  sel.innerHTML = '<option value="">— Kies een leerling —</option>';
+  if(ldr) ldr.textContent = 'Schooljaren ophalen...';
+
   laadCentraleLeerlingen().then(function(lijst){
     if(ldr) ldr.textContent = lijst.length === 0 ? '⚠️ Nog geen leerlingen toegevoegd door begeleider.' : '';
-    lijst.forEach(function(l){
-      var opt = document.createElement('option');
-      opt.value = l.naam; opt.textContent = l.naam;
-      sel.appendChild(opt);
-    });
-    var last = localStorage.getItem('htisa_wg_last_leerling');
-    if(last) sel.value = last;
+
+    if(sjSel){
+      // Haal unieke schooljaren op
+      var jaren = [...new Set(lijst.map(function(l){ return l.schooljaar; }).filter(Boolean))].sort(function(a,b){ return b.localeCompare(a); });
+      sjSel.innerHTML = '<option value="">— Kies je schooljaar —</option>';
+      jaren.forEach(function(j){
+        var opt = document.createElement('option');
+        opt.value = j; opt.textContent = j;
+        sjSel.appendChild(opt);
+      });
+      // Als er maar 1 schooljaar is, selecteer automatisch
+      if(jaren.length === 1){
+        sjSel.value = jaren[0];
+        laadNamenVoorJaar(jaren[0]);
+      }
+      // Als geen schooljaren: toon gewoon alle namen
+      if(jaren.length === 0){
+        document.getElementById('leerling-naam-wrap').style.display = 'block';
+        var sel = document.getElementById(selectId);
+        sel.innerHTML = '<option value="">— Kies jouw naam —</option>';
+        lijst.forEach(function(l){
+          var opt = document.createElement('option');
+          opt.value = l.naam; opt.textContent = l.naam;
+          sel.appendChild(opt);
+        });
+      }
+    }
   }).catch(function(){
     if(ldr) ldr.textContent = '⚠️ Kon leerlingen niet laden.';
   });
+}
+
+function laadNamenVoorJaar(jaar){
+  var naamWrap = document.getElementById('leerling-naam-wrap');
+  var sel = document.getElementById('leerling-naam-input');
+  var ldr = document.getElementById('leerling-naam-loading');
+  if(!jaar){ naamWrap.style.display = 'none'; return; }
+
+  naamWrap.style.display = 'block';
+  sel.innerHTML = '<option value="">— Kies jouw naam —</option>';
+  var gefilterd = centraleLeerlingen.filter(function(l){
+    return !jaar || l.schooljaar === jaar;
+  });
+  gefilterd.forEach(function(l){
+    var opt = document.createElement('option');
+    opt.value = l.naam; opt.textContent = l.naam;
+    sel.appendChild(opt);
+  });
+  if(ldr) ldr.textContent = gefilterd.length === 0 ? '⚠️ Geen leerlingen voor dit schooljaar.' : '';
 }
 
 var currentRole=null,selectedStatusWg='',allRecords=[];
@@ -2801,10 +2854,20 @@ function logoutRole(){
 
 // LEERLING
 function saveLeerlingNaam(){
+  var sjSel = document.getElementById('leerling-schooljaar-input');
   var sel = document.getElementById('leerling-naam-input');
-  var naam = sel.tagName === 'SELECT' ? sel.value : sel.value.trim();
-  if(!naam){ return; }
+  var naam = sel ? sel.value.trim() : '';
+  var ldr = document.getElementById('leerling-naam-loading');
+  if(sjSel && sjSel.value === ''){
+    if(ldr){ ldr.style.color='var(--s-ko)'; ldr.textContent='⚠️ Kies eerst je schooljaar'; }
+    return;
+  }
+  if(!naam){
+    if(ldr){ ldr.style.color='var(--s-ko)'; ldr.textContent='⚠️ Kies je naam'; }
+    return;
+  }
   localStorage.setItem('htisa_leerling_naam', naam);
+  if(sjSel && sjSel.value) localStorage.setItem('htisa_leerling_schooljaar', sjSel.value);
   document.getElementById('leerling-naam-screen').style.display='none';
   showLeerlingView(naam);
 }
