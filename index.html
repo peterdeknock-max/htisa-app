@@ -2920,7 +2920,23 @@ function renderLeerlingCal(records){
 
 // WERKGEVER
 function renderWgLeerlingen() {
-  vulLeerlingDropdown('wg-leerling-select', 'wg-leerling-loading');
+  var sel = document.getElementById('wg-leerling-select');
+  var ldr = document.getElementById('wg-leerling-loading');
+  if(!sel) return;
+  if(ldr) ldr.textContent = 'Leerlingen ophalen...';
+  laadCentraleLeerlingen().then(function(lijst){
+    var vorige = localStorage.getItem('htisa_wg_last_leerling') || '';
+    sel.innerHTML = '<option value="">— Kies een leerling —</option>';
+    lijst.forEach(function(l){
+      var opt = document.createElement('option');
+      opt.value = l.naam; opt.textContent = l.naam;
+      if(l.naam === vorige) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    if(ldr) ldr.textContent = lijst.length === 0 ? '⚠️ Nog geen leerlingen toegevoegd.' : '';
+  }).catch(function(){
+    if(ldr) ldr.textContent = '⚠️ Kon leerlingen niet laden.';
+  });
 }
 
 function wgSelectLeerling(naam) {
